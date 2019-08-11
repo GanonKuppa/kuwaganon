@@ -4,6 +4,7 @@ HardwareDebug
 .Debuglinker
 .info
 .project
+.HardwareDebuglinker
 custom.bat
 makefile.init
 umouse Debug.launch
