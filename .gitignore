@@ -1,0 +1,10 @@
+HardwareDebug
+.settings
+.cproject
+.Debuglinker
+.info
+.project
+custom.bat
+makefile.init
+umouse Debug.launch
+umouse HardwareDebug.launch
