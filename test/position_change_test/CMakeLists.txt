@@ -7,7 +7,7 @@ set(CMAKE_CXX_COMPILER "C:/Program Files/mingw-w64/x86_64-8.1.0-posix-sjlj-rt_v6
 
 set(CMAKE_CXX_STANDARD, 11)
 
-include_directories(C:/dropbox/Dropbox/My_data/Umouse/program/trape_test_python/)
-add_executable(main main.cpp udp.cpp curveFactory.cpp)
+include_directories(./)
+add_executable(main main.cpp udp.cpp)
 target_link_libraries(main wsock32 ws2_32)
  

@@ -135,4 +135,21 @@ io.sockets.on("connection", function(socket) {
       mqtt_client.publish('cmd', new Buffer(payload, 'utf8'));
     });
 
+
 });
+
+/*-----------------------------------------------------------------`*/
+var dgram = require('dgram');
+var udp_server = dgram.createSocket('udp4');
+
+udp_server.on('listening', function () {
+    var address = udp_server.address();
+    console.log('UDP Server listening on ' + address.address + ":" + address.port);
+});
+
+udp_server.on('message', function (message, remote) {
+    //console.log(remote.address + ':' + remote.port +' - ' + message);
+    io.sockets.emit("udp_message",message.toString() );    
+});
+
+udp_server.bind(2020, 'localhost');

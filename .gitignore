@@ -11,4 +11,4 @@ makefile.init
 umouse Debug.launch
 umouse HardwareDebug.launch
 tool/UWebApp/umouse_webapp/node_modules
-tool/udp2socket_server/node_modules
+*build/

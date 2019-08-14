@@ -45,6 +45,7 @@
     let s = io.connect('http://' + server_ip + ':' + server_port, { transports: ['websocket'] });
 
     s.on("mqtt_message", function (data) {
+      console.log(data);
       if (data.topic != "mouse") return;
       payload = data.payload;
       let data_view = new DataView(payload);
@@ -187,8 +188,8 @@
     initRender();
     initLight(scene);
     initCamera();
-    var fpsStats = initFpsStats();
-    var memoryStats = initMemoryStats();
+    //var fpsStats = initFpsStats();
+    //var memoryStats = initMemoryStats();
     var clock = new THREE.Clock();
 
     //3Dオブジェクトたち
@@ -221,8 +222,8 @@
       requestAnimationFrame(render);
       controls.update();
       renderer.render(scene, camera);
-      fpsStats.update();
-      memoryStats.update();
+      //fpsStats.update();
+      //memoryStats.update();
       //現在のカメラの位置、角度、ターゲットをlocalStorageに保存
       //console.log(crn)
       if (cameraReady == true) {
