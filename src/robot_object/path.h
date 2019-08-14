@@ -87,6 +87,7 @@ public:
 
     }
 
+
     void print() {
         printfAsync("turn_type %d, block_num %d, turn_dir %d\n", turn_type, block_num, turn_dir);
     }
