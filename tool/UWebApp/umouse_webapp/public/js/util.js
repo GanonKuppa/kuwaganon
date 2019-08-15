@@ -108,7 +108,7 @@ function byte4to32bit(byte0,byte1,byte2,byte3){
 }
  
  
-//16進文字列をbyte毎の数値配列に変換　この関数いらない
+//16進文字列をbyte毎の数値配列に変換
 function hexstr2intList(hexstr,num_) {
   var intList = [];
   for (var i = 0; i < num_; i = i + 2) {

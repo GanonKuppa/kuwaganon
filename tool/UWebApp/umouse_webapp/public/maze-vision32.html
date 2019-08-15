@@ -45,7 +45,7 @@
     let s = io.connect('http://' + server_ip + ':' + server_port, { transports: ['websocket'] });
 
     s.on("mqtt_message", function (data) {
-      console.log(data);
+      //console.log(data);
       if (data.topic != "mouse") return;
       payload = data.payload;
       let data_view = new DataView(payload);
@@ -58,18 +58,47 @@
     });
 
     s.on("udp_message", function(data) {
-      console.log(data);
+      //console.log(data);
       var parse_data = JSON.parse(data);
       if(parse_data["type"] === "robot_pos"){
-        console.log(parse_data["type"],parse_data["x"],parse_data["y"], parse_data["ang"]);
+        //console.log(parse_data["type"],parse_data["x"],parse_data["y"], parse_data["ang"]);
         setRobotPos(parse_data["x"], parse_data["y"], parse_data["ang"] /180.0 * 3.14159265,0,0);
 
       }
       else if(parse_data["type"] === "target_pos"){
-        console.log(parse_data["type"],parse_data["x"],parse_data["y"], parse_data["ang"]);
+        //console.log(parse_data["type"],parse_data["x"],parse_data["y"], parse_data["ang"]);
         setTargetPos(parse_data["x"], parse_data["y"], parse_data["ang"] /180.0 * 3.14159265,0,0);
       }
       else if(parse_data["type"] === "maze_wall"){
+        walls_vertical_list = hexstr2intList(parse_data["walls_vertical"],124*2);
+        walls_horizontal_list = hexstr2intList(parse_data["walls_horizontal"],124*2);
+
+        //console.log(walls_vertical_list);
+        //console.log(walls_horizontal_list);
+
+        for (let i = 0; i < 31; i++) {
+          byte0 = walls_vertical_list[i * 4 + 0];
+          byte1 = walls_vertical_list[i * 4 + 1];
+          byte2 = walls_vertical_list[i * 4 + 2];
+          byte3 = walls_vertical_list[i * 4 + 3];
+          bitList = byte4to32bit(byte0, byte1, byte2, byte3);
+          for (let j = 0; j < 32; j++) {
+            walls_vertical[i+1][j].visible = (bitList[j] == 1 ? true : false);
+          }
+        }
+
+        
+        for (let i = 0; i < 31; i++) {
+          byte0 = walls_horizontal_list[i * 4 + 0];
+          byte1 = walls_horizontal_list[i * 4 + 1];
+          byte2 = walls_horizontal_list[i * 4 + 2];
+          byte3 = walls_horizontal_list[i * 4 + 3];
+          bitList = byte4to32bit(byte0, byte1, byte2, byte3);
+          for (let j = 0; j < 32; j++) {
+            walls_horizontal[i+1][j].visible = (bitList[j] == 1 ? true : false);
+          }
+        }
+
 
       }
     });
