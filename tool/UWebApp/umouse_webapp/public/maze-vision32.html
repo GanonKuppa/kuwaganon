@@ -61,13 +61,13 @@
       //console.log(data);
       var parse_data = JSON.parse(data);
       if(parse_data["type"] === "robot_pos"){
-        //console.log(parse_data["type"],parse_data["x"],parse_data["y"], parse_data["ang"]);
-        setRobotPos(parse_data["x"], parse_data["y"], parse_data["ang"] /180.0 * 3.14159265,0,0);
+        console.log(parse_data["type"],parse_data["x"],parse_data["y"], parse_data["ang"]);
+        setRobotPos(parse_data["x"], parse_data["y"], parse_data["ang"], 0.1, 0);
 
       }
       else if(parse_data["type"] === "target_pos"){
         //console.log(parse_data["type"],parse_data["x"],parse_data["y"], parse_data["ang"]);
-        setTargetPos(parse_data["x"], parse_data["y"], parse_data["ang"] /180.0 * 3.14159265,0,0);
+        setTargetPos(parse_data["x"], parse_data["y"], parse_data["ang"], 0.1, 0);
       }
       else if(parse_data["type"] === "maze_wall"){
         walls_vertical_list = hexstr2intList(parse_data["walls_vertical"],124*2);

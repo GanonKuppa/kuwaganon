@@ -8,6 +8,6 @@ set(CMAKE_CXX_COMPILER "C:/Program Files/mingw-w64/x86_64-8.1.0-posix-sjlj-rt_v6
 set(CMAKE_CXX_STANDARD, 11)
 
 include_directories(./)
-add_executable(main main.cpp udp.cpp sendData2WebApp.cpp)
+add_executable(main main.cpp udp.cpp sendData2WebApp.cpp myUtil.cpp curveFactory.cpp)
 target_link_libraries(main wsock32 ws2_32)
  

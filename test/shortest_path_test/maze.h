@@ -1,12 +1,12 @@
 #pragma once
 
 #include "myUtil.h"
-#include "wallsensor.h"
+//#include "wallsensor.h"
 #include "stdint.h"
 #include <map> // pair
 #include <queue>
 #include "communication.h"
-#include "dataFlash.h"
+//#include "dataFlash.h"
 
 namespace umouse{
 
@@ -202,17 +202,18 @@ public:
        writeWall(x, y, wall);
     }
 
-
+/*
     void writeWall(uint16_t x, uint16_t y, direction_e dir, WallSensor& ws){
         bool l = ws.isLeft();
         bool a = ws.isAhead();
         bool r = ws.isRight();
         writeWall(x, y, dir, l, a, r);
     }
-
+*/
     // return 1:  探索済みの区画に来て、迷路情報と現在の壁情報が一致
     // return 0:  未探索の区画に現在の壁情報を書き込み
     // return -1: 探索済みの区画に来たが、現在の迷路情報と現在の壁情報が矛盾
+/*
     int8_t updateWall(uint16_t x, uint16_t y, direction_e dir, WallSensor& ws) {
         int16_t left_ = ws.left();
         int16_t ahead_l_ = ws.ahead_l();
@@ -283,7 +284,7 @@ public:
             return 0;
         } //end else
     }
-
+*/
     int8_t updateWall(uint16_t x, uint16_t y, direction_e dir, bool l, bool a, bool r) {
          if(x==0 && y==0){
              writeReached(x,y,true);
@@ -437,7 +438,7 @@ public:
 
     };
 
-
+/*
     void watchPotentialMap(void) {
         /////////////////////////////
         for(int j=15;j>=0;j--) {
@@ -483,7 +484,7 @@ public:
         }
         printfAsync("\n   0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f   \n");
     }
-
+*/
 
     int8_t calcRotTimes(direction_e dest_dir, direction_e my_dir){
         int8_t rot_times = dest_dir - my_dir;
@@ -507,7 +508,7 @@ public:
         p = reinterpret_cast<uint8_t *>(&reached[0]);
         for(uint16_t i=0; i<sizeof(reached); i++) byte_arr[i+sizeof(walls_vertical)+sizeof(walls_horizontal)] = p[i];
     }
-
+/*
     void writeMazeData2Flash(void){
         const uint16_t WRITE_TARGET_BLOCK = 512;
         const uint16_t START_INDEX = WRITE_TARGET_BLOCK * DATA_FLASH_BLOCK_BYTE_SIZE;
@@ -563,7 +564,7 @@ public:
         for(uint16_t i=0; i<sizeof(reached); i++) p[i] = byte_arr[i+sizeof(walls_vertical) +sizeof(walls_horizontal) ];
 
     }
-
+*/
 };
 
 }
