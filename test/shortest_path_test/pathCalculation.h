@@ -9,12 +9,14 @@
 //#include "timer.h"
 //#include "sound.h"
 //#include "curveFactory.h"
-//#include "trajectory.h"
+#include "trajectory.h"
 #include "parameterManager.h"
 #include "path.h"
 #include "turnParameter.h"
 #include <windows.h>
 #include "sendData2WebApp.h"
+#include "trajectoryCommander.h"
+#include "pathCompression.h"
 
 namespace umouse
 {
@@ -61,115 +63,154 @@ inline void makeMinStepPath(uint16_t goal_x, uint16_t goal_y, Maze &maze, std::v
             p_y--;
 
         Sleep(20);
-        printf("%d %d %d\n", p_x, p_y, dir);
-        sendRobotPos(p_x *0.09 +0.045, p_y*0.09 +0.045 , dir * 45.0);
+        printfAsync("%d %d %d\n", p_x, p_y, dir);
+        sendRobotPos(p_x *0.09 +0.045, p_y*0.09 +0.045 , dir * 45.0, 0.0);
 
     }
     path_vec.push_back(Path(turn_type_e::STRAIGHT, 1, turn_dir_e::NO_TURN));
 }
 
-inline void jointStraightPath(std::vector<Path> &path_vec)
-{
-    for (uint16_t i = 0; i < (uint16_t)path_vec.size(); i++)
-    {
-        printfAsync("-------%d turntype %d \n", i, path_vec[i].turn_type);
-        //waitmsec(3000);
-        if (i == (uint16_t)path_vec.size())
-        {
-            break;
-        }
-        else if (path_vec[i].turn_type == turn_type_e::STRAIGHT)
-        {
-            if (i + 1 == (uint16_t)path_vec.size())
-                break;
-            while (path_vec[i + 1].turn_type == turn_type_e::STRAIGHT)
-            {
-                path_vec.erase(path_vec.begin() + i + 1);
-                printfAsync("          -- i=%d -- size=%d --block_num=%d \n", i, path_vec.size(), path_vec[i].block_num);
-                path_vec[i].block_num++;
-                if (i + 1 == (uint16_t)path_vec.size())
-                    break;
-            }
-        }
-    }
+inline void translatePathSpin(std::vector<Path> &path_vec)
+{ 
+    compress_straight(path_vec);    
 }
 
-inline void translatePath2NoDiagPath(std::vector<Path> &path_vec)
-{
 
- 
-}
-/*
-inline void translatePath2DiagPath()
+inline void translatePath90Deg(std::vector<Path> &path_vec)
 {
-}
+    path_vec.insert(path_vec.begin(), Path(turn_type_e::STRAIGHT, 1, turn_dir_e::NO_TURN));
 
-inline void HF_playPath2(TurnParameter turn_p, std::vector<Path> &path_vec)
-{
+    path_vec.push_back(Path(turn_type_e::STRAIGHT, 1, turn_dir_e::NO_TURN)); // パスの最後に直線がないと変換がうまくできないのでダミーで入れた
+    path_vec.pop_back(); // ダミーを消去
+    
+    compress_straight(path_vec, 1);    
 }
 
-inline void HF_playPath(TurnParameter turn_p, std::vector<Path> &path_vec)
+
+inline void translatePathLong(std::vector<Path> &path_vec)
 {
-    UMouse &m = UMouse::getInstance();
+    path_vec.insert(path_vec.begin(), Path(turn_type_e::STRAIGHT, 1, turn_dir_e::NO_TURN));
+
+    path_vec.push_back(Path(turn_type_e::STRAIGHT, 1, turn_dir_e::NO_TURN)); // パスの最後に直線がないと変換がうまくできないのでダミーで入れた
+    compress_l_90(path_vec);
+    compress_180(path_vec);
+    path_vec.pop_back(); // ダミーを消去
+    
+    compress_straight(path_vec, 1);    
+}
+
+inline void translatePathDiagonal(std::vector<Path> &path_vec)
+{
+    path_vec.insert(path_vec.begin(), Path(turn_type_e::STRAIGHT, 1, turn_dir_e::NO_TURN));
+
+    path_vec.push_back(Path(turn_type_e::STRAIGHT, 1, turn_dir_e::NO_TURN)); // パスの最後に直線がないと変換がうまくできないのでダミーで入れた
+    compress_l_90(path_vec);
+    compress_180(path_vec);
+    compress_s2d_135(path_vec);
+    compress_d2s_135(path_vec);
+    compress_s2d_45(path_vec);
+    compress_d2s_45(path_vec);
+    compress_d_90(path_vec);
+
+    path_vec.pop_back(); // ダミーを消去
+    compress_straight(path_vec, 1);
+    compress_d_straight(path_vec);
+}
+
+
+inline void HF_playPath(TurnParameter turn_p, std::vector<Path> &path_vec, TrajectoryCommander &trajCommander)
+{
+    //UMouse &m = UMouse::getInstance();
     float v_pre = 0.0;
     float v_fol = 0.0;
     bool is_start_section = true;
 
     float x, v, a, v_max;
     turn_dir_e dir;
+    
     for (uint16_t i = 0; i < (uint16_t)path_vec.size(); i++)
     {
-        //v_pre = v_fol;
-        switch (path_vec[i].turn_type)
-        {
-        case turn_type_e::STRAIGHT:
-            x = float(path_vec[i].block_num) * 0.045;
-            if (is_start_section == true)
-                x += m.WALL2MOUSE_CENTER_DIST;
+        if(path_vec[i].turn_type == turn_type_e::STRAIGHT){
+            if (is_start_section == true && path_vec[i+1].turn_type == turn_type_e::STRAIGHT ){
+                x = 0.01765 + float(path_vec[i+1].block_num) * 0.045;  //m.WALL2MOUSE_CENTER_DIST;
+                path_vec.erase(path_vec.begin() + i + 1);
+            }
+            else if (is_start_section == true && path_vec[i+1].turn_type != turn_type_e::STRAIGHT){
+                x = 0.01765;
+            }else{
+                x = float(path_vec[i].block_num) * 0.045;
+            }                                    
             is_start_section = false;
 
             a = turn_p.a_straight;
             v_max = turn_p.getTurnV(turn_type_e::STRAIGHT);
 
-            if (i == 0)
-                v_pre = 0.0;
-            else
-                v_pre = turn_p.v_turn_90;
+            if (i == 0) v_pre = 0.0;
+            else v_pre = turn_p.getTurnV(path_vec[i-1].turn_type);
 
-            if (i + 1 == (uint16_t)path_vec.size())
-                v_fol = 0.1;
-            else
-                v_fol = turn_p.v_turn_90;
+            if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.1;
+            else v_fol = turn_p.getTurnV(path_vec[i+1].turn_type);
 
             {
-                auto traj_straight0 = StraightTrajectory::createAsWallCenter(x - 0.045, v_pre, v_max, v_fol, a, a);
-                auto traj_straight1 = StraightTrajectory::createAsWallCenter(0.045, v_fol, v_fol, v_fol, a, a);
-                m.trajCommander.push(std::move(traj_straight0));
-                m.trajCommander.push(std::move(traj_straight1));
+                if(path_vec[i].block_num != 1){
+                    auto traj_straight0 = StraightTrajectory::createAsWallCenter(x - 0.045, v_pre, v_max, v_fol, a, a);
+                    auto traj_straight1 = StraightTrajectory::createAsWallCenter(0.045, v_fol, v_fol, v_fol, a, a);
+                    trajCommander.push(std::move(traj_straight0));
+                    trajCommander.push(std::move(traj_straight1));
+                } else{
+                    auto traj_straight0 = StraightTrajectory::createAsWallCenter(x, v_pre, v_max, v_fol, a, a);
+                    trajCommander.push(std::move(traj_straight0));
+                }
             }
-            break;
-        case turn_type_e::TURN_90:
-            v = turn_p.v_turn_90;
+
+        }
+        else if(path_vec[i].turn_type == turn_type_e::D_STRAIGHT){
+            a = turn_p.a_d_straight;
+            v_max = turn_p.getTurnV(turn_type_e::D_STRAIGHT);
+            x = float(path_vec[i].block_num) * 0.045 * 1.4142356;
+            v_pre = turn_p.getTurnV(path_vec[i-1].turn_type);
+    
+            if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.1;
+            else v_fol = turn_p.getTurnV(path_vec[i+1].turn_type);
+
+            {
+                auto traj_straight0 = StraightTrajectory::create(x - 0.045, v_pre, v_max, v_fol, a, a);
+                auto traj_straight1 = StraightTrajectory::create(0.045, v_fol, v_fol, v_fol, a, a);
+                trajCommander.push(std::move(traj_straight0));
+                trajCommander.push(std::move(traj_straight1));
+            }
+
+        }
+        else{
+            v = turn_p.getTurnV(path_vec[i].turn_type);
             dir = path_vec[i].turn_dir;
-            {
-                auto traj0 = StraightTrajectory::create(CurveFactory::getPreDist(turn_type_e::TURN_90), v, v, v, a, a);
-                auto traj1 = CurveTrajectory::createAsNoStraght(v, turn_type_e::TURN_90, dir);
-                auto traj2 = StraightTrajectory::create(CurveFactory::getFolDist(turn_type_e::TURN_90), v, v, v, a, a);
+            {          
+                if (i == 0) v_pre = 0.0;
+                else v_pre = turn_p.getTurnV(path_vec[i-1].turn_type);
 
-                m.trajCommander.push(std::move(traj0));
-                m.trajCommander.push(std::move(traj1));
-                m.trajCommander.push(std::move(traj2));
+                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.1;
+                else v_fol = turn_p.getTurnV(path_vec[i+1].turn_type);
+                a = turn_p.a_straight;
+                float a_pre = MAX(a, ABS(v_pre * v_pre -  v * v) / (2.0f * CurveFactory::getPreDist(path_vec[i].turn_type)));
+                float a_fol = MAX(a, ABS(v_fol * v_fol -  v * v) / (2.0f * CurveFactory::getPreDist(path_vec[i].turn_type)));
+                auto traj0 = StraightTrajectory::create(CurveFactory::getPreDist(path_vec[i].turn_type), v_pre, v, v, a_pre, a_pre);
+                auto traj1 = CurveTrajectory::createAsNoStraght(v, path_vec[i].turn_type, dir);
+                auto traj2 = StraightTrajectory::create(CurveFactory::getFolDist(path_vec[i].turn_type), v, v, v_fol, a_fol, a_fol);
+
+                trajCommander.push(std::move(traj0));
+                trajCommander.push(std::move(traj1));
+                trajCommander.push(std::move(traj2));
             }
-            break;
+
         }
     }
     auto traj_stop = StopTrajectory::create(1.0);
-    m.trajCommander.push(std::move(traj_stop));
+    trajCommander.push(std::move(traj_stop));
 }
 
-inline void HF_playPathPivot(TurnParameter turn_p, std::vector<Path> &path_vec)
+inline void HF_playPathSpin(TurnParameter turn_p, std::vector<Path> &path_vec, TrajectoryCommander &trajCommander)
 {
-    UMouse &m = UMouse::getInstance();
+    //UMouse &m = UMouse::getInstance();
     float v_pre = 0.0;
     float v_fol = 0.0;
     bool is_start_section = true;
@@ -184,7 +225,7 @@ inline void HF_playPathPivot(TurnParameter turn_p, std::vector<Path> &path_vec)
         case turn_type_e::STRAIGHT:
             x = float(path_vec[i].block_num) * 0.045;
             if (is_start_section == true)
-                x += m.WALL2MOUSE_CENTER_DIST;
+                x += 0.01765;//m.WALL2MOUSE_CENTER_DIST;
 
             is_start_section = false;
             a = turn_p.a_straight;
@@ -197,7 +238,7 @@ inline void HF_playPathPivot(TurnParameter turn_p, std::vector<Path> &path_vec)
 
             {
                 auto traj_straight = StraightTrajectory::createAsWallCenter(x, v_pre, v_max, v_fol, a, a);
-                m.trajCommander.push(std::move(traj_straight));
+                trajCommander.push(std::move(traj_straight));
             }
             break;
         case turn_type_e::TURN_90:
@@ -209,24 +250,25 @@ inline void HF_playPathPivot(TurnParameter turn_p, std::vector<Path> &path_vec)
                 auto traj1 = StraightTrajectory::createAsWallCenter(0.015, 0.1, 0.1, 0.0, a, a);
 
                 auto traj2 = StopTrajectory::create(0.05);
-                auto traj3 = SpinTurnTrajectory::create(dir * 90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                auto traj3 = SpinTurnTrajectory::create(dir * 90.0f, 2000.0f, 10000.0f);//pm.spin_ang_v, pm.spin_ang_a);
                 auto traj4 = StopTrajectory::create(0.2);
                 auto traj5 = StraightTrajectory::createAsWallCenter(0.09 / 2.0, 0.0, v, v, a, a);
 
-                m.trajCommander.push(std::move(traj0));
-                m.trajCommander.push(std::move(traj1));
-                m.trajCommander.push(std::move(traj2));
-                m.trajCommander.push(std::move(traj3));
-                m.trajCommander.push(std::move(traj4));
-                m.trajCommander.push(std::move(traj5));
+                trajCommander.push(std::move(traj0));
+                trajCommander.push(std::move(traj1));
+                trajCommander.push(std::move(traj2));
+                trajCommander.push(std::move(traj3));
+                trajCommander.push(std::move(traj4));
+                trajCommander.push(std::move(traj5));
             }
             break;
         }
     }
     auto traj_stop = StopTrajectory::create(3.0);
-    m.trajCommander.push(std::move(traj_stop));
+    trajCommander.push(std::move(traj_stop));
 }
-*/
+
+
 inline void printPath(std::vector<Path> &path_vec)
 {
     printfAsync("==== path_vec ====\n");

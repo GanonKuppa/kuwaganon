@@ -1,3 +1,5 @@
+#pragma once
+
 #include "curveFactory.h"
 
 namespace umouse {
@@ -114,6 +116,8 @@ public:
                 return v_straight;
             case turn_type_e::TURN_90:
                 return v_turn_90;
+            case turn_type_e::TURN_L_90:
+                return v_turn_l_90;      
             case turn_type_e::TURN_180:
                 return v_turn_180;
             case turn_type_e::TURN_S2D_45:
@@ -124,6 +128,8 @@ public:
                 return v_turn_45;
             case turn_type_e::TURN_D2S_135:
                 return v_turn_135;
+            case turn_type_e::TURN_D_90:
+                return v_turn_d_90;    
             case turn_type_e::D_STRAIGHT:
                 return v_d_straight;
             default:

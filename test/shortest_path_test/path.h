@@ -1,4 +1,6 @@
+#pragma once
 #include "curveFactory.h"
+#include <string>
 
 namespace umouse {
 
@@ -87,9 +89,20 @@ public:
 
     }
 
-
     void print() {
-        printfAsync("turn_type %d, block_num %d, turn_dir %d\n", turn_type, block_num, turn_dir);
+        std::string str;
+        if(turn_type == turn_type_e::STRAIGHT) str = "STRAIGHT";
+        else if(turn_type == turn_type_e::TURN_90) str = "TURN_90";
+        else if(turn_type == turn_type_e::TURN_L_90) str = "TURN_L_90";
+        else if(turn_type == turn_type_e::TURN_180) str = "TURN_180";
+        else if(turn_type == turn_type_e::TURN_S2D_45) str = "TURN_S2D_45";
+        else if(turn_type == turn_type_e::TURN_S2D_135) str = "TURN_S2D_135";
+        else if(turn_type == turn_type_e::TURN_D_90) str = "TURN_D_90";
+        else if(turn_type == turn_type_e::TURN_D2S_45) str = "TURN_D2S_45";
+        else if(turn_type == turn_type_e::TURN_D2S_135) str = "TURN_D2S_135";
+        else if(turn_type == turn_type_e::D_STRAIGHT) str = "D_STRAIGHT";
+
+        printfAsync("turn_type %s, block_num %d, turn_dir %d\n", str.c_str(), block_num, turn_dir);
     }
 
 };

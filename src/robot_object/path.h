@@ -1,3 +1,5 @@
+#pragma once
+
 #include "curveFactory.h"
 
 namespace umouse {

@@ -62,13 +62,17 @@
       var parse_data = JSON.parse(data);
       if(parse_data["type"] === "robot_pos"){
         console.log(parse_data["type"],parse_data["x"],parse_data["y"], parse_data["ang"]);
-        setRobotPos(parse_data["x"], parse_data["y"], parse_data["ang"], 0.1, 0);
+        setRobotPos(parse_data["x"], parse_data["y"], parse_data["ang"], parse_data["v"]/10.0, 0);
 
       }
       else if(parse_data["type"] === "target_pos"){
         //console.log(parse_data["type"],parse_data["x"],parse_data["y"], parse_data["ang"]);
         setTargetPos(parse_data["x"], parse_data["y"], parse_data["ang"], 0.1, 0);
       }
+      else if(parse_data["type"] === "needle"){
+        setNeedle(parse_data["x"], parse_data["y"]);
+      }
+
       else if(parse_data["type"] === "maze_wall"){
         walls_vertical_list = hexstr2intList(parse_data["walls_vertical"],124*2);
         walls_horizontal_list = hexstr2intList(parse_data["walls_horizontal"],124*2);
@@ -587,6 +591,18 @@
       target_y_pre = y;
 
     }
+
+    function setNeedle(x, y) {
+      let material_col = { color: '#888800' };
+
+      let geometry = new THREE.BoxGeometry(0.0015, 0.18, 0.0015);
+      let material = new THREE.MeshBasicMaterial(material_col);  //素材を変えることができる; 
+
+      let box = new THREE.Mesh(geometry, material);
+      box.position.set(y, 0.0, x);
+      scene.add(box);
+    }
+
 
     function initWallSensor(scene_){
 

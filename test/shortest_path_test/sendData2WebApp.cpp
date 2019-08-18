@@ -18,7 +18,7 @@ void finalizeWebAppConnection(){
     finalizeUdpClient();
 }
 
-void sendRobotPos(float x, float y, float ang){
+void sendRobotPos(float x, float y, float ang, float v){
     picojson::object obj;
 
     // データの追加
@@ -26,6 +26,7 @@ void sendRobotPos(float x, float y, float ang){
     obj.emplace(std::make_pair("x", x));
     obj.emplace(std::make_pair("y", y));
     obj.emplace(std::make_pair("ang", ang));
+    obj.emplace(std::make_pair("v", v));
     // 文字列にするためにvalueを使用
     picojson::value val(obj);
     // return std::string
@@ -78,3 +79,20 @@ void sendMazeWall(uint32_t* walls_vertical, uint32_t* walls_horizontal){
     val.serialize();    
     sendUdpString( val.serialize());
 }
+
+
+void sendNeedle(float x, float y){
+    picojson::object obj;
+
+    // データの追加
+    obj.emplace(std::make_pair("type", "needle"));
+    obj.emplace(std::make_pair("x", x));
+    obj.emplace(std::make_pair("y", y));
+    // 文字列にするためにvalueを使用
+    picojson::value val(obj);
+    // return std::string
+    val.serialize();    
+    sendUdpString( val.serialize());
+
+
+};
