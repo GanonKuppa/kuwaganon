@@ -1,5 +1,6 @@
 #pragma once
 #include "curveFactory.h"
+#include "communication.h"
 #include <string>
 
 namespace umouse {

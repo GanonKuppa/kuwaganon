@@ -14,6 +14,7 @@ namespace umouse
 
 enum class EMotionType{
     DIAGONAL = 0,
+    DIAGONAL_CENTER,
     STRAIGHT,
     STRAIGHT_WALL_CENTER,
     SPINTURN,
@@ -103,6 +104,7 @@ public:
     std::string getMotionTypeString(){
         std::string str;
         if(motion_type == EMotionType::DIAGONAL) str = "DIAGONAL";
+        else if(motion_type == EMotionType::DIAGONAL_CENTER) str = "DIAGONAL_CENTER";
         else if(motion_type == EMotionType::STRAIGHT) str = "STRAIGHT";
         else if(motion_type == EMotionType::STRAIGHT_WALL_CENTER) str = "STRAIGHT_WALL_CENTER";
         else if(motion_type == EMotionType::SPINTURN) str = "SPINTURN";
@@ -223,6 +225,19 @@ public:
         traj->motion_type=EMotionType::DIAGONAL;
         return std::unique_ptr<BaseTrajectory>(traj);
     }
+
+    static std::unique_ptr<BaseTrajectory> createAsDiagonalCenter(float target_dist_, float v_0_){
+        auto traj = new StraightTrajectory(target_dist_, v_0_);
+        traj->motion_type=EMotionType::DIAGONAL_CENTER;
+        return std::unique_ptr<BaseTrajectory>(traj);
+    }
+
+    static std::unique_ptr<BaseTrajectory> createAsDiagonalCenter(float target_dist_, float v_0_, float v_max_, float v_end_, float a_acc_, float a_dec_){
+        auto traj = new StraightTrajectory(target_dist_, v_0_, v_max_, v_end_, a_acc_, a_dec_  );
+        traj->motion_type=EMotionType::DIAGONAL_CENTER;
+        return std::unique_ptr<BaseTrajectory>(traj);
+    }
+
 
     virtual float getEndX(){
         float ang_rad = DEG2RAD(ang_0);
