@@ -14,6 +14,7 @@ namespace umouse
 
 enum class EMotionType{
     DIAGONAL = 0,
+    DIAGONAL_CENTER,
     STRAIGHT,
     STRAIGHT_WALL_CENTER,
     SPINTURN,
@@ -103,6 +104,7 @@ public:
     std::string getMotionTypeString(){
         std::string str;
         if(motion_type == EMotionType::DIAGONAL) str = "DIAGONAL";
+        else if(motion_type == EMotionType::DIAGONAL_CENTER) str = "DIAGONAL_CENTER";
         else if(motion_type == EMotionType::STRAIGHT) str = "STRAIGHT";
         else if(motion_type == EMotionType::STRAIGHT_WALL_CENTER) str = "STRAIGHT_WALL_CENTER";
         else if(motion_type == EMotionType::SPINTURN) str = "SPINTURN";
@@ -224,6 +226,19 @@ public:
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
+    static std::unique_ptr<BaseTrajectory> createAsDiagonalCenter(float target_dist_, float v_0_){
+        auto traj = new StraightTrajectory(target_dist_, v_0_);
+        traj->motion_type=EMotionType::DIAGONAL_CENTER;
+        return std::unique_ptr<BaseTrajectory>(traj);
+    }
+
+    static std::unique_ptr<BaseTrajectory> createAsDiagonalCenter(float target_dist_, float v_0_, float v_max_, float v_end_, float a_acc_, float a_dec_){
+        auto traj = new StraightTrajectory(target_dist_, v_0_, v_max_, v_end_, a_acc_, a_dec_  );
+        traj->motion_type=EMotionType::DIAGONAL_CENTER;
+        return std::unique_ptr<BaseTrajectory>(traj);
+    }
+
+
     virtual float getEndX(){
         float ang_rad = DEG2RAD(ang_0);
         return x_0 + target_dist * cosf(ang_rad);
@@ -288,8 +303,12 @@ public:
     virtual bool isEnd()
     {
         if(wall_contact == false){
-            if (cumulative_dist >= target_dist)
+            if (cumulative_dist >= target_dist){
+                x = getEndX();
+                y = getEndY();
+                ang = getEndAng();
                 return true;
+            }
             else
                 return false;
         }
@@ -306,6 +325,7 @@ public:
                 return true;
             else
                 return false;
+
         }
     }
 
@@ -425,18 +445,39 @@ public:
     virtual ~CurveTrajectory(){
         delete alp_curve;
     };
-
-    // @ToDo getEndX Y Angがちゃんと実装されていない
+    
     virtual float getEndX(){
-        return x_0;
+        float x;
+        float y;
+        float ang_rad = DEG2RAD(ang_0);
+        if(alp_curve->pre_dist == 0.0f && alp_curve->fol_dist == 0.0f){
+            x = alp_curve->x;
+            y = alp_curve->y * (float)(turn_dir);
+        } 
+        else{
+            x = alp_curve->x_with_pf;
+            y = alp_curve->y_with_pf * (float)(turn_dir);
+        } 
+        return x_0 + x * cosf(ang_rad) - y * sinf(ang_rad);
     }
 
     virtual float getEndY(){
-        return y_0;
+        float x;
+        float y;
+        float ang_rad = DEG2RAD(ang_0);
+        if(alp_curve->pre_dist == 0.0f && alp_curve->fol_dist == 0.0f){
+            x = alp_curve->x;
+            y = alp_curve->y * (float)(turn_dir);
+        } 
+        else{
+            x = alp_curve->x_with_pf;
+            y = alp_curve->y_with_pf * (float)(turn_dir);
+        } 
+        return y_0 + x * sinf(ang_rad) + y * cosf(ang_rad);
     }
 
     virtual float getEndAng(){
-        return ang_0;
+        return fmod(ang_0 + alp_curve->ang * (float)(turn_dir) + 360.0f, 360.0f);        
     }
 
 
@@ -478,7 +519,12 @@ public:
 
     virtual bool isEnd(){
         float end_cumulative_dist = alp_curve->pre_dist + alp_curve->arc_len + alp_curve->fol_dist;
-        if(end_cumulative_dist < cumulative_dist) return true;
+        if(end_cumulative_dist < cumulative_dist){
+             x = getEndX();
+             y = getEndY();
+             ang = getEndAng();
+             return true;
+        }
         else return false;
     }
     ArcLengthParameterizedCurve *alp_curve;
