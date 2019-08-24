@@ -58,7 +58,10 @@ public:
             float dist = residualDist(esti);
 
             if((motion_type == EMotionType::STRAIGHT_WALL_CENTER || 
-                    motion_type == EMotionType::STRAIGHT) &&
+                motion_type == EMotionType::STRAIGHT ||
+                motion_type == EMotionType::DIAGONAL ||
+                motion_type == EMotionType::DIAGONAL_CENTER
+               ) &&
                     dist < 0.0){
                 auto s = trajQueue.front()->getMotionTypeString().c_str();
                 uint16_t hash = trajQueue.front()->hash;
@@ -104,7 +107,10 @@ public:
                 WallSensor &ws = WallSensor::getInstance();
 
                 if((motion_type == EMotionType::STRAIGHT_WALL_CENTER || 
-                        motion_type == EMotionType::STRAIGHT) &&
+                        motion_type == EMotionType::STRAIGHT ||
+                        motion_type == EMotionType::DIAGONAL ||
+                        motion_type == EMotionType::DIAGONAL_CENTER
+                        ) &&
                         ws.isContactWall() == false &&
                         dist > 0.0
                         ){
@@ -145,15 +151,29 @@ public:
         }
         else if(motion_type == EMotionType::STRAIGHT_WALL_CENTER){
             traj = StraightTrajectory::createAsWallCenter(ABS(dist), v_0, v_0, v_0, a_0, a_0);
-        } 
+        }
+        else if(motion_type == EMotionType::DIAGONAL){
+            traj = StraightTrajectory::createAsDiagonal(ABS(dist), v_0, v_0, v_0, a_0, a_0);
+        }
+        else if(motion_type == EMotionType::DIAGONAL_CENTER){
+            traj = StraightTrajectory::createAsDiagonalCenter(ABS(dist), v_0, v_0, v_0, a_0, a_0);
+        }
         else{
             printfAsync("EEEEEE residual compensation Error!\n");
             return;
         }
+
+/*
         if(esti.ang >= 315.0f || esti.ang <  45.0f) x -= dist;        
         if(esti.ang >=  45.0f && esti.ang < 135.0f) y -= dist;
         if(esti.ang >= 135.0f && esti.ang < 225.0f) x += dist;
         if(esti.ang >= 225.0f && esti.ang < 315.0f) y += dist;
+*/
+        float rad = DEG2RAD(ang);
+
+        x -= cosf(rad) * dist;
+        y -= sinf(rad) * dist;
+
         traj->setInitPos(x, y, ang);
         printfAsync(">    >>>>> %f %f %f\n", x, y, ang);
         trajQueue.push_front(std::move(traj));
@@ -163,11 +183,20 @@ public:
     float residualDist(const PositionEstimator& esti){
         float dist = 0.0f;
         if(trajQueue.empty() == false){
+/*
             if(esti.ang >= 315.0f || esti.ang <  45.0f) dist = trajQueue.front()->getEndX() - esti.x;
             if(esti.ang >=  45.0f && esti.ang < 135.0f) dist = trajQueue.front()->getEndY() - esti.y;
             if(esti.ang >= 135.0f && esti.ang < 225.0f) dist = esti.x - trajQueue.front()->getEndX();
             if(esti.ang >= 225.0f && esti.ang < 315.0f) dist = esti.y - trajQueue.front()->getEndY();
+*/
+
+            float rad = DEG2RAD(ang);
+            float x1 = trajQueue.front()->getEndX();
+            float y1 = trajQueue.front()->getEndY();
+            dist = (x1 - esti.x) * cosf(rad) + (y1 - esti.y) * sinf(rad);
+
         }
+
         return dist;
     }
 

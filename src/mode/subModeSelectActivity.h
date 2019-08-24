@@ -137,12 +137,6 @@ private:
         else if (mode == 7) fcled.flash(1, 1, 1, led_on_msec, led_off_msec); //WHITE
     }
 
-    EActivityColor modeNum2Color(uint8_t mode){
-        EActivityColor color;
-        color = (EActivityColor)mode;
-        return color;
-    }
-
 };
 
 
