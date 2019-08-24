@@ -14,6 +14,7 @@
 #include "turnParameter.h"
 #include "trajectoryCommander.h"
 #include "pathCompression.h"
+#include "mouse.h"
 
 namespace umouse
 {

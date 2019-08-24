@@ -337,7 +337,7 @@ void SEE(void){
     SEM.enable=true;
 }
 
-void SEF(void){
+void SEF(int8_t offset){
     Note note;
     SEM.enable=false;
     SEM.clearBuff();
@@ -345,12 +345,13 @@ void SEF(void){
     SEM.wave_form_data[7] = SANKAKU;
     SEM.wave_volume_data[6] = 16;    //各トラックのボリューム  volume_resolution段階
     SEM.wave_volume_data[7] = 16;
-    SEM.bpm = 140;
+    SEM.bpm = 240;
     uint16_t len1 = sizeof(SEF1)/sizeof(SEF1[0]);
     for(int i=0;i<len1;i++){
-        note.pitch = SEF1[i][0];
+        note.pitch = SEF1[i][0] + offset;
         note.len = SEF1[i][1];
         SEM.noteBuff[6].push(note);
+        SEM.noteBuff[7].push(note);
     }
     SEM.enable=true;
 }
@@ -400,7 +401,7 @@ void RAMEN(void){
     SEM.wave_form_data[7] = SANKAKU;
     SEM.wave_volume_data[6] = 32;    //各トラックのボリューム  volume_resolution段階
     SEM.wave_volume_data[7] = 0;
-    SEM.bpm = 200;
+    SEM.bpm = 250;
     uint16_t len1 = sizeof(RAMEN1)/sizeof(RAMEN1[0]);
     for(int i=0;i<len1;i++){
         note.pitch = RAMEN1[i][0];

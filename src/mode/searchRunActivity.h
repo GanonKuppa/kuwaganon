@@ -37,7 +37,7 @@ namespace umouse {
             printfAsync("This is search run activity.\n");
 
             Intent *intent = new Intent();
-            intent->int8_t_param["SUB_MODE_NUM"] = 5;
+            intent->uint8_t_param["SUB_MODE_NUM"] = 5;
             auto activity = ActivityFactory::cteateSubModeSelect();
             activity->start(intent);
             printfAsync("SUB MODE SELECT RESULT = %d", intent->uint8_t_param["SUB_MODE"]);

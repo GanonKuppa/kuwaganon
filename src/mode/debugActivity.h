@@ -31,7 +31,7 @@ protected:
         printfAsync("This is debug activity.\n");
 /*
         Intent *intent = new Intent();
-        intent->int8_t_param["SUB_MODE_NUM"] = 6;
+        intent->uint8_t_param["SUB_MODE_NUM"] = 6;
         auto activity = ActivityFactory::cteateSubModeSelect();
         activity->start(intent);
         printfAsync("SUB MODE SELECT RESULT = %d", intent->uint8_t_param["SUB_MODE"]);

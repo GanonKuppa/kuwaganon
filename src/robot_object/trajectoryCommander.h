@@ -7,6 +7,7 @@
 #include <string>
 #include "communication.h"
 #include "wallsensor.h"
+#include "positionEstimator.h"
 
 namespace umouse{
 
@@ -84,7 +85,10 @@ public:
 */
 
             if(trajQueue.front()->isEnd() == true){
-                
+                x = trajQueue.front()->x;
+                y = trajQueue.front()->y;
+                ang = trajQueue.front()->ang;
+
                 auto s = trajQueue.front()->getMotionTypeString().c_str();
                 uint16_t hash = trajQueue.front()->hash;
 /*

@@ -28,7 +28,7 @@ void SE_CURSOR_MOVE(){
 }
 
 
-void SE_CURSOR_MOVE(int8_t note_offset){
+void SE_CURSOR_MOVE(int8_t offset){
     Note note;
     SEM.enable=false;
     SEM.clearBuff();
@@ -40,7 +40,7 @@ void SE_CURSOR_MOVE(int8_t note_offset){
 
     uint16_t len1 = sizeof(CURSOR_MOVE)/sizeof(CURSOR_MOVE[0]);
     for(int i=0;i<len1;i++){
-        note.pitch = CURSOR_MOVE[i][0] + note_offset;
+        note.pitch = CURSOR_MOVE[i][0] + offset;
         note.len = CURSOR_MOVE[i][1];
         SEM.noteBuff[6].push(note);
     }
@@ -130,7 +130,7 @@ static const uint16_t CONFIRM[][2] ={
     {nR,l______l}
 };
 
-void SE_CONFIRM(void){
+void SE_CONFIRM(int8_t offset){
     Note note;
     SEM.enable=false;
     SEM.clearBuff();
@@ -141,7 +141,7 @@ void SE_CONFIRM(void){
     SEM.bpm = 120;
     uint16_t len1 = sizeof(CONFIRM)/sizeof(CONFIRM[0]);
     for(int i=0;i<len1;i++){
-        note.pitch = CONFIRM[i][0];
+        note.pitch = CONFIRM[i][0] + offset;
         note.len = CONFIRM[i][1];
         SEM.noteBuff[6].push(note);
     }

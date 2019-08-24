@@ -24,19 +24,37 @@ namespace umouse {
         void onStart() {
             printfAsync("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■.\n");
             printfAsync("This is search run activity.\n");
+            uint8_t run_mode = 0;
+            uint8_t param_mode = 0;
+            {
+                Intent *intent = new Intent();
+                intent->uint8_t_param["SUB_MODE_NUM"] = 6;
+                auto activity = ActivityFactory::cteateSubModeSelect();
+                activity->start(intent);
+                printfAsync("SUB MODE SELECT RESULT = %d", intent->uint8_t_param["SUB_MODE"]);
+                run_mode = intent->uint8_t_param["SUB_MODE"];
+                if(run_mode == 0) return;
 
-            Intent *intent = new Intent();
-            intent->int8_t_param["SUB_MODE_NUM"] = 8;
-            auto activity = ActivityFactory::cteateSubModeSelect();
-            activity->start(intent);
-            printfAsync("SUB MODE SELECT RESULT = %d", intent->uint8_t_param["SUB_MODE"]);
-            uint8_t mode = intent->uint8_t_param["SUB_MODE"];
-            delete intent;
+                delete intent;
+            }
+
+            {
+                Intent *intent = new Intent();
+                intent->uint8_t_param["SUB_MODE_NUM"] = 8;
+                intent->uint16_t_param["LED_ON_MSEC"] = 125;
+                intent->uint16_t_param["LED_OFF_MSEC"] = 125;
+                intent->int8_t_param["NOTE_PITCH_OFSET"] = 2;
+                auto activity = ActivityFactory::cteateSubModeSelect();
+                activity->start(intent);
+                printfAsync("SUB MODE SELECT RESULT = %d", intent->uint8_t_param["SUB_MODE"]);
+                param_mode = intent->uint8_t_param["SUB_MODE"];
+                if(param_mode == 0) return;
+                delete intent;
+            }
+
+
             UMouse &m = UMouse::getInstance();
             ParameterManager &pm = ParameterManager::getInstance();
-
-
-
 
             waitmsec(1000);
             ICM20602 &icm = ICM20602::getInstance();
@@ -58,27 +76,44 @@ namespace umouse {
 
             TurnParameter turn_p;
 
-            if (mode == 0) return;
-            else if(mode == 1) turn_p.set(0.6, 0.2, 3.0);
-            else if(mode == 2) turn_p.set(0.6, 0.2 ,3.0);
-            else if(mode == 3) turn_p.set(0.6, 0.3 ,3.0);
-            else if(mode == 4) turn_p.set(2.0, 0.35, 3.0);
-            else if(mode == 5) turn_p.set(2.5, 0.35, 6.0);
-            else if(mode == 6) turn_p.set(3.0, 0.35, 8.0);
-            else if(mode == 7) turn_p.set(3.0, 0.35 ,10.0);
-
-
+            if (param_mode == 0) return;
+            else if(param_mode == 1) turn_p.set(0.3, 0.3, 4.0);
+            else if(param_mode == 2) turn_p.set(0.6, 0.3, 4.0);
+            else if(param_mode == 3) turn_p.set(0.9, 0.3, 4.0);
+            else if(param_mode == 4) turn_p.set(1.0, 0.35, 4.0);
+            else if(param_mode == 5) turn_p.set(1.5, 0.35, 6.0);
+            else if(param_mode == 6) turn_p.set(2.5, 0.35, 8.0);
+            else if(param_mode == 7) turn_p.set(3.0, 0.35, 10.0);
 
             std::vector<Path> path_vec;
             makeMinStepPath(pm.goal_x, pm.goal_y, m.maze, path_vec);
             printfAsync("--- makeMinStepPath ----\n");
             printPath(path_vec);
-            printfAsync("--- jointStraightPath ----\n");
-            jointStraightPath(path_vec);
 
-            if(mode == 1 ) HF_playPathPivot(turn_p, path_vec);
-            else if(mode == 2 || mode == 3 || mode == 4 || mode == 5 || mode == 6 || mode == 7) HF_playPath(turn_p, path_vec);
 
+            if(run_mode == 0 ){
+                 return;
+            }
+            else if(run_mode == 1 ){
+                translatePathSpin(path_vec);
+                HF_playPathSpin(turn_p, path_vec, m.trajCommander);
+            }
+            else if(run_mode == 2){
+                translatePathDiagonal(path_vec);
+                HF_playPathSpinDiagonal(turn_p, path_vec, m.trajCommander);
+            }
+            else if(run_mode == 3){
+                translatePath90Deg(path_vec);
+                HF_playPath(turn_p, path_vec, m.trajCommander);
+            }
+            else if(run_mode == 4){
+                translatePathLong(path_vec);
+                HF_playPath(turn_p, path_vec, m.trajCommander);
+            }
+            else if(run_mode == 5){
+                translatePathDiagonal(path_vec);
+                HF_playPath(turn_p, path_vec, m.trajCommander);
+            }
 
         };
         void onFinish() {};

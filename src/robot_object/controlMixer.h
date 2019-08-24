@@ -148,6 +148,8 @@ namespace umouse {
             if(traj.motion_type == EMotionType::STOP ||
                traj.motion_type == EMotionType::SPINTURN ||
                traj.motion_type == EMotionType::CURVE ||
+               traj.motion_type == EMotionType::DIAGONAL ||
+               traj.motion_type == EMotionType::DIAGONAL_CENTER ||
                ((traj.motion_type == EMotionType::STRAIGHT || 
                  traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER
                ) && 
@@ -218,7 +220,9 @@ namespace umouse {
             if(traj.motion_type == EMotionType::STOP || traj.motion_type == EMotionType::SPINTURN) {
                 v_pidf.set(pm.trans_v_spin_P, pm.trans_v_spin_I, pm.trans_v_spin_D, pm.trans_v_spin_F);
             }
-            else if(traj.motion_type == EMotionType::STRAIGHT || traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ){
+            else if(traj.motion_type == EMotionType::STRAIGHT || traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
+                    traj.motion_type == EMotionType::DIAGONAL || traj.motion_type == EMotionType::DIAGONAL_CENTER
+            ){
                 v_pidf.set(pm.trans_v_P, pm.trans_v_I, pm.trans_v_D, pm.trans_v_F);
             }
             else if(traj.motion_type == EMotionType::CURVE ){
@@ -229,7 +233,9 @@ namespace umouse {
             if(traj.motion_type == EMotionType::STOP || traj.motion_type == EMotionType::SPINTURN) {
                 ang_v_pidf.set(pm.rot_v_spin_P, pm.rot_v_spin_I, pm.rot_v_spin_D, pm.rot_v_spin_F);
             }
-            else if(traj.motion_type == EMotionType::STRAIGHT || traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ){
+            else if(traj.motion_type == EMotionType::STRAIGHT || traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
+                    traj.motion_type == EMotionType::DIAGONAL || traj.motion_type == EMotionType::DIAGONAL_CENTER
+            ){
                 ang_v_pidf.set(pm.rot_v_P, pm.rot_v_I, pm.rot_v_D, pm.rot_v_F);
             }
             else if(traj.motion_type == EMotionType::CURVE ){
