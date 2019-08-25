@@ -260,7 +260,7 @@ namespace umouse {
             int16_t th_off = pm.wall_corner_threshold_off_l;
 
             if(left_q.at(0) < th_off) {
-                for(int i=1;i<20;i++) {
+                for(int i=1;i<BUFF_SIZE;i++) {
                     if(left_q.at(i)> th_on) {
                         return true;
                     }
@@ -276,7 +276,7 @@ namespace umouse {
             int16_t th_off = pm.wall_corner_threshold_off_r;
 
             if(right_q.at(0) < th_off) {
-                for(int i=1;i<20;i++) {
+                for(int i=1;i<BUFF_SIZE;i++) {
                     if(right_q.at(i)> th_on) {
                         return true;
                     }

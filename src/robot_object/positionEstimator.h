@@ -68,7 +68,7 @@ namespace umouse
             if(ws.isOnWallCenter() == true && ws.isAhead() == false && v > 0.1 && ABS(ang_v) < 100.0f) {
                 //fcled.turn(1,1,1);
 
-                if(ang >= 315.0f || ang < 45.0f) {
+                if(ang >= 315.0f || ang < 45.0f) {                    
                     ang = 0.0f;
                     y = (uint8_t)(y / 0.09f) * 0.09f + 0.09f/2.0f;
                     SE_POSITION_CHANGE();
@@ -92,18 +92,22 @@ namespace umouse
 
             if(ws.isCornerL() == true && ABS(ang_v) < 50.0f && v > 0.1 ) {
                 if(ang >= 350.0f || ang < 10.0f) {
+                    printfAsync("msg_flag:%f,%f,isCornerL\n", x, y);
                     x = (uint8_t)(x / 0.09f) * 0.09f + 0.09f - pm.wall_corner_read_offset_l;
                     SE_CORNER_L();
                 }
                 if(ang >= 80.0f && ang < 100.0f) {
+                    printfAsync("msg_flag:%f,%f,isCornerL\n", x, y);
                     y = (uint8_t)(y / 0.09f) * 0.09f + 0.09f - pm.wall_corner_read_offset_l;
                     SE_CORNER_L();
                 }
                 if(ang >= 170.0f && ang < 190.0f) {
+                    printfAsync("msg_flag:%f,%f,isCornerL\n", x, y);
                     x = (uint8_t)(x / 0.09f) * 0.09f + pm.wall_corner_read_offset_l;
                     SE_CORNER_L();
                 }
                 if(ang >= 260.0f && ang < 280.0f) {
+                    printfAsync("msg_flag:%f,%f,isCornerL\n", x, y);
                     y = (uint8_t)(y / 0.09f) * 0.09f + pm.wall_corner_read_offset_l;
                     SE_CORNER_L();
                 }
@@ -112,18 +116,22 @@ namespace umouse
 
             if(ws.isCornerR() == true && ABS(ang_v) < 50.0f && v > 0.1 ) {
                 if(ang >= 350.0f || ang < 10.0f) {
+                    printfAsync("msg_flag:%f,%f,isCornerR\n", x, y);
                     x = (uint8_t)(x / 0.09f) * 0.09f + 0.09f - pm.wall_corner_read_offset_r;
                     SE_CORNER_R();
                 }
                 if(ang >= 80.0f && ang < 100.0f) {
+                    printfAsync("msg_flag:%f,%f,isCornerR\n", x, y);
                     y = (uint8_t)(y / 0.09f) * 0.09f + 0.09f - pm.wall_corner_read_offset_r;
                     SE_CORNER_R();
                 }
                 if(ang >= 170.0f && ang < 190.0f) {
+                    printfAsync("msg_flag:%f,%f,isCornerR\n", x, y);
                     x = (uint8_t)(x / 0.09f) * 0.09f + pm.wall_corner_read_offset_r;
                     SE_CORNER_R();
                 }
                 if(ang >= 260.0f && ang < 280.0f) {
+                    printfAsync("msg_flag:%f,%f,isCornerR\n", x, y);
                     y = (uint8_t)(y / 0.09f) * 0.09f + pm.wall_corner_read_offset_r;
                     SE_CORNER_R();
                 }

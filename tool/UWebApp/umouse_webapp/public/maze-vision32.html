@@ -12,7 +12,7 @@
 
 
   <!-- jQuery読み込み -->
-  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="./js/jquery-latest.js"></script>
   <script type="text/javascript" src="./js/jquery.cookie.js"></script>
   
   <!-- THREE.js関連読み込み -->
@@ -35,6 +35,7 @@
     let server_ip = "";
     let server_port = "";
     let message_len = 0;
+    let msg = "";
     $.getJSON("../json/param.json", function (data) {
       server_ip = data.SERVER_ID;
       server_port = data.SERVER_PORT;
@@ -118,8 +119,32 @@
         console.log("chksum err" + intList[6] + "  " + sum);
         return;
       }
-      console.log(intList[160]);
+      //console.log(intList[160]);
       //addMessageConsole(String(intList[160]) + ":" + bytes_to_hex_string(intList.slice(160, 160 + 70)));
+
+
+      //printf部分の処理
+      if (intList[7] != 0) {
+        msg = "";
+        
+        for (var i = 0; i < intList[7]; i++) {
+          if (intList[message_len - 60 + i] == 10) {  //10はLFの文字コードです。         
+            let msg_str = utf8_hex_string_to_string(msg); 
+            console.log(msg_str);
+            if(msg_str.split(":")[0].indexOf("msg_flag") !== -1){
+              let split_comma = msg_str.split(":")[1].split(",");
+              let x_flag = parseFloat(split_comma[0]);
+              let y_flag = parseFloat(split_comma[1]);
+              let str_flag = split_comma[2];
+              addMsgFlag(str_flag, x_flag, y_flag);
+            };
+
+            msg = "";
+          } else {
+            msg += intList[message_len - 60 + i].toString(16);
+          }
+        }
+      }
 
 
 
@@ -245,7 +270,6 @@
     
     initLetterCoor_x(scene);
     initLetterCoor_y(scene);
-
 
     //walls_vertical[0][0].children[0].material.opacity = 0.1;
     //walls_vertical[0][0].children[1].material.opacity = 0.1;
@@ -502,7 +526,7 @@
 
       loader.addEventListener('load', function (event) {
         let geometry = event.content;
-        let material = new THREE.MeshLambertMaterial({ ambient: 0xff5533, color: 0xffffff });
+        let material = new THREE.MeshLambertMaterial({ color: 0xffffff });
         let mesh = new THREE.Mesh(geometry, material);
         mesh.position.set(0.09 / 2, 0.0, 0.09 / 2);
         mesh.rotation.set(0, Math.PI / 2, 0);
@@ -728,6 +752,62 @@
         letter.rotation.set(-Math.PI / 2.0, 0, -Math.PI / 2.0);
       }
     }
+
+    //文字列を追加
+    function addMsgFlag(text, x, y) {
+      scene_ = scene;
+      let texture_size = {
+        width: 256,
+        height: 32
+      };
+
+      function texture() {
+        let canvas_ = document.createElement('canvas');
+        canvas_.width = texture_size.width;
+        canvas_.height = texture_size.height;
+
+        let context = canvas_.getContext('2d');
+
+        context.fillStyle = 'rgba(255, 255, 0, 0.25)';
+        context.fillRect(0, 0, texture_size.width, texture_size.height);
+        context.font = " 12px 'Hiragino Kaku Gothic ProN' ,'メイリオ', sans-serif";
+        context.textAlign = 'center';
+        context.fillStyle = "#ffffff";
+        context.fillText(text, canvas_.width * 0.5, canvas_.height * 0.5);
+
+        let texture_ = new THREE.Texture(canvas_);
+        texture_.needsUpdate = true;
+        return texture_;
+      }
+
+      let material = new THREE.MeshBasicMaterial({
+        map: texture(),
+        side: THREE.DoubleSide,
+        transparent: true
+      });
+
+      let geometry = new THREE.PlaneGeometry(texture_size.width, texture_size.height);
+
+      let mesh = new THREE.Mesh(geometry, material);
+      mesh.scale.set(0.0009 / 2, 0.0009 / 2, 0.0009 / 2);
+      mesh.position.set(y, 0.25, x+0.05);
+      mesh.rotation.set(0, -Math.PI / 2, 0);
+      scene_.add(mesh);
+
+      {
+        let material_col = { color: '#ffff00', transparent: true, opacity:0.25 };
+        let geometry = new THREE.BoxGeometry(0.0015, 0.49, 0.0015);
+        let material = new THREE.MeshBasicMaterial(material_col);  //素材を変えることができる; 
+
+        let box = new THREE.Mesh(geometry, material);
+        box.position.set(y, 0.0, x);
+        scene_.add(box);
+      }  
+
+      return mesh;      
+    }
+
+
 
     //受信パケット表示の更新処理
     let logno_console = 0;
