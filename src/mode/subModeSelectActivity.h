@@ -35,7 +35,7 @@ class SubModeSelectActivity : public BaseActivity{
 
         printfAsync("sub mode select start. submodenum = %d\n",sub_mode_num);
 
-        SEF();
+        SEF(note_pitch_offset);
         //LEDをチカチカ
         FcLed &fcled = FcLed::getInstance();
         fcled.turn(1, 1, 1);
