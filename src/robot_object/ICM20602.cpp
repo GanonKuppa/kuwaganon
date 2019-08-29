@@ -110,6 +110,13 @@ void ICM20602::init() {
     omega_ref[0] = pm.gyro_x_ref;
     omega_ref[1] = pm.gyro_y_ref;
     omega_ref[2] = pm.gyro_z_ref;
+
+    acc_ref[0] = pm.acc_x_ref;
+    acc_ref[1] = pm.acc_y_ref;
+    acc_ref[2] = pm.acc_z_ref;
+
+
+
 }
 
 void ICM20602::update() {
@@ -134,8 +141,8 @@ void ICM20602::update() {
     uint8_t gyro_yout_l = readReg(0x46);
     uint8_t gyro_zout_h = readReg(0x47);
     uint8_t gyro_zout_l = readReg(0x48);
-    acc_raw[0] = concatenate2Byte_int(accel_yout_h, accel_yout_l);
-    acc_raw[1] = concatenate2Byte_int(accel_xout_h, accel_xout_l);
+    acc_raw[0] = concatenate2Byte_int(accel_xout_h, accel_xout_l);
+    acc_raw[1] = concatenate2Byte_int(accel_yout_h, accel_yout_l);
     acc_raw[2] = - concatenate2Byte_int(accel_zout_h, accel_zout_l);
 
     omega_raw[0] = concatenate2Byte_int(gyro_xout_h, gyro_xout_l);
@@ -271,23 +278,20 @@ void ICM20602::calibAccOffset(uint32_t ref_num) {
         acc_x[i] = acc_raw[0];
         acc_y[i] = acc_raw[1];
         acc_z[i] = acc_raw[2];
-        waitusec(1000);
+        waitusec(500);
         //printfAsync("%d| calibrating... %d, %d, %d\n", i, acc_x[i],
         //        acc_y[i], acc_z[i]);
         //printfAsync("%d\n",i);
     }
-    quickSort_int16(acc_x, 0, ref_num - 1);
-    quickSort_int16(acc_y, 0, ref_num - 1);
-    quickSort_int16(acc_z, 0, ref_num - 1);
 
-    for (i = ref_num / 4; i < (ref_num * 3 / 4 + 1); i++) {
+    for (i = 0; i < ref_num; i++) {
         acc_x_sum += (float) (acc_x[i]);
         acc_y_sum += (float) (acc_y[i]);
         acc_z_sum += (float) (acc_z[i]);
     }
-    acc_ref[0] = (int16_t) (2.0 * acc_x_sum / (float) ref_num);
-    acc_ref[1] = (int16_t) (2.0 * acc_y_sum / (float) ref_num);
-    acc_ref[2] = (int16_t) (2.0 * acc_z_sum / (float) ref_num);
+    acc_ref[0] = (int16_t) (acc_x_sum / (float) ref_num);
+    acc_ref[1] = (int16_t) (acc_y_sum / (float) ref_num);
+    acc_ref[2] = (int16_t) (acc_z_sum / (float) ref_num);
 
     //writeEEPROMOffsetaccInt(&acc_offset_vec[0]);
     printfAsync("=====ICM20602=====\n gyro offset %d, %d, %d\n", acc_ref[0],

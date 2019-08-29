@@ -225,8 +225,8 @@
       let led_g = parseLed_G(intList);
       let led_b = parseLed_B(intList);
 
-      setRobotPos(mouse_x, mouse_y, mouse_ang, mouse_v, intList[160]);
-      setTargetPos(target_x, target_y, target_ang, target_v, intList[160]);
+      setRobotPos(mouse_x, mouse_y, mouse_ang, mouse_v/10.0, intList[160]);
+      setTargetPos(target_x, target_y, target_ang, target_v/10.0, intList[160]);
       updateDataView(time, voltage, V_l, V_r, mouse_x, mouse_y, mouse_ang, mouse_v);
       updateWallSensorView(lf, l, r, rf);
       if(led_r == 0 && led_g == 0 && led_b == 0) setRobotColor(0XAA0000 * 1 + 0XAA00 * 1 + 1 * 0xAA );

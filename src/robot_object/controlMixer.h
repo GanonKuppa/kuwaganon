@@ -150,9 +150,9 @@ namespace umouse {
                traj.motion_type == EMotionType::CURVE ||
                traj.motion_type == EMotionType::DIAGONAL ||
                traj.motion_type == EMotionType::DIAGONAL_CENTER ||
-               ((traj.motion_type == EMotionType::STRAIGHT || 
-                 traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER
-               ) && 
+               traj.motion_type == EMotionType::STRAIGHT ||
+               (traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER
+                && 
                 (WallSensor::getInstance().isRight_for_ctrl() == false &&
                 WallSensor::getInstance().isLeft_for_ctrl() == false)
                )

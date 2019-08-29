@@ -56,6 +56,7 @@ class UMouse {
 public:
     static constexpr float WALL2MOUSE_CENTER_DIST = 0.01765;
     static constexpr float READ_WALL_OFFSET = 0.01;
+    static constexpr float DELTA_T = 0.0005;
 
     // -32768 から 32767
 
@@ -74,6 +75,7 @@ public:
     float gyro_ang_v;// -2000deg/secから+2000deg/sec
     float v_acc;
     float v_comp;
+    float v_side;
 
     float wall_P;//event側で更新  -10.0から10.0   x 3000
     float wall_I;//event側で更新  -10.0から10.0   x 3000
@@ -177,7 +179,7 @@ public:
         PowerTransmission &pt = PowerTransmission::getInstance();
         WallSensor &ws = WallSensor::getInstance();
 
-        posEsti.update(v_comp ,adis.omega_f[2], trajCommander.getMotionType());
+        posEsti.update(v_comp ,adis.omega_f[2], 0.0f, trajCommander.getMotionType());
         trajCommander.update(posEsti);
         
         if(trajCommander.empty() != true){
@@ -231,14 +233,18 @@ public:
         ParameterManager &pm = ParameterManager::getInstance();
         //ws.isCorner();
 
-        if (ABS(wo.v) < 0.005) v_acc = 0.0;
-        else v_acc += imu.acc_f[1] * 0.0005;
+        //if (ABS(wo.v) < 0.005) v_acc = 0.0;
+        //else
+            v_acc += imu.acc_f[1] * DELTA_T;
 
         float gain = pm.v_comp_gain;
 
-        v_comp = (gain)*(v_comp + imu.acc_f[1] * 0.0005) + (1.0-gain)*(wo.v);
+        v_comp = (gain)*(v_comp + imu.acc_f[1] * DELTA_T) + (1.0-gain)*(wo.v);
         if(ABS(wo.v) < 0.1 ) v_comp = wo.v;
         updateBuff();
+
+        v_side += (imu.acc_f[0] - v_comp * DEG2RAD(adis.omega_f[2]))* DELTA_T;
+        if(ABS(posEsti.ang_v) < 50.0f) v_side = 0.0f;
 
         coor.x = (uint8_t)(posEsti.x / 0.09f);
         coor.y = (uint8_t)(posEsti.y / 0.09f);

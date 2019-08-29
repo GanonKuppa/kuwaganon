@@ -263,7 +263,7 @@ void HF_playPathSpin(TurnParameter turn_p, std::vector<Path> &path_vec, Trajecto
 
                 auto traj2 = StopTrajectory::create(0.05);
                 auto traj3 = SpinTurnTrajectory::create(dir * 90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                auto traj4 = StopTrajectory::create(0.2);
+                auto traj4 = StopTrajectory::create(0.05);
                 auto traj5 = StraightTrajectory::createAsWallCenter(0.09 / 2.0, 0.0, v, v, a, a);
 
                 trajCommander.push(std::move(traj0));

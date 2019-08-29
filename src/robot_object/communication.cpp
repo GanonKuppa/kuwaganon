@@ -497,9 +497,9 @@ void packData(uint8_t *buf) {
     set2ByteVal(buf, 88, m.coor.x);
     set2ByteVal(buf, 90, m.coor.y);
 
-    set2ByteVal(buf, 92, m.posEsti.x, 1000);
-    set2ByteVal(buf, 94, m.posEsti.y, 1000);
-    set2ByteVal(buf, 96, m.posEsti.ang, 100);
+    set2ByteVal(buf, 92, (float)m.posEsti.x, 1000);
+    set2ByteVal(buf, 94, (float)m.posEsti.y, 1000);
+    set2ByteVal(buf, 96, (float)m.posEsti.ang, 100);
     set2ByteVal(buf, 98, (int16_t)m.direction);
     set2ByteVal(buf, 100, m.trajCommander.x, 1000);
     set2ByteVal(buf, 102, m.trajCommander.y, 1000);

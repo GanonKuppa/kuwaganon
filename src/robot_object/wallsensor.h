@@ -17,39 +17,6 @@
 namespace umouse {
 
     class WallSensor {
-    private:
-        const uint8_t BUFF_SIZE = 30;
-        const uint16_t LED_ON_USEC = 20;
-        bool enable;
-        float in_wall_center_time;
-        float contact_wall_time;
-        float ahead_on_time;
-        const float DELTA_T = 0.0005;
-
-        WallSensor() {
-
-            enable = true;
-            in_wall_center_time = 0.0f;
-            contact_wall_time = 0.0f;
-            ahead_on_time = 0.0f;
-            ahead_l_on = 0;
-            ahead_r_on = 0;
-            left_on = 0;
-            right_on = 0;
-
-            ahead_l_off = 0;
-            ahead_r_off = 0;
-            left_off = 0;
-            right_off = 0;
-            for (uint8_t i = 0; i < BUFF_SIZE; i++) {
-                ahead_l_q.push_front(0);
-                ahead_r_q.push_front(0);
-                right_q.push_front(0);
-                left_q.push_front(0);
-            }
-
-        }
-        ~WallSensor() {}
 
     public:
 
@@ -117,7 +84,7 @@ namespace umouse {
             }
 
             if(isAhead() == true) ahead_on_time += DELTA_T;
-            else ahead_on_time = 0.0;
+            else ahead_on_time = 0.0f;
 
         }
 
@@ -286,6 +253,42 @@ namespace umouse {
         }
 
     private:
+        const uint8_t BUFF_SIZE = 30;
+        const uint16_t LED_ON_USEC = 20;
+        bool enable;
+        float in_wall_center_time;
+        float contact_wall_time;
+        float ahead_on_time;
+        const float DELTA_T = 0.0005;
+
+
+
+        WallSensor() {
+
+            enable = true;
+            in_wall_center_time = 0.0f;
+            contact_wall_time = 0.0f;
+            ahead_on_time = 0.0f;
+            ahead_l_on = 0;
+            ahead_r_on = 0;
+            left_on = 0;
+            right_on = 0;
+
+            ahead_l_off = 0;
+            ahead_r_off = 0;
+            left_off = 0;
+            right_off = 0;
+
+
+            for (uint8_t i = 0; i < BUFF_SIZE; i++) {
+                ahead_l_q.push_front(0);
+                ahead_r_q.push_front(0);
+                right_q.push_front(0);
+                left_q.push_front(0);
+            }
+
+        }
+        ~WallSensor() {}
 
         void turnOnAllLed() {
             PORTE.PODR.BIT.B0 = 1; //SLED_OUT1

@@ -12,20 +12,28 @@ namespace umouse
 
     class PositionEstimator {
     public:
-        float x;
-        float y;
         float v;
-        float ang;
+        float v_side;
+        
+        double ang;
+        double x;
+        double y;
+
         float ang_v;
+
         float contact_wall_cool_down_time;
-        const float DELTA_T = 0.0005;
+        float corner_r_cool_down_time;
+        float corner_l_cool_down_time;        
+
+        const double DELTA_T = 0.0005;
 
         PositionEstimator() {
-            x = 0.09f /2.0f;
-            y = 0.09f / 2.0f;
-            ang = 90.0f;
+            x = 0.09 / 2.0;
+            y = 0.09 / 2.0;
+            ang = 90.0;
             ang_v = 0.0f;
             v = 0.0f;
+
             contact_wall_cool_down_time = 0.0f;
         }
 
@@ -44,25 +52,50 @@ namespace umouse
             ang = ang_;
             ang_v = 0.0f;
             v = 0.0f;
+            ang_v_2 = 0.0;
+            x_d_2 = 0.0;
+            y_d_2 = 0.0;
+
+            ang_v_1 = 0.0;
+            x_d_1 = 0.0;
+            y_d_1 = 0.0;
+
+
         }
 
-        void update(float v_, float ang_v_, EMotionType motion_type) {
+
+        void update(float v_, float ang_v_, float v_side_, EMotionType motion_type) {
             ICM20602 &icm = ICM20602::getInstance();
             WallSensor &ws = WallSensor::getInstance();
             ParameterManager &pm = ParameterManager::getInstance();
+
+
             ang_v = ang_v_;
             v = v_;
+            v_side = v_side_;
 
-            ang += ang_v * DELTA_T;
-            ang = fmod(ang + 360.0f, 360.0f);
+            ang += calcAdamsBashforthDelta(ang_v, ang_v_1, ang_v_2);
+            
+            ang = fmod(ang + 360.0, 360.0);
 
-            float ang_rad = DEG2RAD(ang);
+            double ang_rad = DEG2RAD(ang);
 
-            float x_d = v * cosf(ang_rad);
-            float y_d = v * sinf(ang_rad);
+            double x_d = v * cos(ang_rad) + v_side * sin(ang_rad);
+            double y_d = v * sin(ang_rad) - v_side * cos(ang_rad);
 
-            x += DELTA_T * x_d;
-            y += DELTA_T * y_d;
+            x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);
+            y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
+
+            ang_v_2 = ang_v_1;
+            x_d_2 = x_d_1;
+            y_d_2 = y_d_1;
+
+            ang_v_1 = ang_v;
+            x_d_1 = x_d;
+            y_d_1 = y_d;
+
+
+
 
             FcLed &fcled = FcLed::getInstance();
             if(ws.isOnWallCenter() == true && ws.isAhead() == false && v > 0.1 && ABS(ang_v) < 100.0f) {
@@ -90,52 +123,73 @@ namespace umouse
                 }
             }
 
-            if(ws.isCornerL() == true && ABS(ang_v) < 50.0f && v > 0.1 ) {
+            if( corner_l_cool_down_time &&
+                ws.isCornerL() == true && 
+                ABS(ang_v) < 50.0f     &&
+                v > 0.1 
+            ) {
                 if(ang >= 350.0f || ang < 10.0f) {
                     printfAsync("msg_flag:%f,%f,isCornerL\n", x, y);
                     x = (uint8_t)(x / 0.09f) * 0.09f + 0.09f - pm.wall_corner_read_offset_l;
                     SE_CORNER_L();
+                    corner_l_cool_down_time = 0.1;
                 }
                 if(ang >= 80.0f && ang < 100.0f) {
                     printfAsync("msg_flag:%f,%f,isCornerL\n", x, y);
                     y = (uint8_t)(y / 0.09f) * 0.09f + 0.09f - pm.wall_corner_read_offset_l;
                     SE_CORNER_L();
+                    corner_l_cool_down_time = 0.1;
                 }
                 if(ang >= 170.0f && ang < 190.0f) {
                     printfAsync("msg_flag:%f,%f,isCornerL\n", x, y);
                     x = (uint8_t)(x / 0.09f) * 0.09f + pm.wall_corner_read_offset_l;
                     SE_CORNER_L();
+                    corner_l_cool_down_time = 0.1;
                 }
                 if(ang >= 260.0f && ang < 280.0f) {
                     printfAsync("msg_flag:%f,%f,isCornerL\n", x, y);
                     y = (uint8_t)(y / 0.09f) * 0.09f + pm.wall_corner_read_offset_l;
                     SE_CORNER_L();
+                    corner_l_cool_down_time = 0.1;
                 }
 
             }
+            corner_l_cool_down_time -= DELTA_T;
+            if(corner_l_cool_down_time < 0.0f)corner_l_cool_down_time = 0.0f;
 
-            if(ws.isCornerR() == true && ABS(ang_v) < 50.0f && v > 0.1 ) {
+
+            if(corner_r_cool_down_time == 0.0f &&
+               ws.isCornerR() == true && 
+               ABS(ang_v) < 50.0f && 
+               v > 0.1 ) {
                 if(ang >= 350.0f || ang < 10.0f) {
                     printfAsync("msg_flag:%f,%f,isCornerR\n", x, y);
                     x = (uint8_t)(x / 0.09f) * 0.09f + 0.09f - pm.wall_corner_read_offset_r;
                     SE_CORNER_R();
+                    corner_r_cool_down_time = 0.1;
                 }
                 if(ang >= 80.0f && ang < 100.0f) {
                     printfAsync("msg_flag:%f,%f,isCornerR\n", x, y);
                     y = (uint8_t)(y / 0.09f) * 0.09f + 0.09f - pm.wall_corner_read_offset_r;
                     SE_CORNER_R();
+                    corner_r_cool_down_time = 0.1;
                 }
                 if(ang >= 170.0f && ang < 190.0f) {
                     printfAsync("msg_flag:%f,%f,isCornerR\n", x, y);
                     x = (uint8_t)(x / 0.09f) * 0.09f + pm.wall_corner_read_offset_r;
                     SE_CORNER_R();
+                    corner_r_cool_down_time = 0.1;
                 }
                 if(ang >= 260.0f && ang < 280.0f) {
                     printfAsync("msg_flag:%f,%f,isCornerR\n", x, y);
                     y = (uint8_t)(y / 0.09f) * 0.09f + pm.wall_corner_read_offset_r;
                     SE_CORNER_R();
+                    corner_r_cool_down_time = 0.1;
                 }
             }
+            corner_r_cool_down_time -= DELTA_T;
+            if(corner_r_cool_down_time < 0.0f)corner_r_cool_down_time = 0.0f;
+
 
 
             if(ws.getContactWallTime() > 0.1 &&
@@ -175,10 +229,10 @@ namespace umouse
                 return (uint8_t)(y / 0.09f) * 0.09f + 0.09f/2.0f - y ;
             }
             if(ang >= 45.0f && ang < 135.0f) {
-                return (uint8_t)(x / 0.09f) * 0.09f + 0.09f/2.0f - x;
+                return x - (uint8_t)(x / 0.09f) * 0.09f + 0.09f/2.0f;
             }
             if(ang >= 135.0f && ang < 225.0f) {
-                return (uint8_t)(y / 0.09f) * 0.09f + 0.09f/2.0f - y;
+                return y-(uint8_t)(y / 0.09f) * 0.09f + 0.09f/2.0f;
             }
             if(ang >= 225.0f && ang < 315.0f) {
                 return (uint8_t)(x / 0.09f) * 0.09f + 0.09f/2.0f - x;
@@ -200,6 +254,22 @@ namespace umouse
             return diff;
         };
 
+    private:
+        float ang_v_1;
+        float x_d_1;
+        float y_d_1;
+        float ang_v_2;
+        float x_d_2;
+        float y_d_2;
+
+        double calcAdamsBashforthDelta(double s_0, double s_1, double s_2 ){
+            if(s_1 == 0.0 && s_2 == 0.0) return s_0 * DELTA_T;
+            else return (23.0 * s_0 - 16.0 * s_1 + 5.0 * s_2) / 12.0 * DELTA_T;
+        };
+
+
+
     };
+
 
 }
