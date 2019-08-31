@@ -489,6 +489,9 @@ void packData(uint8_t *buf) {
     set2ByteVal(buf, 68, (uint16_t)(fcled.G.getState()));
     set2ByteVal(buf, 70, (uint16_t)(fcled.B.getState()));
     set2ByteVal(buf, 72, adis.omega_raw[2]);
+    set2ByteVal(buf, 74, adis.acc_raw[0]);
+    set2ByteVal(buf, 76, adis.acc_raw[1]);
+    set2ByteVal(buf, 78, (uint16_t)0);
 
     set2ByteVal(buf, 80, m.start.x);
     set2ByteVal(buf, 82, m.start.y);
@@ -505,12 +508,12 @@ void packData(uint8_t *buf) {
     set2ByteVal(buf, 102, m.trajCommander.y, 1000);
     set2ByteVal(buf, 104, m.trajCommander.ang, 100);
 
-    set2ByteVal(buf, 106, wo.v, 10000);
+    set2ByteVal(buf, 106, (float)wo.v, 10000);
     //set2ByteVal(buf, 108, m.trajCommander.y, 1000);
     set2ByteVal(buf, 110, m.trajCommander.v, 10000);
     set2ByteVal(buf, 112, m.ctrlMixer.target_trans_v, 10000);
 
-    set2ByteVal(buf, 114, m.posEsti.ang_v, 10);
+    set2ByteVal(buf, 114, (float)m.posEsti.ang_v, 10);
     set2ByteVal(buf, 116, m.trajCommander.ang_v, 10);
     set2ByteVal(buf, 118, m.ctrlMixer.target_rot_v, 10);
 

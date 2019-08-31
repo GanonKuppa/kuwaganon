@@ -12,8 +12,8 @@ namespace umouse
 
     class PositionEstimator {
     public:
-        float v;
-        float v_side;
+        double v;
+        double v_side;
         
         double ang;
         double x;
@@ -64,7 +64,7 @@ namespace umouse
         }
 
 
-        void update(float v_, float ang_v_, float v_side_, EMotionType motion_type) {
+        void update(double v_, float ang_v_, double v_side_, EMotionType motion_type) {
             ICM20602 &icm = ICM20602::getInstance();
             WallSensor &ws = WallSensor::getInstance();
             ParameterManager &pm = ParameterManager::getInstance();
@@ -80,11 +80,20 @@ namespace umouse
 
             double ang_rad = DEG2RAD(ang);
 
-            double x_d = v * cos(ang_rad) + v_side * sin(ang_rad);
-            double y_d = v * sin(ang_rad) - v_side * cos(ang_rad);
-
+            double x_d = v * cos(ang_rad);
+            double y_d = v * sin(ang_rad);
+/*
             x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);
             y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
+*/
+            float ang_v_rad = DEG2RAD(ang_v);
+            if(ABS(ang_v)>10.0f){
+                x += v * cos(ang_rad) * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
+                y += v * sin(ang_rad) * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
+            } else{
+                x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);
+                y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
+            }
 
             ang_v_2 = ang_v_1;
             x_d_2 = x_d_1;

@@ -243,8 +243,8 @@ public:
         if(ABS(wo.v) < 0.1 ) v_comp = wo.v;
         updateBuff();
 
-        v_side += (imu.acc_f[0] - v_comp * DEG2RAD(adis.omega_f[2]))* DELTA_T;
-        if(ABS(posEsti.ang_v) < 50.0f) v_side = 0.0f;
+        v_side += imu.acc_f[0] * DELTA_T;
+        if(ABS(posEsti.ang_v) < 0.0001f || true) v_side = 0.0f;
 
         coor.x = (uint8_t)(posEsti.x / 0.09f);
         coor.y = (uint8_t)(posEsti.y / 0.09f);

@@ -5,6 +5,7 @@
 void initRSPI0(void);
 void initRSPI1(void);
 uint8_t communicate8bitRSPI0(uint8_t transmit);
+uint16_t communicate16bitRSPI0(uint16_t transmit);
 uint8_t communicate8bitRSPI1(uint8_t transmit);
 
 void communicateNbyteRSPI0(uint8_t * send, uint8_t* recv, uint8_t num);

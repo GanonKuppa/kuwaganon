@@ -19,15 +19,23 @@ private:
     uint16_t L_ENC_pre;
     uint16_t R_ENC_now;
     uint16_t L_ENC_now;
+    int64_t R_count_32bit;
+    int64_t L_count_32bit;
+    int64_t R_count_32bit_1;
+    int64_t L_count_32bit_1;
+    int64_t R_count_32bit_2;
+    int64_t L_count_32bit_2;
+
+
     const float BIG_R = 500000.0;
-    const float DELTA_T = 0.0005;
-    const float TIRE_GEAR_NUM = 49.0;
-    const float ENC_GEAR_NUM = 49.0;
-    const float GEAR_RATIO = TIRE_GEAR_NUM / ENC_GEAR_NUM;
-    const float ENC_RESOLUTION = 4096.0;
-    const float ENC_R_DIR = -1.0; // 機体が進む方向にタイヤを回した場合に位相係数カウント値が増えるか減るか
-    const float ENC_L_DIR = 1.0; // 増えるなら 1.0, 減るなら -1.0
-    const float PI = 3.14159265358979323846264;
+    const double DELTA_T = 0.0005;
+    const double TIRE_GEAR_NUM = 49.0;
+    const double ENC_GEAR_NUM = 49.0;
+    const double GEAR_RATIO = TIRE_GEAR_NUM / ENC_GEAR_NUM;
+    const double ENC_RESOLUTION = 4096.0;
+    const double ENC_R_DIR = -1.0; // 機体が進む方向にタイヤを回した場合に位相係数カウント値が増えるか減るか
+    const double ENC_L_DIR = 1.0; // 増えるなら 1.0, 減るなら -1.0
+    const double PI = 3.14159265358979323846264;
 
     WheelOdometry() {
         v = 0.0;
@@ -53,20 +61,31 @@ private:
         tire_ang_L = 0.0;
         v_ave = 0.0;
 
+        R_count_32bit = 0;
+        L_count_32bit = 0;
+        R_count_32bit_1 = 0;
+        L_count_32bit_1 = 0;
+        R_count_32bit_2 = 0;
+        L_count_32bit_2 = 0;
+
         for (uint8_t i = 0; i < 10; i++) {
             v_list.push_front(0.0);
         }
 
     }
 
+    double calcDiffWithInterpolation(int64_t s_0, int64_t s_1, int64_t s_2){
+        return (3.0 * (double)s_0 -  4.0 * (double)s_1 + (double)s_2) /(2.0 * DELTA_T);
+    }
+
     ~WheelOdometry() {
-    };
+    }
 
 
 public:
-    float v;
-    float v_R;
-    float v_L;
+    double v;
+    double v_R;
+    double v_L;
     float rpm_R;
     float rpm_L;
     float ang_v;
@@ -96,14 +115,23 @@ public:
             count_diff_L -= 65536;
         if (count_diff_L < -32768)
             count_diff_L += 65536;
+        
+        R_count_32bit += count_diff_R;
+        L_count_32bit += count_diff_L;
+
 
         ParameterManager &pm = ParameterManager::getInstance();
         //エンコーダより計測された速度
 
-        v_R = (ENC_R_DIR * PI * pm.dia_tire / GEAR_RATIO
-                * (float) (count_diff_R) / ENC_RESOLUTION) / DELTA_T;
-        v_L = (ENC_L_DIR * PI * pm.dia_tire / GEAR_RATIO
-                * (float) (count_diff_L) / ENC_RESOLUTION) / DELTA_T;
+        v_R = (ENC_R_DIR * PI * pm.dia_tire / GEAR_RATIO / ENC_RESOLUTION) *
+              calcDiffWithInterpolation(R_count_32bit, R_count_32bit_1, R_count_32bit_2);
+        v_L = (ENC_L_DIR * PI * pm.dia_tire / GEAR_RATIO / ENC_RESOLUTION) *
+              calcDiffWithInterpolation(L_count_32bit, L_count_32bit_1, L_count_32bit_2);
+
+        R_count_32bit_2 = R_count_32bit_1;
+        L_count_32bit_2 = L_count_32bit_1;
+        R_count_32bit_1 = R_count_32bit;
+        L_count_32bit_1 = L_count_32bit;
 
         v = (v_R + v_L) * 0.5;
         kappa = 2.0 * (v_R - v_L) / (pm.tread * (v_R + v_L));
@@ -135,7 +163,7 @@ public:
     float getAveV(){
         return v_ave;
     }
-    float getV() {
+    double getV() {
         return v;
     };
 
@@ -147,11 +175,11 @@ public:
         return -kappa;
     };
 
-    float getV_R() {
+    double getV_R() {
         return v_R;
     };
 
-    float getV_L() {
+    double getV_L() {
         return v_L;
     };
 

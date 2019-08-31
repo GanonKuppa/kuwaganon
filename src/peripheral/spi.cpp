@@ -75,25 +75,43 @@ void initRSPI0() {
 }
 
 void useSSLA0RSPI0(){
+    setEnableRSPI0(0);
     RSPI0.SPBR = 5; //8MHz
     RSPI0.SPCMD0.BIT.SSLA = 0; //0:SSL0 1:SSL1
+    RSPI0.SPCMD0.BIT.SPB = 0b0111;
 }
 
 void useSSLA1RSPI0(){
+    setEnableRSPI0(0);
     RSPI0.SPCMD0.BIT.SSLA = 1; //0:SSL0 1:SSL1
     RSPI0.SPBR = 20; //2MHz
+    RSPI0.SPCMD0.BIT.SPB = 0b1111;
+
 }
 
 
 uint8_t communicate8bitRSPI0(uint8_t transmit) {
     unsigned int receive;
     RSPI0.SPDR.LONG = (uint8_t) transmit;
-    //while(RSPI0.SPSR.BIT.SPTEF != 1);
+    while(RSPI0.SPSR.BIT.SPTEF != 1){
+    };
     while (RSPI0.SPSR.BIT.SPRF == 0) {
-        //
     }
     receive = RSPI0.SPDR.LONG;
     return (uint8_t) (receive & 0xff);
+}
+
+uint16_t communicate16bitRSPI0(uint16_t transmit){
+    setEnableRSPI0(0);
+    setEnableRSPI0(1);
+    uint32_t receive;
+    RSPI0.SPDR.LONG = (uint16_t) transmit;
+    while(RSPI0.SPSR.BIT.SPTEF == 0){} //送信完了待ち
+    while(RSPI0.SPSR.BIT.SPRF == 0){} //データ受信待ち
+
+    receive = RSPI0.SPDR.LONG;
+
+    return (uint16_t) (receive & 0xffff);
 }
 
 uint8_t communicate8bitRSPI1(uint8_t transmit) {
@@ -178,8 +196,9 @@ void communicateNbyteRSPI0(uint8_t* send, uint8_t* recv, uint8_t num) {
     for (int i = 0; i < num; i++) {
         //1byte受信するたびにちょっと待ち時間が必要
         uint32_t dummy = TMR0.TCNT;
-        while (dummy == TMR0.TCNT)
-            ;
+        while (dummy == TMR0.TCNT);
+
+
         recv[i] = communicate8bitRSPI0(send[i]);
     }
     setEnableRSPI0(0);
@@ -191,8 +210,7 @@ void communicateNbyteRSPI1(uint8_t* send, uint8_t* recv, uint8_t num) {
 
         //1byte受信するたびにちょっと待ち時間が必要
         uint32_t dummy = TMR0.TCNT;
-        while (dummy == TMR0.TCNT)
-            ;
+        while (dummy == TMR0.TCNT);
         recv[i] = communicate8bitRSPI1(send[i]);
     }
     setEnableRSPI1(0);

@@ -41,6 +41,7 @@ extern "C" void __main() {
 #include <array>
 #include <memory>
 #include <myUtil.h>
+#include <functional>
 
 //peripheral_RX71M
 #include "clock.h"
@@ -129,29 +130,40 @@ void timeInterrupt(void) {
     //スロット0
     if (int_tick_count % 4 == 0) {
         if (getElapsedMsec() > 7000){
-            icm.update();
-            adis.update();
+            wheelOdometry.update();
+            std::function< void(void) > w1 = [&icm]() { icm.update(); };
+            std::function< void(void) > w2 = []() { waitusec_sub(10); };
+            std::function< void(void) > w3 = [&wallSen]() { wallSen.update();};
+            std::function< void(void) > w4 = [&mouse]() { mouse.update(); };
+            adis.update(w1, w2, w3, w4);
         }
-        wheelOdometry.update();
-        mouse.update();
+        else{
+            wallSen.update();
+            mouse.update();
+        }
     }
     //スロット1
-    if (int_tick_count % 4 == 1) {
-        wallSen.update();
+    if (int_tick_count % 4 == 0) {
+        wheelOdometry.update();
         gamepad.update();
     }
     //スロット2
     if (int_tick_count % 4 == 2) {
         if (getElapsedMsec() > 7000){
-            icm.update();
-            adis.update();
+            std::function< void(void) > w1 = [&icm]() { icm.update(); };
+            std::function< void(void) > w2 = []() { waitusec_sub(10); };
+            std::function< void(void) > w3 = [&wallSen]() { wallSen.update();};
+            std::function< void(void) > w4 = [&mouse]() { mouse.update(); };
+            adis.update(w1, w2, w3, w4);
         }
-        wheelOdometry.update();
-        mouse.update();
+        else{
+            wallSen.update();
+            mouse.update();
+        }
     }
     //スロット3
     if (int_tick_count % 4 == 3) {
-        wallSen.update();
+        wheelOdometry.update();
         dialL.update();
         dialR.update();
         fcled.update();

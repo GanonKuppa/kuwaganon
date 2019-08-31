@@ -7,14 +7,13 @@
 #include "timer.h"
 #include "myUtil.h"
 #include <deque>
+#include <functional>
 
 namespace umouse {
 
 class adis16470{
 
 public:
-    const uint8_t BUFF_SIZE = 10;
-    const float CONSTANT_G = 9.80665;
     int16_t omega_raw[3];
     int32_t omega_raw_32bit[3];
     int16_t acc_raw[3];
@@ -29,8 +28,9 @@ public:
     float omega_f[3];
     float acc_f[3];
 
-    uint8_t whoAmI(){
-        return readReg(0x72);
+    uint16_t whoAmI(){
+        uint16_t dummy = readReg(0x7200);
+        return readReg(0x7200);
     }
     void init(){
         ParameterManager &pm = ParameterManager::getInstance();
@@ -48,30 +48,54 @@ public:
         return instance;
     }
 
-    void update(){
+
+    void update(std::function< void(void) > w1,
+                std::function< void(void) > w2,
+                std::function< void(void) > w3,
+                std::function< void(void) > w4){
+
         ParameterManager &pm = ParameterManager::getInstance();
-        uint16_t Z_GYRO_OUT = readReg(0x0C);
-        waitusec_sub(10);
-        uint16_t Z_GYRO_LOW = readReg(0x0E);
+
+        uint16_t dummy       = readReg(0x0C00);
+        w1();
+        uint16_t Z_GYRO_LOW  = readReg(0x0E00);
+        w2();
+        uint16_t Z_GYRO_OUT  = readReg(0x1200);
+        w3();
+        uint16_t X_ACCEL_OUT = readReg(0x1600);
+        w4();
+        uint16_t Y_ACCEL_OUT = readReg(0x0000);
+
+
+        // GYRO_Z
         omega_raw[2] = Z_GYRO_OUT;
         omega_raw[1] = Z_GYRO_LOW;
         omega_raw_32bit[2] = ((Z_GYRO_OUT << 16) + Z_GYRO_LOW);
-
         omega_ref[2] = pm.gyro2_z_ref;
-
-        omega_c[2] = (- (omega_raw_32bit[2]) / 655360.0 ) - pm.gyro2_z_ref;
+        omega_c[2] = (omega_raw_32bit[2] * GYRO32BIT_SCALE) - omega_ref[2];
 
         float scaler = 0.0f;
         if(omega_c[2] >= 0) scaler= pm.gyro2_scaler_left;
         else scaler = pm.gyro2_scaler_right;
 
-
-        //omega_f[2] =  0.5 * (scaler * 0.1f * 0.01f * omega_c[2]) + 0.5 * omega_f[2];
         omega_f[2] = scaler * omega_c[2];
 
+        // ACC Y
+        acc_raw[1] = Y_ACCEL_OUT;
+        acc_c[1] = Y_ACCEL_OUT * ACC_SCALE;// - acc_ref[1];
+        acc_ref[1] = pm.acc2_y_ref;
+        acc_f[1] = acc_c[1];
+
+        // ACC X
+        acc_raw[0] = X_ACCEL_OUT;
+        acc_c[0] = X_ACCEL_OUT * ACC_SCALE;// - acc_ref[1];
+        acc_ref[0] = pm.acc2_x_ref;
+        acc_f[0] = acc_c[2];
 
 
     };
+
+
 
 
     void calibOmegaOffset(uint32_t ref_num){
@@ -81,7 +105,7 @@ public:
 
         for (uint32_t i = 0; i < ref_num; i++) {
             waitusec(500);
-            omega_z_sum += -(omega_raw_32bit[2]) / 655360.0f;
+            omega_z_sum += (omega_raw_32bit[2]) * GYRO32BIT_SCALE;
         }
 
         ref_z = (omega_z_sum / (float) (ref_num));
@@ -96,37 +120,37 @@ public:
 
 
 private:
+    const float CONSTANT_G = 9.80665;
+    const float GYRO32BIT_SCALE = - 1/655360.0f;
+    const float ACC_SCALE = 0.00125f * CONSTANT_G;
 
+/*
     uint16_t readReg(uint16_t adress){
         useSSLA1RSPI0();
         uint8_t sendBuf[2];
         uint8_t recvBuf[2];
 
         sendBuf[0] = adress;
-        sendBuf[1] = adress + 1;
-        //sendBuf[2] = 0;
+        sendBuf[1] = adress;
+
+        communicateNbyteRSPI0(sendBuf, recvBuf, 2);
+        waitusec_sub(10);
+        // なぜか前回読み取り値が次の受信時に取得される
         communicateNbyteRSPI0(sendBuf, recvBuf, 2);
         useSSLA0RSPI0();
 
         return (recvBuf[0] << 8)+ (recvBuf[1]);
     };
+*/
 
-    uint64_t readGyro32bit(){
+    uint16_t readReg(uint16_t adress){
         useSSLA1RSPI0();
-        uint8_t sendBuf[6];
-        uint8_t recvBuf[6];
 
-        sendBuf[0] = 0x0C;
-        sendBuf[1] = 0x0D;
-        sendBuf[2] = 0x0E;
-        sendBuf[3] = 0x0F;
-        sendBuf[4] = 0x0E;
-        sendBuf[5] = 0x0F;
-        communicateNbyteRSPI0(sendBuf, recvBuf, 6);
+        uint8_t recvBuf[2];
+        uint16_t recv = communicate16bitRSPI0(adress);
         useSSLA0RSPI0();
-        return ((recvBuf[0]) + (recvBuf[1] << 8) + (recvBuf[2] << 16) + (recvBuf[3] << 24)+ (recvBuf[4] << 32) + (recvBuf[5] << 40));
-
-    }
+        return recv;
+    };
 
 
     void writeReg(uint16_t adress, uint16_t data){

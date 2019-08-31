@@ -354,6 +354,7 @@ namespace umouse {
                         m.maze.writeMazeData2Flash();
                         printfAsync("OOOOO Start!\n");
                         auto traj0 = StraightTrajectory::createAsWallCenter(0.09/2.0, v, v, 0.0, a, a);
+                        auto traj1 = StopTrajectory::create(1.0f);
                         m.trajCommander.push(std::move(traj0));
                     }
                     else {

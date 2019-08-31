@@ -37,18 +37,18 @@ public:
     float y;
     float y_d;
     float y_dd;
-    float ang;
+    double ang;
     float ang_v;
     float ang_a;
     float v;
     float a;
     float target_dist;
-    float cumulative_dist;
-    float cumulative_ang;
+    double cumulative_dist;
+    double cumulative_ang;
     float cumulative_t;
     EMotionType motion_type;
     uint16_t hash;
-    const float DELTA_T = 0.0005;
+    const double DELTA_T = 0.0005;
 
     void setInitPos(float x_, float y_, float ang_){
         x = x_;
@@ -400,8 +400,12 @@ public:
     {
         if(target_cumulative_ang == 0.0f) return true;
 
-        if (ABS(cumulative_ang) >= ABS(target_cumulative_ang))
+        if (ABS(cumulative_ang) >= ABS(target_cumulative_ang)){
+            x = getEndX();
+            y = getEndY();
+            ang = getEndAng();
             return true;
+        }            
         else
             return false;
     }
