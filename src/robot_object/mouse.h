@@ -325,9 +325,6 @@ private:
     UMouse() {
 
         direction = N;
-        //ab_position.x = 0.09;
-        //ab_position.y = 0.09;
-        //ab_ang = 90.0;
         switch_back = false;
         direct_duty_set_enable = false;
         initBuff();

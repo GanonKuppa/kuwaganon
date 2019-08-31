@@ -130,7 +130,6 @@ void timeInterrupt(void) {
     //スロット0
     if (int_tick_count % 4 == 0) {
         if (getElapsedMsec() > 7000){
-            wheelOdometry.update();
             std::function< void(void) > w1 = [&icm]() { icm.update(); };
             std::function< void(void) > w2 = []() { waitusec_sub(10); };
             std::function< void(void) > w3 = [&wallSen]() { wallSen.update();};

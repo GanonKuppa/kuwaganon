@@ -79,11 +79,11 @@ namespace umouse {
             if (param_mode == 0) return;
             else if(param_mode == 1) turn_p.set(0.3, 0.3, 4.0);
             else if(param_mode == 2) turn_p.set(0.6, 0.3, 4.0);
-            else if(param_mode == 3) turn_p.set(0.9, 0.3, 4.0);
-            else if(param_mode == 4) turn_p.set(1.0, 0.35, 4.0);
-            else if(param_mode == 5) turn_p.set(1.5, 0.35, 6.0);
-            else if(param_mode == 6) turn_p.set(2.5, 0.35, 8.0);
-            else if(param_mode == 7) turn_p.set(3.0, 0.35, 10.0);
+            else if(param_mode == 3) turn_p.set(1.0, 1.0, 0.35, 0.55, 0.5, 0.4, 0.4, 0.4, 6.0, 3.0);
+            else if(param_mode == 4) turn_p.set(1.5, 1.0, 0.35, 0.55, 0.5, 0.4, 0.4, 0.4, 6.0, 3.0);
+            else if(param_mode == 5) turn_p.set(2.0, 1.0, 0.35, 0.55, 0.5, 0.4, 0.4, 0.4, 6.0, 3.0);
+            else if(param_mode == 6) turn_p.set(2.5, 1.0, 0.4, 0.55, 0.5, 0.4, 0.4, 0.4, 8.0, 3.0);
+            else if(param_mode == 7) turn_p.set(3.0, 1.0, 0.4, 0.55, 0.5, 0.4, 0.4, 0.4, 8.0, 3.0);
 
             std::vector<Path> path_vec;
             makeMinStepPath(pm.goal_x, pm.goal_y, m.maze, path_vec);
