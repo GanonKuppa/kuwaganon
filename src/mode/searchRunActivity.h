@@ -41,6 +41,7 @@ namespace umouse {
             auto activity = ActivityFactory::cteateSubModeSelect();
             activity->start(intent);
             printfAsync("SUB MODE SELECT RESULT = %d", intent->uint8_t_param["SUB_MODE"]);
+            if(intent->uint8_t_param["SUB_MODE"] == (uint8_t)ESearchMode::BACK_MODE_SELECT) return;
 
             UMouse &m = UMouse::getInstance();
             waitmsec(1000);
