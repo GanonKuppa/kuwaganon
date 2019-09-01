@@ -166,7 +166,10 @@ void ParameterManager::init() {
     registration<uint16_t>(143, wall_contact_threshold_ahead_r);
     registration<uint16_t>(144, wall_contact_collision_threshold_ahead_l);
     registration<float>(145, wall_contact_offset);
-    ;
+    registration<uint16_t>(146, wall_diagonal_ahead_l_threshold); //146;
+    registration<uint16_t>(147, wall_diagonal_ahead_r_threshold); //147;
+    registration<float>(148, wall_diagonal_avoid_add_ang); //148;
+
     ;
     ;
     registration<int16_t>(150, gyro_x_ref);

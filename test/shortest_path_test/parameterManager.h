@@ -203,6 +203,9 @@ namespace umouse {
          uint16_t wall_contact_threshold_ahead_r; //143
          uint16_t wall_contact_collision_threshold_ahead_l; //144
          float wall_contact_offset; //145
+         uint16_t wall_diagonal_ahead_l_threshold; //146;
+         uint16_t wall_diagonal_ahead_r_threshold; //147;
+         float wall_diagonal_avoid_add_ang; //148;
 
 
          int16_t gyro_x_ref; //150

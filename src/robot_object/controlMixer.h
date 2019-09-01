@@ -105,6 +105,9 @@ namespace umouse {
         }
 
         void update( const BaseTrajectory& traj, const PositionEstimator& esti) {
+            ParameterManager &pm = ParameterManager::getInstance();
+
+
             setPIDF(traj);
             local_x_pidf.update(traj.x, esti.x);
             local_y_pidf.update(traj.y, esti.y);
@@ -144,6 +147,12 @@ namespace umouse {
             else {
                 wall_pidf.reset();
             }
+/*
+            if(traj.motion_type == EMotionType::DIAGONAL_CENTER){
+                float diag_error = WallSensor::getInstance().ahead_l()
+                if( > )target_rot_v += 
+            }
+*/
 
             if(traj.motion_type == EMotionType::STOP ||
                traj.motion_type == EMotionType::SPINTURN ||
@@ -158,7 +167,14 @@ namespace umouse {
                )
                //traj.v < 0.11 ||
                //1
-            ) {
+            ) {                
+                if(traj.motion_type == EMotionType::DIAGONAL_CENTER){
+                    float target_ang = traj.ang;
+                    if (WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold) target_ang -= pm.wall_diagonal_avoid_add_ang;
+                    else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold) target_ang += pm.wall_diagonal_avoid_add_ang;
+                    ang_pidf.update(target_ang, esti.ang);
+                }
+
                 ang_pidf.update(traj.ang, esti.ang);
                 target_rot_v += ang_pidf.getControlVal();
             }
@@ -171,6 +187,8 @@ namespace umouse {
                 ang_pidf.reset();
                 printfAsync("reset!!\n");
             }
+            
+
 
 
             v_pidf.update(target_trans_v, esti.v);
@@ -180,7 +198,6 @@ namespace umouse {
             duty(0) = 0.0f;
             duty(1) = 0.0f;
 
-            ParameterManager &pm = ParameterManager::getInstance();
 
             Eigen::Vector2f duty_v_FF(0.0f, 0.0f);
             duty_v_FF += pt.transAccDuty(target_trans_a);
