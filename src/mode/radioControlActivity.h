@@ -26,9 +26,9 @@ protected:
         UMouse &m = UMouse::getInstance();
         float limit = 0.0;
         if(gamepad.LB > 1){
-            limit = 0.8;
+            limit = 0.75;
         }
-        else limit = 0.4;
+        else limit = 0.65;
 
         float l_duty = constrain(gamepad.L3D_y/128.0,-limit, limit);
         float r_duty = constrain(gamepad.R3D_y/128.0,-limit, limit);
