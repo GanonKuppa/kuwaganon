@@ -6,6 +6,7 @@
 #include "wallsensor.h"
 
 
+
 namespace umouse{
 
 class WallController : public VelocityTypePidController {
@@ -57,11 +58,13 @@ public:
 class WallPidfController : public VelocityTypePidfController{
 public:
 
-    virtual void update(WallSensor& ws) {
+    virtual void update(WallSensor& ws, bool isRWall, bool isLWall) {
         if((ws.isRight_for_ctrl() == false &&
             ws.isLeft_for_ctrl() == false ) ||
             ws.isAhead_l() == true ||
-            ws.isAhead_r() == true) {
+            ws.isAhead_r() == true ||
+           (isRWall == false &&
+            isLWall == false ) ) {
             reset();
             return;
         }
@@ -69,8 +72,8 @@ public:
         int16_t e_fr = 0;
         int16_t e_fl = 0;
         float error = 0.0f;
-        if(ws.isRight_for_ctrl() == true) e_fr = +(ws.right() - ws.center_r() );
-        if(ws.isLeft_for_ctrl() == true ) e_fl = -(ws.left() - ws.center_l() );
+        if(ws.isRight_for_ctrl() == true && isRWall == true) e_fr = +(ws.right() - ws.center_r() );
+        if(ws.isLeft_for_ctrl() == true && isLWall == true) e_fl = -(ws.left() - ws.center_l() );
 
         e_fr = constrain(e_fr, -ws.center_r()*1.5f, ws.center_r()*1.5f);
         e_fl = constrain(e_fl, -ws.center_l()*1.5f, ws.center_l()*1.5f);

@@ -133,18 +133,18 @@ void timeInterrupt(void) {
             std::function< void(void) > w1 = [&icm]() { icm.update(); };
             std::function< void(void) > w2 = []() { waitusec_sub(10); };
             std::function< void(void) > w3 = [&wallSen]() { wallSen.update();};
-            std::function< void(void) > w4 = [&mouse]() { mouse.update(); };
+            std::function< void(void) > w4 = [&mouse]() { waitusec_sub(10); };
             adis.update(w1, w2, w3, w4);
         }
         else{
-            wallSen.update();
-            mouse.update();
+            wallSen.update();            
         }
     }
     //スロット1
     if (int_tick_count % 4 == 0) {
         wheelOdometry.update();
         gamepad.update();
+        mouse.update();
     }
     //スロット2
     if (int_tick_count % 4 == 2) {
@@ -152,12 +152,11 @@ void timeInterrupt(void) {
             std::function< void(void) > w1 = [&icm]() { icm.update(); };
             std::function< void(void) > w2 = []() { waitusec_sub(10); };
             std::function< void(void) > w3 = [&wallSen]() { wallSen.update();};
-            std::function< void(void) > w4 = [&mouse]() { mouse.update(); };
+            std::function< void(void) > w4 = [&mouse]() { waitusec_sub(10); };
             adis.update(w1, w2, w3, w4);
         }
         else{
-            wallSen.update();
-            mouse.update();
+            wallSen.update();            
         }
     }
     //スロット3
@@ -166,6 +165,7 @@ void timeInterrupt(void) {
         dialL.update();
         dialR.update();
         fcled.update();
+        mouse.update();
 
     }
 

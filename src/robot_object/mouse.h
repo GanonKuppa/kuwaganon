@@ -195,7 +195,7 @@ public:
         if(direct_duty_set_enable != true){
             if(trajCommander.empty() != true){
                 auto traj = trajCommander.getTraj();
-                ctrlMixer.update(traj, posEsti);
+                ctrlMixer.update(traj, posEsti, isRWallControllable(), isLWallControllable());
                 auto duty = ctrlMixer.getDuty();
                 if(ws.isContactWall() == true &&
                    ws.getContactWallTime() > 0.2 &&
@@ -277,6 +277,7 @@ public:
     bool inReadWallArea(){
         float fmod_x = fmod(posEsti.x, 0.09);
         float fmod_y = fmod(posEsti.y, 0.09);
+        
         if(getDirection() == direction_e::E){
             if(fmod_x < 0.09 && fmod_x >= 0.09 - READ_WALL_OFFSET) return true;
             else return false;
@@ -319,7 +320,7 @@ public:
         printfAsync("pos = (%f, %f), ang=%f, coor = (%d, %d) dir = %d , \n",
             posEsti.x, posEsti.y, posEsti.ang, coor.x, coor.y, direction);
     }
-/*
+
     bool isRWallControllable(){
         // マウスと同じ角度の座標系における区画の入口からの距離
         float fmod_x = fmod(posEsti.x, 0.09);
@@ -347,7 +348,7 @@ public:
             else if (direction == direction_e::S) y_--;
         }
 
-        return maze.existRWall(x_, y_, direction
+        return maze.existRWall(x_, y_, direction);
     }
 
     bool isLWallControllable(){
@@ -379,7 +380,7 @@ public:
 
         return maze.existLWall(x_, y_, direction);
     }
-*/
+
 
 private:
     UMouse() {

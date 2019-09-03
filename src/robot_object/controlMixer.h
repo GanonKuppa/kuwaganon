@@ -104,7 +104,7 @@ namespace umouse {
 
         }
 
-        void update( const BaseTrajectory& traj, const PositionEstimator& esti) {
+        void update( const BaseTrajectory& traj, const PositionEstimator& esti, bool isRWall, bool isLWall) {
             ParameterManager &pm = ParameterManager::getInstance();
 
 
@@ -143,7 +143,7 @@ namespace umouse {
             if(traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER && traj.v > 0.1 //&&
 //                UMouse::getInstance().isWallControllable();
                ) {
-                wall_pidf.update(WallSensor::getInstance());
+                wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall);
                 target_rot_v += wall_pidf.getControlVal();
             }
             else {
