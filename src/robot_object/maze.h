@@ -120,6 +120,24 @@ public:
         return wall;
     };
 
+    bool existRWall(uint16_t x, uint16_t y, direction_e dir){
+        Wall wall = readWall(x, y);    
+        if(dir == direction_e::E) return wall.S && wall.SF;
+        else if(dir == direction_e::N) return wall.E && wall.EF;
+        else if(dir == direction_e::W) return wall.N && wall.NF;
+        else if(dir == direction_e::S) return wall.W && wall.WF;
+        else return false;
+    }
+
+    bool existLWall(uint16_t x, uint16_t y, direction_e dir){
+        Wall wall = readWall(x, y);
+        if(dir == direction_e::E) return wall.N && wall.NF;
+        else if(dir == direction_e::N) return wall.W && wall.WF;
+        else if(dir == direction_e::W) return wall.S && wall.SF;
+        else if(dir == direction_e::S) return wall.E && wall.SF;
+        else return false;
+    }
+
     void updateStartSectionWall(){
         writeReached(0,0,true);
         Wall wall = Wall(direction_e::N, true, false, true);

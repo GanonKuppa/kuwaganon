@@ -319,7 +319,67 @@ public:
         printfAsync("pos = (%f, %f), ang=%f, coor = (%d, %d) dir = %d , \n",
             posEsti.x, posEsti.y, posEsti.ang, coor.x, coor.y, direction);
     }
+/*
+    bool isRWallControllable(){
+        // マウスと同じ角度の座標系における区画の入口からの距離
+        float fmod_x = fmod(posEsti.x, 0.09);
+        float fmod_y = fmod(posEsti.y, 0.09);        
+        float dist = 0.0;
+        if(getDirection() == direction_e::E){
+            dist = fmod_x;
+        }
+        if(getDirection() == direction_e::N){
+            dist = fmod_y;
+        }
+        if(getDirection() == direction_e::W){
+            dist = 0.09f - fmod_x;
+        }
+        if(getDirection() == direction_e::S){
+            dist = 0.09f - fmod_y;
+        }
 
+        uint8_t x_ = coor.x;
+        uint8_t y_ = coor.y;
+        if(dist > 0.045f){
+            if (direction == direction_e::E) x_++;
+            else if (direction == direction_e::N) y_++;
+            else if (direction == direction_e::W) x_--;
+            else if (direction == direction_e::S) y_--;
+        }
+
+        return maze.existRWall(x_, y_, direction
+    }
+
+    bool isLWallControllable(){
+        // マウスと同じ角度の座標系における区画の入口からの距離
+        float fmod_x = fmod(posEsti.x, 0.09);
+        float fmod_y = fmod(posEsti.y, 0.09);        
+        float dist = 0.0;
+        if(getDirection() == direction_e::E){
+            dist = fmod_x;
+        }
+        if(getDirection() == direction_e::N){
+            dist = fmod_y;
+        }
+        if(getDirection() == direction_e::W){
+            dist = 0.09f - fmod_x;
+        }
+        if(getDirection() == direction_e::S){
+            dist = 0.09f - fmod_y;
+        }
+
+        uint8_t x_ = coor.x;
+        uint8_t y_ = coor.y;
+        if(dist > 0.045f){
+            if (direction == direction_e::E) x_++;
+            else if (direction == direction_e::N) y_++;
+            else if (direction == direction_e::W) x_--;
+            else if (direction == direction_e::S) y_--;
+        }
+
+        return maze.existLWall(x_, y_, direction);
+    }
+*/
 
 private:
     UMouse() {

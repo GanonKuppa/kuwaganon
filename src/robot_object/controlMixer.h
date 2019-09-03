@@ -140,7 +140,9 @@ namespace umouse {
                 target_rot_v_pre = target_rot_v;
             }
 
-            if(traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER && traj.v > 0.1) {
+            if(traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER && traj.v > 0.1 //&&
+//                UMouse::getInstance().isWallControllable();
+               ) {
                 wall_pidf.update(WallSensor::getInstance());
                 target_rot_v += wall_pidf.getControlVal();
             }

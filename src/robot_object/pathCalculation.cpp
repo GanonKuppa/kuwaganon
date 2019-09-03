@@ -16,8 +16,7 @@
 #include "pathCompression.h"
 #include "mouse.h"
 
-namespace umouse
-{
+namespace umouse {
 
 void makeMinStepPath(uint16_t goal_x, uint16_t goal_y, Maze &maze, std::vector<Path> &path_vec)
 {
