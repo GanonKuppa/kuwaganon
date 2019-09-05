@@ -134,6 +134,7 @@ public:
         L_count_32bit_1 = L_count_32bit;
 
         v = (v_R + v_L) * 0.5;
+        if( fabs(v_R + v_L) > 0.001)
         kappa = 2.0 * (v_R - v_L) / (pm.tread * (v_R + v_L));
         float ang_v_rad = (v_R - v_L) / pm.tread; //v * kappa;
         ang_v = RAD2DEG(ang_v_rad);
@@ -163,9 +164,13 @@ public:
     float getAveV(){
         return v_ave;
     }
-    double getV() {
-        return v;
+    float getV() {
+        return (float)v;
     };
+
+    double getV_double(){
+        return v;
+    }
 
     float getAng_v() {
         return ang_v;
@@ -175,12 +180,12 @@ public:
         return -kappa;
     };
 
-    double getV_R() {
-        return v_R;
+    float getV_R() {
+        return (float)v_R;
     };
 
-    double getV_L() {
-        return v_L;
+    float getV_L() {
+        return (float)v_L;
     };
 
     float getTireAng_L(){

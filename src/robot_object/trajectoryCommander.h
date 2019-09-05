@@ -42,7 +42,7 @@ public:
             return false;
     }
 
-    void update(const PositionEstimator& esti){
+    void update(PositionEstimator& esti){
         
 
         if(trajQueue.empty() == false){
@@ -69,7 +69,7 @@ public:
                 printfAsync(">    ------- exceeded traj end! --------\n");
                 printfAsync(">    motion_type: %s %04x\n", s, hash);
                 printfAsync(">    (x_t, y_t, ang_t)=(%f, %f, %f) queue num:%d | dist:%f \n", x, y, ang ,trajQueue.size(), trajQueue.front()->target_dist);
-                printfAsync(">    (x_e, y_e, ang_e)=(%f, %f, %f)\n", esti.x, esti.y, esti.ang);
+                printfAsync(">    (x_e, y_e, ang_e)=(%f, %f, %f)\n", esti.getX(), esti.getY(), esti.getAng());
                 printfAsync(">    cumulative_dist overwrited!\n");
 
                 x = trajQueue.front()->getEndX();
@@ -180,7 +180,7 @@ public:
         //SE_Im7();
     }
 
-    float residualDist(const PositionEstimator& esti){
+    float residualDist(PositionEstimator& esti){
         float dist = 0.0f;
         if(trajQueue.empty() == false){
 /*
@@ -193,7 +193,7 @@ public:
             float rad = DEG2RAD(ang);
             float x1 = trajQueue.front()->getEndX();
             float y1 = trajQueue.front()->getEndY();
-            dist = (x1 - esti.x) * cosf(rad) + (y1 - esti.y) * sinf(rad);
+            dist = (x1 - esti.getX()) * cosf(rad) + (y1 - esti.getY()) * sinf(rad);
 
         }
 

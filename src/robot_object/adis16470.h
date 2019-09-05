@@ -61,15 +61,15 @@ public:
         uint16_t Z_GYRO_LOW  = readReg(0x0E00);
         w2();
         uint16_t Z_GYRO_OUT  = readReg(0x1200);
+/*
         w3();
         uint16_t X_ACCEL_OUT = readReg(0x1600);
         w4();
         uint16_t Y_ACCEL_OUT = readReg(0x0000);
-
+*/
 
         // GYRO_Z
         omega_raw[2] = Z_GYRO_OUT;
-        omega_raw[1] = Z_GYRO_LOW;
         omega_raw_32bit[2] = ((Z_GYRO_OUT << 16) + Z_GYRO_LOW);
         omega_ref[2] = pm.gyro2_z_ref;
         omega_c[2] = (omega_raw_32bit[2] * GYRO32BIT_SCALE) - omega_ref[2];
@@ -79,7 +79,7 @@ public:
         else scaler = pm.gyro2_scaler_right;
 
         omega_f[2] = scaler * omega_c[2];
-
+/*
         // ACC Y
         acc_raw[1] = Y_ACCEL_OUT;
         acc_c[1] = Y_ACCEL_OUT * ACC_SCALE;// - acc_ref[1];
@@ -91,10 +91,9 @@ public:
         acc_c[0] = X_ACCEL_OUT * ACC_SCALE;// - acc_ref[1];
         acc_ref[0] = pm.acc2_x_ref;
         acc_f[0] = acc_c[2];
-
+*/
 
     };
-
 
 
 

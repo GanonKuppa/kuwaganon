@@ -104,13 +104,13 @@ namespace umouse {
 
         }
 
-        void update( const BaseTrajectory& traj, const PositionEstimator& esti, bool isRWall, bool isLWall) {
+        void update(BaseTrajectory& traj, PositionEstimator& esti, bool isRWall, bool isLWall) {
             ParameterManager &pm = ParameterManager::getInstance();
 
 
             setPIDF(traj);
-            local_x_pidf.update(traj.x, esti.x);
-            local_y_pidf.update(traj.y, esti.y);
+            local_x_pidf.update(traj.x, esti.getX());
+            local_y_pidf.update(traj.y, esti.getY());
 
             if(traj.motion_type == EMotionType::STOP) FcLed::getInstance().turn(1,0,0);
             else FcLed::getInstance().turn(0,0,0);
@@ -162,22 +162,25 @@ namespace umouse {
                traj.motion_type == EMotionType::DIAGONAL ||
                traj.motion_type == EMotionType::DIAGONAL_CENTER ||
                traj.motion_type == EMotionType::STRAIGHT ||
+               (isLWall == false && isRWall == false) ||
                (traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER
                 && 
                 (WallSensor::getInstance().isRight_for_ctrl() == false &&
                 WallSensor::getInstance().isLeft_for_ctrl() == false)
                )
-               //traj.v < 0.11 ||
-               //1
             ) {                
                 if(traj.motion_type == EMotionType::DIAGONAL_CENTER){
                     float target_ang = traj.ang;
-                    if (WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold) target_ang -= pm.wall_diagonal_avoid_add_ang;
-                    else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold) target_ang += pm.wall_diagonal_avoid_add_ang;
-                    ang_pidf.update(target_ang, esti.ang);
+
+                    if (WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold){
+                        target_ang -= pm.wall_diagonal_avoid_add_ang;
+                    }
+                    else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold){
+                        target_ang += pm.wall_diagonal_avoid_add_ang;
+                    }
                 }
 
-                ang_pidf.update(traj.ang, esti.ang);
+                ang_pidf.update(traj.ang, esti.getAng());
                 target_rot_v += ang_pidf.getControlVal();
             }
             else {
@@ -193,8 +196,8 @@ namespace umouse {
 
 
 
-            v_pidf.update(target_trans_v, esti.v);
-            ang_v_pidf.update(target_rot_v, esti.ang_v);
+            v_pidf.update(target_trans_v, esti.getV());
+            ang_v_pidf.update(target_rot_v, esti.getAngV());
 
             PowerTransmission &pt = PowerTransmission::getInstance();
             duty(0) = 0.0f;

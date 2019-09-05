@@ -238,8 +238,8 @@ public:
         int16_t right_ = ws.right();
         printfAsync("▶▶▶ 壁|| 左:%d 前:(%d %d) 右:%d \n",left_, ahead_l_, ahead_r_ ,right_);
 
-        if(x==0 && y==0){
-            writeReached(x,y,true);
+        if(x == 0 && y == 0){
+            writeReached(x, y, true);
             Wall wall;
             wall.E = 1;
             wall.N = 0;

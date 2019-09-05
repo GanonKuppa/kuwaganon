@@ -394,14 +394,14 @@ void packVelocityAdjData(uint8_t *buf){
         set2ByteVal(buf, 136+ 2*i, (float)m.v_acc_buff.at(i), 3000.0);
         set2ByteVal(buf, 302+ 2*i, (float)m.acc_y_buff.at(i), 20.0);
     }
-
+/*
     for(int i= 0; i<27; i++){
         set2ByteVal(buf, 196+ 2*i, (float)m.v_comp_buff.at(i), 3000.0);
     }
     for(int i= 0; i<3; i++){
         set2ByteVal(buf, 362+ 2*i, (float)m.v_comp_buff.at(i+27), 3000.0);
     }
-
+*/
 
     //printf Data
     uint16_t start_byte = PERIODIC_MSG_LEN - printfFieldNum;
@@ -500,9 +500,9 @@ void packData(uint8_t *buf) {
     set2ByteVal(buf, 88, m.coor.x);
     set2ByteVal(buf, 90, m.coor.y);
 
-    set2ByteVal(buf, 92, (float)m.posEsti.x, 1000);
-    set2ByteVal(buf, 94, (float)m.posEsti.y, 1000);
-    set2ByteVal(buf, 96, (float)m.posEsti.ang, 100);
+    set2ByteVal(buf, 92, (float)m.posEsti.getX(), 1000);
+    set2ByteVal(buf, 94, (float)m.posEsti.getY(), 1000);
+    set2ByteVal(buf, 96, (float)m.posEsti.getAng(), 100);
     set2ByteVal(buf, 98, (int16_t)m.direction);
     set2ByteVal(buf, 100, m.trajCommander.x, 1000);
     set2ByteVal(buf, 102, m.trajCommander.y, 1000);
@@ -513,7 +513,7 @@ void packData(uint8_t *buf) {
     set2ByteVal(buf, 110, m.trajCommander.v, 10000);
     set2ByteVal(buf, 112, m.ctrlMixer.target_trans_v, 10000);
 
-    set2ByteVal(buf, 114, (float)m.posEsti.ang_v, 10);
+    set2ByteVal(buf, 114, (float)m.posEsti.getAngV(), 10);
     set2ByteVal(buf, 116, m.trajCommander.ang_v, 10);
     set2ByteVal(buf, 118, m.ctrlMixer.target_rot_v, 10);
 

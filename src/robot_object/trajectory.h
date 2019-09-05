@@ -37,7 +37,7 @@ public:
     float y;
     float y_d;
     float y_dd;
-    double ang;
+    float ang;
     float ang_v;
     float ang_a;
     float v;

@@ -73,8 +73,7 @@ public:
     float t_ang;//event側で更新    x 100
     float accum_ang;//event側で更新    x 100
     float gyro_ang_v;// -2000deg/secから+2000deg/sec
-    float v_acc;
-    float v_comp;
+    float v_acc;    
     float v_side;
 
     float wall_P;//event側で更新  -10.0から10.0   x 3000
@@ -117,8 +116,7 @@ public:
     std::deque<float> ang_v_buff;
     std::deque<float> t_v_buff;
     std::deque<float> v_buff;
-    std::deque<float> v_acc_buff;
-    std::deque<float> v_comp_buff;
+    std::deque<float> v_acc_buff;    
     std::deque<float> acc_x_buff;
     std::deque<float> acc_y_buff;
 
@@ -138,8 +136,6 @@ public:
             t_v_buff.push_front(0.0);
             v_buff.push_front(0.0);
             v_acc_buff.push_front(0.0);
-            v_comp_buff.push_front(0.0);
-            v_comp_buff.push_front(0.0);
             acc_x_buff.push_front(0.0);
             acc_y_buff.push_front(0.0);
         }
@@ -154,7 +150,6 @@ public:
         v_buff.push_front(wodo.getV());
         v_acc_buff.push_front(v_acc);
         acc_y_buff.push_front(imu.acc_f[1]);
-        v_comp_buff.push_front(v_comp);
 
         t_ang_v_buff.pop_back();
         ang_v_buff.pop_back();
@@ -162,10 +157,8 @@ public:
         v_buff.pop_back();
         v_acc_buff.pop_back();
         acc_y_buff.pop_back();
-        v_comp_buff.pop_back();
     }
-
-    bool switch_back; // 0:スイッチバックしてない状態 1:スイッチバックしている状態
+    
 
     static UMouse& getInstance() {
         static UMouse instance;
@@ -179,7 +172,7 @@ public:
         PowerTransmission &pt = PowerTransmission::getInstance();
         WallSensor &ws = WallSensor::getInstance();
 
-        posEsti.update(v_comp ,adis.omega_f[2], 0.0f, trajCommander.getMotionType());
+        posEsti.update(wo.getV_double(), adis.omega_f[2], 0.0f, trajCommander.getMotionType(), ws);
         trajCommander.update(posEsti);
         
         if(trajCommander.empty() != true){
@@ -220,7 +213,7 @@ public:
             printfAsync("motion_type: %d\n", trajCommander.getTraj().motion_type);
             printfAsync("(ang_v_t, wodo, gyro)=(%f, %f, %f)\n",trajCommander.ang_v, wo.ang_v, imu.omega_f[2]);
             printfAsync("(x_t, y_t, ang_t)=(%f, %f, %f)\n", trajCommander.x, trajCommander.y, trajCommander.ang);
-            printfAsync("(x_e, y_e  ang_e)=(%f, %f, %f)\n", posEsti.x, posEsti.y, posEsti.ang);
+            printfAsync("(x_e, y_e  ang_e)=(%f, %f, %f)\n", posEsti.getX(), posEsti.getY(), posEsti.getAng());
             printfAsync("-------------------------\n");
 
             trajCommander.clear();
@@ -237,17 +230,10 @@ public:
         //else
             v_acc += imu.acc_f[1] * DELTA_T;
 
-        float gain = pm.v_comp_gain;
-
-        v_comp = (gain)*(v_comp + imu.acc_f[1] * DELTA_T) + (1.0-gain)*(wo.v);
-        if(ABS(wo.v) < 0.1 ) v_comp = wo.v;
         updateBuff();
 
-        v_side += imu.acc_f[0] * DELTA_T;
-        if(ABS(posEsti.ang_v) < 0.0001f || true) v_side = 0.0f;
-
-        coor.x = (uint8_t)(posEsti.x / 0.09f);
-        coor.y = (uint8_t)(posEsti.y / 0.09f);
+        coor.x = (uint8_t)(posEsti.getX() / 0.09f);
+        coor.y = (uint8_t)(posEsti.getY() / 0.09f);
 
         direction = getDirection();
 
@@ -256,9 +242,6 @@ public:
 
 
 
-    float getVComp(bool sb_flag) {
-        return v_comp;
-    }
 
 
     /*
@@ -266,17 +249,17 @@ public:
     uint8_t getCoorY(){return (uint8_t)(posEsti.y / 0.09f); }
 */
     direction_e getDirection(){
-        if(posEsti.ang >= 315.0f || posEsti.ang <  45.0f) return direction_e::E;
-        if(posEsti.ang >=  45.0f && posEsti.ang < 135.0f) return direction_e::N;
-        if(posEsti.ang >= 135.0f && posEsti.ang < 225.0f) return direction_e::W;
-        if(posEsti.ang >= 225.0f && posEsti.ang < 315.0f) return direction_e::S;
+        if(posEsti.getAng() >= 315.0f || posEsti.getAng() <  45.0f) return direction_e::E;
+        if(posEsti.getAng() >=  45.0f && posEsti.getAng() < 135.0f) return direction_e::N;
+        if(posEsti.getAng() >= 135.0f && posEsti.getAng() < 225.0f) return direction_e::W;
+        if(posEsti.getAng() >= 225.0f && posEsti.getAng() < 315.0f) return direction_e::S;
         return direction_e::E;
     }
 
 
     bool inReadWallArea(){
-        float fmod_x = fmod(posEsti.x, 0.09);
-        float fmod_y = fmod(posEsti.y, 0.09);
+        float fmod_x = fmod(posEsti.getX(), 0.09);
+        float fmod_y = fmod(posEsti.getY(), 0.09);
         
         if(getDirection() == direction_e::E){
             if(fmod_x < 0.09 && fmod_x >= 0.09 - READ_WALL_OFFSET) return true;
@@ -298,8 +281,8 @@ public:
     }
 
     float calcDistNextSection(){
-        float fmod_x = fmod(posEsti.x, 0.09);
-        float fmod_y = fmod(posEsti.y, 0.09);        
+        float fmod_x = fmodf(posEsti.getX(), 0.09f);
+        float fmod_y = fmodf(posEsti.getY(), 0.09f);        
         if(getDirection() == direction_e::E){
             return 0.09f - fmod_x;
         }
@@ -318,13 +301,13 @@ public:
 
     void printPos(){
         printfAsync("pos = (%f, %f), ang=%f, coor = (%d, %d) dir = %d , \n",
-            posEsti.x, posEsti.y, posEsti.ang, coor.x, coor.y, direction);
+            posEsti.getX(), posEsti.getY(), posEsti.getAng(), coor.x, coor.y, direction);
     }
 
     bool isRWallControllable(){
         // マウスと同じ角度の座標系における区画の入口からの距離
-        float fmod_x = fmod(posEsti.x, 0.09);
-        float fmod_y = fmod(posEsti.y, 0.09);        
+        float fmod_x = fmodf(posEsti.getX(), 0.09f);
+        float fmod_y = fmodf(posEsti.getY(), 0.09f);        
         float dist = 0.0;
         if(getDirection() == direction_e::E){
             dist = fmod_x;
@@ -353,8 +336,8 @@ public:
 
     bool isLWallControllable(){
         // マウスと同じ角度の座標系における区画の入口からの距離
-        float fmod_x = fmod(posEsti.x, 0.09);
-        float fmod_y = fmod(posEsti.y, 0.09);        
+        float fmod_x = fmod(posEsti.getX(), 0.09);
+        float fmod_y = fmod(posEsti.getY(), 0.09);        
         float dist = 0.0;
         if(getDirection() == direction_e::E){
             dist = fmod_x;
@@ -385,8 +368,7 @@ public:
 private:
     UMouse() {
 
-        direction = N;
-        switch_back = false;
+        direction = N;        
         direct_duty_set_enable = false;
         initBuff();
         maze.readMazeDataFromFlash();
