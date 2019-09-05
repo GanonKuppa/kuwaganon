@@ -135,7 +135,7 @@
               let split_comma = msg_str.split(":")[1].split(",");
               let x_flag = parseFloat(split_comma[0]);
               let y_flag = parseFloat(split_comma[1]);
-              let str_flag "";
+              let str_flag = "";
               for(var i=2; i <split_comma.len(); i++) str_flag += split_comma[i];
               addMsgFlag(str_flag, x_flag, y_flag);
             };
