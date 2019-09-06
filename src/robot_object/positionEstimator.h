@@ -183,25 +183,25 @@ private:
     double y_d_2;
 
     void onWallCenterCorrection(WallSensor &ws){
-        if(ws.isOnWallCenter() == true && ws.isAhead() == false && v > 0.1 && fabsf(ang_v) < 100.0f) {            
+        if(ws.isOnWallCenter() == true && ws.isAhead() == false && v > 0.1f && v < 0.34f && fabsf(ang_v) < 50.0f) {            
 
             if(ang >= 315.0 || ang < 45.0) {                    
-                ang = 0.0;
+                ang = 0.0f;
                 y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;
                 SE_POSITION_CHANGE();
             }
             if(ang >= 45.0 && ang < 135.0) {
-                ang = 90.0;
+                ang = 90.0f;
                 x = (uint8_t)(x / 0.09) * 0.09 + 0.09/2.0;
                 SE_POSITION_CHANGE();
             }
             if(ang >= 135.0 && ang < 225.0) {
-                ang = 180.0;
+                ang = 180.0f;
                 y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;
                 SE_POSITION_CHANGE();
             }
             if(ang >= 225.0 && ang < 315.0) {
-                ang = 270.0;
+                ang = 270.0f;
                 x = (uint8_t)(x / 0.09) * 0.09 + 0.09/2.0;
                 SE_POSITION_CHANGE();
             }

@@ -6,6 +6,8 @@
 #include "timer.h"
 #include "activityFactory.h"
 #include "pathCalculation.h"
+#include "trajectory.h"
+#include "trajectoryCommander.h"
 #include "parameterManager.h"
 #include "ICM20602.h"
 #include "adis16470.h"
@@ -78,12 +80,12 @@ namespace umouse {
 
             if (param_mode == 0) return;
             //                                  v   turn_v a
-            else if(param_mode == 1) turn_p.set(0.3, 0.3, 4.0);
-            else if(param_mode == 2) turn_p.set(0.6, 0.3, 4.0);
+            else if(param_mode == 1) turn_p.set(0.36, 0.36, 4.0);
+            else if(param_mode == 2) turn_p.set(0.6, 0.36, 4.0);
             //                                  v    v_d  90    l90   180  d90  45   135  a    a_diag
-            else if(param_mode == 3) turn_p.set(1.0, 0.45, 0.35, 0.5, 0.4, 0.4, 0.4, 0.4, 6.0, 3.0);
-            else if(param_mode == 4) turn_p.set(1.5, 0.45, 0.35, 0.5, 0.4, 0.4, 0.4, 0.4, 6.0, 3.0);
-            else if(param_mode == 5) turn_p.set(2.0, 0.45, 0.35, 0.5, 0.4, 0.4, 0.4, 0.4, 6.0, 3.0);
+            else if(param_mode == 3) turn_p.set(1.0, 0.45, 0.375, 0.5, 0.4, 0.4, 0.4, 0.4, 6.0, 3.0);
+            else if(param_mode == 4) turn_p.set(1.5, 0.45, 0.375, 0.5, 0.4, 0.4, 0.4, 0.4, 6.0, 3.0);
+            else if(param_mode == 5) turn_p.set(2.0, 0.45, 0.375, 0.5, 0.4, 0.4, 0.4, 0.4, 6.0, 3.0);
             else if(param_mode == 6) turn_p.set(2.5, 0.45, 0.4 , 0.5, 0.4, 0.4, 0.4, 0.4, 8.0, 3.0);
             else if(param_mode == 7) turn_p.set(3.0, 0.45, 0.4 , 0.5, 0.4, 0.4, 0.4, 0.4, 8.0, 3.0);
 
@@ -116,9 +118,12 @@ namespace umouse {
                 translatePathDiagonal(path_vec);
                 HF_playPath(turn_p, path_vec, m.trajCommander);
             }
+            // ゴール区画に微妙に入り切れないことを防ぐための処理
+            auto traj0 = StraightTrajectory::create(0.09f, 0.1f);
+            m.trajCommander.push(std::move(traj0));    
 
         };
-        void onFinish() {};
+        void onFinish() { };
     };
 
 }

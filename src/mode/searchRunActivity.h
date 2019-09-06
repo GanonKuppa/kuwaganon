@@ -240,7 +240,7 @@ namespace umouse {
                             if (ws.isAhead() == true) {
                                 traj0 = StraightTrajectory::create(0.03f, v, v, 0.1f, a, a);
                                 traj1 = StraightTrajectory::create(0.015f, 0.1f, 0.1f, 0.1f, a, a);
-                                traj2 = StopTrajectory::createAsDirectDutySet(0.05);
+                                traj2 = StopTrajectory::createAsDirectDutySet(0.2);
                                 SEG();
                                 ahead_comp_timestamp = getElapsedMsec();
                             }
@@ -385,7 +385,7 @@ namespace umouse {
                             if (ws.isAhead() == true ) {
                                 traj0 = StraightTrajectory::create(0.03f, v, v, 0.1f, a, a);
                                 traj1 = StraightTrajectory::create(0.015f, 0.1f, 0.1f, 0.1f, a, a);
-                                traj2 = StopTrajectory::createAsDirectDutySet(0.1f);
+                                traj2 = StopTrajectory::createAsDirectDutySet(0.2f);
                                 SEG();
                             }
 

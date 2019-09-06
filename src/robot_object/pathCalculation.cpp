@@ -215,8 +215,6 @@ void HF_playPath(TurnParameter turn_p, std::vector<Path> &path_vec, TrajectoryCo
 
         }
     }
-    auto traj_stop = StopTrajectory::create(1.0);
-    trajCommander.push(std::move(traj_stop));
 }
 
 void HF_playPathSpin(TurnParameter turn_p, std::vector<Path> &path_vec, TrajectoryCommander &trajCommander)
@@ -275,8 +273,6 @@ void HF_playPathSpin(TurnParameter turn_p, std::vector<Path> &path_vec, Trajecto
             break;
         }
     }
-    auto traj_stop = StopTrajectory::create(3.0);
-    trajCommander.push(std::move(traj_stop));
 }
 
 
@@ -465,8 +461,6 @@ void HF_playPathSpinDiagonal(TurnParameter turn_p, std::vector<Path> &path_vec, 
             }
         }
     }
-    auto traj_stop = StopTrajectory::create(1.0);
-    trajCommander.push(std::move(traj_stop));
 }
 
 void printPath(std::vector<Path> &path_vec)

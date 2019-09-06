@@ -179,16 +179,18 @@ namespace umouse {
                     else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold){
                         target_ang += pm.wall_diagonal_avoid_add_ang;
                     }
-                }else if( WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold &&
-                          WallSensor::getInstance().ahead_r() <= pm.wall_diagonal_ahead_r_threshold     ){
-                    ang_pidf.update(target_ang, esti.getAng());
-                    target_rot_v += ang_pidf.getControlVal();
                 }
-                else if(WallSensor::getInstance().ahead_l() <= pm.wall_diagonal_ahead_l_threshold &&
+               
+                else if( WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold &&
+                          WallSensor::getInstance().ahead_r() <= 100     ){
+                        target_ang -= pm.wall_diagonal_avoid_add_ang;                    
+                }
+                else if(WallSensor::getInstance().ahead_l() <= 100 &&
                         WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold ){
                         target_ang += pm.wall_diagonal_avoid_add_ang;
                 }
-
+                ang_pidf.update(target_ang, esti.getAng());
+                target_rot_v += ang_pidf.getControlVal(); 
             }
             else {
                 ang_pidf.reset();

@@ -43,12 +43,12 @@ public:
     float v;
     float a;
     float target_dist;
-    double cumulative_dist;
-    double cumulative_ang;
+    float cumulative_dist;
+    float cumulative_ang;
     float cumulative_t;
     EMotionType motion_type;
     uint16_t hash;
-    const double DELTA_T = 0.0005;
+    const float DELTA_T = 0.0005;
 
     void setInitPos(float x_, float y_, float ang_){
         x = x_;
