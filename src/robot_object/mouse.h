@@ -40,13 +40,27 @@ public:
     T x;
     T y;
 
+    Coor2D(){}
+
     bool operator==(const Coor2D& coor) {
         if (coor.x == x && coor.y == y) return true;
         else return false;
     }
+
+    bool operator!=(const Coor2D& coor) {
+        if (coor.x != x || coor.y != y) return true;
+        else return false;
+    }
+
+
     void set(T x_, T y_) {
         x = x_;
         y = y_;
+    }
+
+    Coor2D(const Coor2D &coor) {
+            x = coor.x;
+            y = coor.y;
     }
 
 };
@@ -258,23 +272,23 @@ public:
 
 
     bool inReadWallArea(){
-        float fmod_x = fmod(posEsti.getX(), 0.09);
-        float fmod_y = fmod(posEsti.getY(), 0.09);
+        float fmod_x = fmodf(posEsti.getX(), 0.09f);
+        float fmod_y = fmodf(posEsti.getY(), 0.09f);
         
         if(getDirection() == direction_e::E){
-            if(fmod_x < 0.09 && fmod_x >= 0.09 - READ_WALL_OFFSET) return true;
+            if(fmod_x < 0.089f && fmod_x >= 0.09f - READ_WALL_OFFSET) return true;
             else return false;
         }
         if(getDirection() == direction_e::N){
-            if(fmod_y < 0.09 && fmod_y >= 0.09 - READ_WALL_OFFSET) return true;
+            if(fmod_y < 0.089f && fmod_y >= 0.09f - READ_WALL_OFFSET) return true;
             else return false;
         }
         if(getDirection() == direction_e::W){
-            if(fmod_x > 0.00 && fmod_x <= READ_WALL_OFFSET) return true;
+            if(fmod_x > 0.001f && fmod_x <= READ_WALL_OFFSET) return true;
             else return false;
         }
         if(getDirection() == direction_e::S){
-            if(fmod_y > 0.00 && fmod_y <= READ_WALL_OFFSET) return true;
+            if(fmod_y > 0.001f && fmod_y <= READ_WALL_OFFSET) return true;
             else return false;
         }
         return false;
@@ -308,7 +322,7 @@ public:
         // マウスと同じ角度の座標系における区画の入口からの距離
         float fmod_x = fmodf(posEsti.getX(), 0.09f);
         float fmod_y = fmodf(posEsti.getY(), 0.09f);        
-        float dist = 0.0;
+        float dist = 0.0f;
         if(getDirection() == direction_e::E){
             dist = fmod_x;
         }
@@ -336,9 +350,9 @@ public:
 
     bool isLWallControllable(){
         // マウスと同じ角度の座標系における区画の入口からの距離
-        float fmod_x = fmod(posEsti.getX(), 0.09);
-        float fmod_y = fmod(posEsti.getY(), 0.09);        
-        float dist = 0.0;
+        float fmod_x = fmodf(posEsti.getX(), 0.09f);
+        float fmod_y = fmodf(posEsti.getY(), 0.09f);
+        float dist = 0.0f;
         if(getDirection() == direction_e::E){
             dist = fmod_x;
         }

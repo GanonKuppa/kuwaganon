@@ -168,20 +168,27 @@ namespace umouse {
                 (WallSensor::getInstance().isRight_for_ctrl() == false &&
                 WallSensor::getInstance().isLeft_for_ctrl() == false)
                )
-            ) {                
-                if(traj.motion_type == EMotionType::DIAGONAL_CENTER){
-                    float target_ang = traj.ang;
-
+            ) { 
+                float target_ang = traj.ang;               
+                if(traj.motion_type == EMotionType::DIAGONAL_CENTER
+                   
+                ){                    
                     if (WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold){
                         target_ang -= pm.wall_diagonal_avoid_add_ang;
                     }
                     else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold){
                         target_ang += pm.wall_diagonal_avoid_add_ang;
                     }
+                }else if( WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold &&
+                          WallSensor::getInstance().ahead_r() <= pm.wall_diagonal_ahead_r_threshold     ){
+                    ang_pidf.update(target_ang, esti.getAng());
+                    target_rot_v += ang_pidf.getControlVal();
+                }
+                else if(WallSensor::getInstance().ahead_l() <= pm.wall_diagonal_ahead_l_threshold &&
+                        WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold ){
+                        target_ang += pm.wall_diagonal_avoid_add_ang;
                 }
 
-                ang_pidf.update(traj.ang, esti.getAng());
-                target_rot_v += ang_pidf.getControlVal();
             }
             else {
                 ang_pidf.reset();

@@ -236,7 +236,7 @@ public:
         int16_t ahead_l_ = ws.ahead_l();
         int16_t ahead_r_ = ws.ahead_r();
         int16_t right_ = ws.right();
-        printfAsync("▶▶▶ 壁|| 左:%d 前:(%d %d) 右:%d \n",left_, ahead_l_, ahead_r_ ,right_);
+
 
         if(x == 0 && y == 0){
             writeReached(x, y, true);
