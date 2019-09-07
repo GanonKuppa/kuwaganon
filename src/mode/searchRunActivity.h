@@ -51,7 +51,6 @@ namespace umouse {
             icm.calibAccOffset(200);
             adis.calibOmegaOffset(800);
 
-
             std::unique_ptr<BaseState> state = std::unique_ptr<BaseState>(new Start2GoalState(intent));
             stateMachine.push(std::move(state));
             delete intent;
@@ -276,7 +275,15 @@ namespace umouse {
             }
             bool isEnd() {
                 UMouse &m = UMouse::getInstance();
-                if(m.goal.x == m.coor.x && m.goal.y == m.coor.y) return true;
+                ParameterManager &pm = ParameterManager::getInstance();
+                if(m.goal.x == m.coor.x && m.goal.y == m.coor.y){
+                    return true;
+                } 
+                else if(getElapsedSec() > pm.search_limit_time_sec){
+                    printfAsync("search limit time up!\n");
+                    m.maze.writeMazeData2Flash();
+                    return true;
+                }
                 return false;
             }
         };
@@ -288,6 +295,7 @@ namespace umouse {
             ESearchMode mode;
             bool pre_in_read_wall_area;
             Coor2D<uint16_t> pre_read_wall_coor;
+
 
             Goal2StartState(Intent* intent_) : BaseState(intent_) {
                 mode = (ESearchMode)(intent_->uint8_t_param["SUB_MODE"]);
@@ -424,7 +432,15 @@ namespace umouse {
             }
             bool isEnd() {
                 UMouse &m = UMouse::getInstance();
-                if(m.start.x == m.coor.x && m.start.y == m.coor.y) return true;
+                ParameterManager &pm = ParameterManager::getInstance();
+                if(m.start.x == m.coor.x && m.start.y == m.coor.y){
+                    return true;
+                } 
+                else if(getElapsedSec() > pm.search_limit_time_sec){
+                    printfAsync("search limit time up!\n");
+                    m.maze.writeMazeData2Flash();
+                    return true;
+                }
                 return false;
             }
         };

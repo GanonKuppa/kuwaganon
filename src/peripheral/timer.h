@@ -21,4 +21,5 @@ unsigned int getTimeuCount_sub(void);
 unsigned int endTimeuCount_sub(void);
 
 unsigned int getElapsedMsec(void);
+unsigned int getElapsedSec(void);
 

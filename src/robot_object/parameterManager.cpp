@@ -189,7 +189,7 @@ void ParameterManager::init() {
     registration<float>(164, a_search_run);
     registration<uint8_t>(165, goal_x);
     registration<uint8_t>(166, goal_y);
-    ;
+    registration<uint16_t>(167, search_limit_time_sec);
     ;
     ;
     ;

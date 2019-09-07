@@ -226,7 +226,7 @@ namespace umouse {
         float a_search_run; //164
         uint8_t goal_x; //165
         uint8_t goal_y; //166
-         ; //167
+        uint16_t search_limit_time_sec; //167
          ; //168
          ; //169
          ; //170

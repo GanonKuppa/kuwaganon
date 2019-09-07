@@ -171,3 +171,9 @@ unsigned int getElapsedMsec() {
 }
 
 
+unsigned int getElapsedSec(){
+    return getElapsedMsec() / 1000;
+};
+
+
+
