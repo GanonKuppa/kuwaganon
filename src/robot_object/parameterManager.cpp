@@ -153,8 +153,10 @@ void ParameterManager::init() {
     registration<uint16_t>(130, wall_ctrl_threshold_delta_left);
     registration<uint16_t>(131, wall_ctrl_add_val_right);
     registration<uint16_t>(132, wall_ctrl_add_val_left);
-    ;
-    ;
+
+    registration<float>(133, diag_r_corner_read_offset);
+    registration<float>(134, diag_l_corner_read_offset);
+
     registration<uint16_t>(135, wall_corner_threshold_on_r);
     registration<uint16_t>(136, wall_corner_threshold_off_r);
     registration<uint16_t>(137, wall_corner_threshold_on_l);

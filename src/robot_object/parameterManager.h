@@ -189,8 +189,8 @@ namespace umouse {
         uint16_t wall_ctrl_threshold_delta_left; //130
         uint16_t wall_ctrl_add_val_right; //131
         uint16_t wall_ctrl_add_val_left; //132
-         ; //133
-         ; //134
+        float diag_r_corner_read_offset; //133
+        float diag_l_corner_read_offset; //134
          uint16_t wall_corner_threshold_on_r; //135
          uint16_t wall_corner_threshold_off_r; //136
          uint16_t wall_corner_threshold_on_l; //137

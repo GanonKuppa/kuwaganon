@@ -124,9 +124,7 @@
 
 
       //printf部分の処理
-      if (intList[7] != 0) {
-        msg = "";
-        
+      if (intList[7] != 0) {     
         for (var i = 0; i < intList[7]; i++) {
           if (intList[message_len - 60 + i] == 10) {  //10はLFの文字コードです。         
             let msg_str = utf8_hex_string_to_string(msg); 

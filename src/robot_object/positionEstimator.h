@@ -96,6 +96,8 @@ public:
         onWallCenterCorrection(ws);
         cornerLCorrection(ws);
         cornerRCorrection(ws);
+        diagCornerRCorrection(ws);
+        diagCornerLCorrection(ws);
         //contactWallCorrection(motion_type, ws);
     }
 
@@ -169,6 +171,9 @@ private:
     float contact_wall_cool_down_time;
     float corner_r_cool_down_time;
     float corner_l_cool_down_time;
+    float diag_corner_r_cool_down_time;
+    float diag_corner_l_cool_down_time;
+    
     const double DELTA_T = 0.0005;
     const double PI = 3.14159265358979323846264338327950288;
 
@@ -190,17 +195,17 @@ private:
                 y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;
                 SE_POSITION_CHANGE();
             }
-            if(ang >= 45.0 && ang < 135.0) {
+            else if(ang >= 45.0 && ang < 135.0) {
                 ang = 90.0f;
                 x = (uint8_t)(x / 0.09) * 0.09 + 0.09/2.0;
                 SE_POSITION_CHANGE();
             }
-            if(ang >= 135.0 && ang < 225.0) {
+            else if(ang >= 135.0 && ang < 225.0) {
                 ang = 180.0f;
                 y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;
                 SE_POSITION_CHANGE();
             }
-            if(ang >= 225.0 && ang < 315.0) {
+            else if(ang >= 225.0 && ang < 315.0) {
                 ang = 270.0f;
                 x = (uint8_t)(x / 0.09) * 0.09 + 0.09/2.0;
                 SE_POSITION_CHANGE();
@@ -220,13 +225,13 @@ private:
             if(ang >= 350.0 || ang < 10.0) {
                 x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (double)pm.wall_corner_read_offset_l;
             }
-            if(ang >= 80.0 && ang < 100.0) {
+            else if(ang >= 80.0 && ang < 100.0) {
                 y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (double)pm.wall_corner_read_offset_l;
             }
-            if(ang >= 170.0 && ang < 190.0) {
+            else if(ang >= 170.0 && ang < 190.0) {
                 x = (uint8_t)(x / 0.09) * 0.09 + (double)pm.wall_corner_read_offset_l;
             }
-            if(ang >= 260.0 && ang < 280.0) {
+            else if(ang >= 260.0 && ang < 280.0) {
                 y = (uint8_t)(y / 0.09) * 0.09 + (double)pm.wall_corner_read_offset_l;
             }
             else {
@@ -295,15 +300,15 @@ private:
                 ang = 0.0;
                 x = (uint8_t)(x / 0.09) * 0.09 + (double)pm.wall_contact_offset;
             }
-            if(ang >= 45.0 && ang < 135.0) {
+            else if(ang >= 45.0 && ang < 135.0) {
                 ang = 90.0;
                 y = (uint8_t)(y / 0.09) * 0.09 + (double)pm.wall_contact_offset;
             }
-            if(ang >= 135.0 && ang < 225.0) {
+            else if(ang >= 135.0 && ang < 225.0) {
                 ang = 180.0f;
                 x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (double)pm.wall_contact_offset;
             }
-            if(ang >= 225.0 && ang < 315.0) {
+            else if(ang >= 225.0 && ang < 315.0) {
                 ang = 270.0;
                 y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (double)pm.wall_contact_offset;
             }
@@ -315,9 +320,90 @@ private:
 
     }
 
+
+
+
+
+
     double calcAdamsBashforthDelta(double s_0, double s_1, double s_2 ){
         if(s_1 == 0.0 && s_2 == 0.0) return s_0 * DELTA_T;
         else return (23.0 * s_0 - 16.0 * s_1 + 5.0 * s_2) / 12.0 * DELTA_T;
+    }    
+    
+    void diagCornerRCorrection(WallSensor & ws){
+        ParameterManager &pm = ParameterManager::getInstance();
+        if(pm.diag_r_corner_read_offset < 0.0f) return;
+        if(diag_corner_r_cool_down_time == 0.0f &&
+            ws.isCornerR() == true &&
+            fabs(ang_v) < 50.0 && 
+            v > 0.1 ) {
+            
+            bool done = true;
+
+
+            if( ang >= 40.0  && ang < 50.0 ) {
+                y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (double)pm.diag_r_corner_read_offset;
+            }
+            else if(ang >= 130.0 && ang < 140.0) {
+                x = (uint8_t)(x / 0.09) * 0.09 +  (double)pm.diag_r_corner_read_offset;
+            }
+            else if(ang >= 220.0 && ang < 230.0) {
+                y = (uint8_t)(y / 0.09) * 0.09 + (double)pm.diag_r_corner_read_offset;
+            }
+            else if(ang >= 310.0 && ang < 320.0) {
+                x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (double)pm.diag_r_corner_read_offset;
+            }
+            else{
+                done = false;
+            }
+
+            if(done == true){
+                printfAsync("msg_flag:%f,%f,isDiagCornerR\n", getX(), getY());
+                SE_CORNER_R();
+                diag_corner_r_cool_down_time = 0.1f;
+            }
+
+        }
+        diag_corner_r_cool_down_time -= (float)DELTA_T;
+        if(diag_corner_r_cool_down_time < 0.0f) diag_corner_r_cool_down_time = 0.0f;
+    }
+
+
+    void diagCornerLCorrection(WallSensor & ws){
+        ParameterManager &pm = ParameterManager::getInstance();
+        if(pm.diag_l_corner_read_offset < 0.0f) return;
+        if(diag_corner_l_cool_down_time == 0.0f &&
+            ws.isCornerL() == true &&
+            fabs(ang_v) < 50.0 && 
+            v > 0.1 ) {
+            
+            bool done = true;
+
+            if( ang >= 40.0  && ang < 50.0 ) {
+                x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (double)pm.diag_l_corner_read_offset;
+            }
+            else if(ang >= 130.0 && ang < 140.0) {
+                y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (double)pm.diag_l_corner_read_offset;
+            }
+            else if(ang >= 220.0 && ang < 230.0) {
+                x = (uint8_t)(x / 0.09) * 0.09 + (double)pm.diag_l_corner_read_offset;
+            }
+            else if(ang >= 310.0 && ang < 320.0) {
+                y = (uint8_t)(y / 0.09) * 0.09 + (double)pm.diag_l_corner_read_offset;
+            }
+            else{
+                done = false;
+            }
+
+            if(done == true){
+                printfAsync("msg_flag:%f,%f,isDiagCornerL\n", getX(), getY());
+                SE_CORNER_L();
+                diag_corner_l_cool_down_time = 0.1f;
+            }
+
+        }
+        diag_corner_l_cool_down_time -= (float)DELTA_T;
+        if(diag_corner_l_cool_down_time < 0.0f) diag_corner_l_cool_down_time = 0.0f;
     }
 
     double deg2rad(double deg){
