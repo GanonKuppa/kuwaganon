@@ -57,7 +57,7 @@ namespace umouse {
             ang_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
 
             error_sec = 0.0f;
-            error_limit_sec = 0.2f; // 秒
+            error_limit_sec = 1.0f; // 秒
             ang_v_error_th = 270.0f;
             v_error_th = 0.5;
 
@@ -132,7 +132,6 @@ namespace umouse {
 
                 float traj_ang_rad = DEG2RAD(traj.ang);
                 target_trans_a = target_x_dd * cosf(traj_ang_rad) + target_y_dd * sinf(traj_ang_rad);
-                // constrainLのつけ方がおかしい。
                 target_trans_v += target_trans_a * DELTA_T;
 
                 target_rot_v = RAD2DEG((target_y_dd * cosf(traj_ang_rad) - target_x_dd * sinf(traj_ang_rad))/ target_trans_v );
@@ -199,7 +198,9 @@ namespace umouse {
             if( traj.motion_type != motion_type_pre){
                 ang_v_pidf.reset();
                 ang_pidf.reset();
-                printfAsync("reset!!\n");
+                v_pidf.reset();
+                
+                //printfAsync("reset!!\n");
             }
             
 
@@ -283,10 +284,10 @@ namespace umouse {
 
             // 速度PIDFサチュレーション設定
             if(traj.motion_type == EMotionType::STOP || traj.motion_type == EMotionType::SPINTURN) {
-                v_pidf.setSatuationEnable(pm.trans_v_PIDF_satuation_enable);
+                v_pidf.setSatuationEnable(false);
             }
             else {
-                v_pidf.setSatuationEnable(false);
+                v_pidf.setSatuationEnable(pm.trans_v_PIDF_satuation_enable);                
             }
 
             // 速度PIDFイネーブル設定

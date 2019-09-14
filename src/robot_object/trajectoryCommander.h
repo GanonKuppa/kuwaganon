@@ -8,6 +8,7 @@
 #include "communication.h"
 #include "wallsensor.h"
 #include "positionEstimator.h"
+#include <functional>
 
 namespace umouse{
 
@@ -65,27 +66,18 @@ public:
                     dist < 0.0){
                 auto s = trajQueue.front()->getMotionTypeString().c_str();
                 uint16_t hash = trajQueue.front()->hash;
-
+/*
                 printfAsync(">    ------- exceeded traj end! --------\n");
                 printfAsync(">    motion_type: %s %04x\n", s, hash);
                 printfAsync(">    (x_t, y_t, ang_t)=(%f, %f, %f) queue num:%d | dist:%f \n", x, y, ang ,trajQueue.size(), trajQueue.front()->target_dist);
                 printfAsync(">    (x_e, y_e, ang_e)=(%f, %f, %f)\n", esti.getX(), esti.getY(), esti.getAng());
                 printfAsync(">    cumulative_dist overwrited!\n");
-
+*/
                 x = trajQueue.front()->getEndX();
                 y = trajQueue.front()->getEndY();
                 ang = trajQueue.front()->getEndAng();
                 trajQueue.front()->cumulative_dist = trajQueue.front()->target_dist;
             }
-
-
-/*
-            if(motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
-                    motion_type == EMotionType::STRAIGHT){
-                WallSensor &ws = WallSensor::getInstance();
-                if(ws.isContactWall() == true)trajQueue.front()->forceEnd();
-            }
-*/
 
             if(trajQueue.front()->isEnd() == true){
                 x = trajQueue.front()->x;
@@ -98,7 +90,7 @@ public:
                 printfAsync(">    ------- traj end --------\n");
                 printfAsync(">    motion_type: %s %04x\n", s, hash);
                 printfAsync(">    (x_t, y_t, ang_t)=(%f, %f, %f) queue num:%d | dist:%f \n", x, y, ang ,trajQueue.size(), trajQueue.front()->target_dist);
-                printfAsync(">    (x_e, y_e, ang_e)=(%f, %f, %f)\n", esti.x, esti.y, esti.ang);
+                printfAsync(">    (x_e, y_e, ang_e)=(%f, %f, %f)\n", esti.getX(), esti.getY(), esti.getAng());
                 printfAsync(">    residualDist: %f\n", dist);
                 printfAsync(">    -------------------------\n");
 */
@@ -128,7 +120,7 @@ public:
                     printfAsync("★    ------- traj begin --------\n");
                     printfAsync("★    motion_type: %s %04x\n", s, hash);
                     printfAsync("★    (x_t, y_t, ang_t)=(%f, %f, %f) queue num:%d | dist:%f \n", x, y, ang ,trajQueue.size(), trajQueue.front()->target_dist);
-                    printfAsync("★    (x_e, y_e, ang_e)=(%f, %f, %f)\n", esti.x, esti.y, esti.ang);
+                    printfAsync("★    (x_e, y_e, ang_e)=(%f, %f, %f)\n", esti.getX(), esti.getY(), esti.getAng());
                     printfAsync("★    residualDist: %f\n", dist);
                     printfAsync("★    -------------------------\n");
 */
@@ -163,12 +155,6 @@ public:
             return;
         }
 
-/*
-        if(esti.ang >= 315.0f || esti.ang <  45.0f) x -= dist;        
-        if(esti.ang >=  45.0f && esti.ang < 135.0f) y -= dist;
-        if(esti.ang >= 135.0f && esti.ang < 225.0f) x += dist;
-        if(esti.ang >= 225.0f && esti.ang < 315.0f) y += dist;
-*/
         float rad = DEG2RAD(ang);
 
         x -= cosf(rad) * dist;
@@ -183,12 +169,6 @@ public:
     float residualDist(PositionEstimator& esti){
         float dist = 0.0f;
         if(trajQueue.empty() == false){
-/*
-            if(esti.ang >= 315.0f || esti.ang <  45.0f) dist = trajQueue.front()->getEndX() - esti.x;
-            if(esti.ang >=  45.0f && esti.ang < 135.0f) dist = trajQueue.front()->getEndY() - esti.y;
-            if(esti.ang >= 135.0f && esti.ang < 225.0f) dist = esti.x - trajQueue.front()->getEndX();
-            if(esti.ang >= 225.0f && esti.ang < 315.0f) dist = esti.y - trajQueue.front()->getEndY();
-*/
 
             float rad = DEG2RAD(ang);
             float x1 = trajQueue.front()->getEndX();

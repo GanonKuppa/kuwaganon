@@ -343,7 +343,7 @@ public:
         if(potential_min == potential_S) return S;
     };
 
-    uint8_t get_unknown_direction(uint16_t x, uint16_t y, direction_e dir) {
+    uint8_t getUnknownDirection(uint16_t x, uint16_t y, direction_e dir) {
         uint8_t ran_judge_E = 0;
         uint8_t ran_judge_N = 0;
         uint8_t ran_judge_W = 0;
@@ -374,6 +374,14 @@ public:
         if(ran_judge_S == 1) return 6;
 
         return 255;
+    }
+
+    direction_e getSearchDirection(uint16_t x, uint16_t y, direction_e dir){
+        uint8_t min_dir = (uint8_t)getMinDirection(x, y, dir);
+        uint8_t unknown_dir = (uint8_t)getUnknownDirection(x, y, dir);
+        if(unknown_dir == 255) return (direction_e)min_dir;
+        else if(unknown_dir != min_dir) return (direction_e)unknown_dir;
+        else return (direction_e)min_dir;
     }
 
     void makeSearchMap(uint16_t x, uint16_t y) {

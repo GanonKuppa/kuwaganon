@@ -169,7 +169,7 @@ void ICM20602::update() {
 
     for (int i = 0; i < 3; i++) {
         acc_c[i] = acc_raw[i] - acc_ref[i];
-        acc_f[i] = acc_c[i] * ACC_2g * G;
+        acc_f[i] = 0.02 * (acc_c[i] * ACC_2g * G) + 0.98 * acc_f[i];
     }
 
     temp_raw = concatenate2Byte_int(temp_out_h, temp_out_l);

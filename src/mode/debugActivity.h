@@ -54,8 +54,10 @@ protected:
         m.ctrlMixer.reset();
 
         ParameterManager &pm = ParameterManager::getInstance();
-        auto traj0 = StraightTrajectory::createAsWallCenter(0.09 * 15 + m.WALL2MOUSE_CENTER_DIST, 0.0, 0.2, 0.1, 1.0, 1.0);
+        auto traj0 = StraightTrajectory::createAsWallCenter(0.09 * 15 + m.WALL2MOUSE_CENTER_DIST, 0.0, 0.15, 0.1, 1.0, 1.0);
+        auto traj1 = StopTrajectory::create(1.0);
         m.trajCommander.push(std::move(traj0));
+        m.trajCommander.push(std::move(traj1));
 
 
 

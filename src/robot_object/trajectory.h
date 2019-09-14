@@ -20,7 +20,7 @@ enum class EMotionType{
     SPINTURN,
     CURVE,
     STOP,
-    STOP_DIRECT_DUTY_SET
+    DIRECT_DUTY_SET
 };
 
 
@@ -550,21 +550,25 @@ public:
         stop_time = stop_time_;
     }
 
+    StopTrajectory(float stop_time_, float x_, float y_, float ang_){
+        init(x_, y_, 0.0f, 0.0f, ang_, 0.0f, 0.0f);
+        motion_type = EMotionType::STOP;
+        stop_time = stop_time_;
+    }
+
     static std::unique_ptr<BaseTrajectory> create(float stop_time_){
         return std::unique_ptr<BaseTrajectory>(new StopTrajectory(stop_time_));
     }
 
-
-
-    static std::unique_ptr<BaseTrajectory> createAsDirectDutySet(float stop_time_){
-
-
-        auto traj = new StopTrajectory(stop_time_);
-        traj->motion_type=EMotionType::STOP_DIRECT_DUTY_SET;
-        return std::unique_ptr<BaseTrajectory>(traj);
-
+    static std::unique_ptr<BaseTrajectory> create(float stop_time_, float x_, float y_, float ang_){
+        return std::unique_ptr<BaseTrajectory>(new StopTrajectory(stop_time_, x_, y_, ang_));
     }
 
+    static std::unique_ptr<BaseTrajectory> createAsDirectDutySet(float stop_time_){
+        auto traj = new StopTrajectory(stop_time_);
+        traj->motion_type=EMotionType::DIRECT_DUTY_SET;
+        return std::unique_ptr<BaseTrajectory>(traj);
+    }
 
     virtual float getEndX(){
         return x_0;
@@ -591,6 +595,65 @@ public:
 private:
     float stop_time;
 };
+
+
+class UpdateInjectionTrajectory : public BaseTrajectory{
+public:
+    UpdateInjectionTrajectory(float stop_time_, std::function< void(void) > injection_func_){
+        float x_ = 0.0;
+        float y_ = 0.0;
+        float ang_ = 0.0;
+
+        init(x_, y_, 0.0f, 0.0f, ang_, 0.0f, 0.0f);
+        motion_type = EMotionType::DIRECT_DUTY_SET;
+        stop_time = stop_time_;
+        injection_func = injection_func_;
+    }
+
+    UpdateInjectionTrajectory(float stop_time_, float x_, float y_, float ang_, std::function< void(void) > injection_func_){
+        init(x_, y_, 0.0f, 0.0f, ang_, 0.0f, 0.0f);
+        motion_type = EMotionType::DIRECT_DUTY_SET;
+        stop_time = stop_time_;
+        injection_func = injection_func_;
+    }
+
+    static std::unique_ptr<BaseTrajectory> create(float stop_time_, std::function< void(void) > injection_func_){
+        return std::unique_ptr<BaseTrajectory>(new UpdateInjectionTrajectory(stop_time_, injection_func_));
+    }
+
+    static std::unique_ptr<BaseTrajectory> create(float stop_time_, float x_, float y_, float ang_, std::function< void(void) > injection_func_){
+        return std::unique_ptr<BaseTrajectory>(new UpdateInjectionTrajectory(stop_time_, x_, y_, ang_, injection_func_));
+    }
+
+
+    virtual float getEndX(){
+        return x_0;
+    }
+
+    virtual float getEndY(){
+        return y_0;
+    }
+
+    virtual float getEndAng(){
+        return ang_0;
+    }
+
+    virtual void update(){
+        cumulative_t += DELTA_T;
+        injection_func();
+    }
+
+    virtual bool isEnd(){
+        if(stop_time < cumulative_t) return true;
+        else return false;
+    }
+
+private:
+    float stop_time;
+    std::function< void(void) > injection_func;
+
+};
+
 
 
 

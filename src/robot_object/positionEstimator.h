@@ -52,33 +52,45 @@ public:
     }
 
 
-    void update(double v_, double ang_v_, double a_ ,EMotionType motion_type, WallSensor &ws) {
+    void update(double v_, double ang_v_, double a_y, double a_x, EMotionType motion_type, WallSensor &ws) {
         ICM20602 &icm = ICM20602::getInstance();
         ParameterManager &pm = ParameterManager::getInstance();
 
         ang_v = ang_v_;
 
         double gain = (double)pm.v_comp_gain;
+        double ang_v_rad = deg2rad(ang_v);       
+        double sin_val;
+        double cos_val;
+        double beta_dot;
 
         // 速度相補フィルタ
-        v = (gain)*(v_ + a_ * DELTA_T) + (1.0 - gain)*(v_);
-        if(fabs(v_) < 0.1 ) v = v_;
+        v = (gain)*(v + a_y * DELTA_T) + (1.0 - gain)*(v_);
+        if(fabs(a_y) < 1.0 ||  fabs(v_) < 0.05 ) v = v_;
+        
+
+        if(v > 0.2) beta_dot =  -a_x / v - ang_v_rad;
+        else beta_dot = 0.0;
+
+        if(fabs(ang_v) < 50.0 || !(motion_type == EMotionType::CURVE )){
+            beta = 0.0;
+        }
+        else{
+            beta += beta_dot * DELTA_T;
+        }
+        beta = 0.0;
 
         ang += calcAdamsBashforthDelta(ang_v, ang_v_1, ang_v_2);        
         ang = fmod(ang + 360.0, 360.0);
 
         double ang_rad = deg2rad(ang);
-        double sin_val;
-        double cos_val;
-
-        sincos(ang_rad, &sin_val, &cos_val);
+        sincos(ang_rad - beta , &sin_val, &cos_val);
         double x_d = v * cos_val;
         double y_d = v * sin_val;
 
-        double ang_v_rad = deg2rad(ang_v);
         if(fabs(ang_v) > 10.0){
-            x += v * cos_val * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
-            y += v * sin_val * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
+            x += x_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
+            y += y_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
         } else{
             x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);
             y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
@@ -107,16 +119,16 @@ public:
         float y_ = getY();
 
         if(ang_ >= 315.0f || ang_ < 45.0f) {
-            return (uint8_t)(y / 0.09f) * 0.09f + 0.09f/2.0f - y_ ;
+            return ((uint8_t)(y_ / 0.09f) * 0.09f + 0.09f/2.0f) - y_ ;
         }
         else if(ang_ >= 45.0f && ang_ < 135.0f) {
-            return x_ - (uint8_t)(x_ / 0.09f) * 0.09f + 0.09f/2.0f;
+            return x_ - ((uint8_t)(x_ / 0.09f) * 0.09f + 0.09f/2.0f);
         }
         else if(ang_ >= 135.0f && ang_ < 225.0f) {
-            return y - (uint8_t)(y / 0.09f) * 0.09f + 0.09f/2.0f;
+            return y_ - ((uint8_t)(y_ / 0.09f) * 0.09f + 0.09f/2.0f);
         }
         else if(ang_ >= 225.0f && ang_ < 315.0f) {
-            return (uint8_t)(x_ / 0.09f) * 0.09f + 0.09f/2.0f - x_;
+            return ((uint8_t)(x_ / 0.09f) * 0.09f + 0.09f/2.0f) - x_;
         }
         return 0.0f;
     }
@@ -165,6 +177,7 @@ private:
 
     double v;    
     double ang;
+    double beta;
     double x;
     double y;
 

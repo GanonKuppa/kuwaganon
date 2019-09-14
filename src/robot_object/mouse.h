@@ -186,11 +186,11 @@ public:
         PowerTransmission &pt = PowerTransmission::getInstance();
         WallSensor &ws = WallSensor::getInstance();
 
-        posEsti.update(wo.getV_double(), adis.omega_f[2], 0.0f, trajCommander.getMotionType(), ws);
+        posEsti.update(wo.getV_double(), adis.omega_f[2], imu.acc_f[1], imu.acc_f[0], trajCommander.getMotionType(), ws);
         trajCommander.update(posEsti);
         
         if(trajCommander.empty() != true){
-            if(trajCommander.getMotionType() == EMotionType::STOP_DIRECT_DUTY_SET){
+            if(trajCommander.getMotionType() == EMotionType::DIRECT_DUTY_SET){
                 direct_duty_set_enable = true;
             }else{
                 direct_duty_set_enable = false;
@@ -204,12 +204,12 @@ public:
                 auto traj = trajCommander.getTraj();
                 ctrlMixer.update(traj, posEsti, isRWallControllable(), isLWallControllable());
                 auto duty = ctrlMixer.getDuty();
-                if(ws.isContactWall() == true &&
-                   ws.getContactWallTime() > 0.2 &&
+                if( ws.getContactWallTime() > 0.1f &&
                    (trajCommander.getMotionType() == EMotionType::STRAIGHT ||
                     trajCommander.getMotionType() == EMotionType::STRAIGHT_WALL_CENTER)
                    ){
-                    pt.setDuty(0.0, 0.0);
+                    pt.setDuty(0.4, 0.4);
+                    ctrlMixer.reset();
                     //trajCommander.clear();
                 }else{
                     pt.setDuty(duty(0), duty(1));

@@ -85,16 +85,16 @@ public:
         for (int i = 0; i < num_1V; i++) {
             SEA();
             if (i == 4)
-                waitmsec(500);
+                waitmsec(100);
             else
-                waitmsec(250);
+                waitmsec(50);
         }
-        waitmsec(400);
+        waitmsec(200);
         for (int i = 0; i < num_0_1V; i++) {
             SEB();
-            waitmsec(250);
+            waitmsec(100);
         }
-        waitmsec(400);
+        waitmsec(200);
     }
 
 

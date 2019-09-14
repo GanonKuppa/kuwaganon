@@ -129,7 +129,7 @@ void timeInterrupt(void) {
     }
     //スロット0
     if (int_tick_count % 4 == 0) {
-        if (getElapsedMsec() > 7000){
+        if (getElapsedMsec() > 5000){
             std::function< void(void) > w1 = [&icm]() {icm.update();};
             std::function< void(void) > w2 = [&wallSen]() {wallSen.update();};
             std::function< void(void) > w3 = []() {waitusec_sub(10);};
@@ -148,7 +148,7 @@ void timeInterrupt(void) {
     }
     //スロット2
     if (int_tick_count % 4 == 2) {
-        if (getElapsedMsec() > 7000){
+        if (getElapsedMsec() > 5000){
             std::function< void(void) > w1 = [&icm]() {icm.update();};
             std::function< void(void) > w2 = [&wallSen]() {wallSen.update();};
             std::function< void(void) > w3 = []() {waitusec_sub(10);};
@@ -278,9 +278,9 @@ void startUpInit() {
     umouse::printfAsync("Compile FILE: %s\n", __FILE__);
     umouse::printfAsync("---------------------------\n");
     GB();
-    waitmsec(1800);
+    waitmsec(1000);
     randomNote(compile_hash);
-    waitmsec(400);
+    waitmsec(300);
     /////////////電池電圧警告////////////////
     umouse::BatVoltageMonitor::getInstance().voltageSoundCount();
 
