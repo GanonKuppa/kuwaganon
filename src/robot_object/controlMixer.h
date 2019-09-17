@@ -19,39 +19,33 @@ namespace umouse {
     public:
         VelocityTypePidfController v_pidf;
         VelocityTypePidfController ang_v_pidf;
-        VelocityTypePidfController local_x_pidf;
-        VelocityTypePidfController local_y_pidf;
-        VelocityTypePidfController r_pidf;
+        VelocityTypePidfController pos_pidf;
         AngPidfController ang_pidf;
-
         WallPidfController wall_pidf;
+        
         const float DELTA_T = 0.0005;
-
-        float target_x_dd;
-        float target_y_dd;
 
         float target_trans_v;
         float target_trans_a;
 
         float target_rot_v_pre;
+        float target_rot_x;
         float target_rot_v;
         float target_rot_a;
 
         Eigen::Vector2f duty;
 
         ControlMixer() {
-            target_x_dd = 0.0f;
-            target_y_dd = 0.0f;
 
             target_trans_v = 0.0f;
             target_trans_a = 0.0f;
 
             target_rot_v_pre = 0.0f;
+            target_rot_x = 0.0f;
             target_rot_v = 0.0f;
             target_rot_a = 0.0f;
 
-            local_x_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
-            local_y_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
+            pos_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
             v_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
             ang_v_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
             ang_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
@@ -65,17 +59,14 @@ namespace umouse {
         }
 
         void reset() {
-            target_x_dd = 0.0f;
-            target_y_dd = 0.0f;
-
             target_trans_v = 0.0f;
             target_trans_a = 0.0f;
 
             target_rot_v_pre = 0.0f;
+            target_rot_x = 0.0f;
             target_rot_v = 0.0f;
             target_rot_a = 0.0f;
-            local_x_pidf.reset();
-            local_y_pidf.reset();
+            pos_pidf.reset();
             v_pidf.reset();
             ang_v_pidf.reset();
             ang_pidf.reset();
@@ -107,105 +98,62 @@ namespace umouse {
         void update(BaseTrajectory& traj, PositionEstimator& esti, bool isRWall, bool isLWall) {
             ParameterManager &pm = ParameterManager::getInstance();
 
-
             setPIDF(traj);
-            local_x_pidf.update(traj.x, esti.getX());
-            local_y_pidf.update(traj.y, esti.getY());
+            target_trans_v = traj.v;
+            target_trans_a = traj.a;
+            
+            target_rot_x = traj.ang;
+            target_rot_v = traj.ang_v;
+            target_rot_a = traj.ang_a;
 
-            if(traj.motion_type == EMotionType::STOP) FcLed::getInstance().turn(1,0,0);
-            else FcLed::getInstance().turn(0,0,0);
 
-            if(ABS(traj.v) < 0.11 ||
-                    traj.motion_type == EMotionType::STOP ||
-                    traj.motion_type == EMotionType::SPINTURN ||
-                    true) {
-                target_trans_v = traj.v;
-                target_trans_a = traj.a;
-                target_rot_v = traj.ang_v;
-                target_rot_a = traj.ang_a;
-                local_x_pidf.reset();
-                local_y_pidf.reset();
-            }
-            else {
-                target_x_dd = traj.x_dd + local_x_pidf.getControlVal();
-                target_y_dd = traj.y_dd + local_y_pidf.getControlVal();
-
-                float traj_ang_rad = DEG2RAD(traj.ang);
-                target_trans_a = target_x_dd * cosf(traj_ang_rad) + target_y_dd * sinf(traj_ang_rad);
-                target_trans_v += target_trans_a * DELTA_T;
-
-                target_rot_v = RAD2DEG((target_y_dd * cosf(traj_ang_rad) - target_x_dd * sinf(traj_ang_rad))/ target_trans_v );
-                target_rot_a = (target_rot_v - target_rot_v_pre) / DELTA_T;
-                target_rot_v_pre = target_rot_v;
-            }
-
-            if(traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER && traj.v > 0.1 //&&
-//                UMouse::getInstance().isWallControllable();
-               ) {
+            if(traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER) {
                 wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall);
-                target_rot_v += wall_pidf.getControlVal();
             }
             else {
                 wall_pidf.reset();
             }
-/*
-            if(traj.motion_type == EMotionType::DIAGONAL_CENTER){
-                float diag_error = WallSensor::getInstance().ahead_l()
-                if( > )target_rot_v += 
-            }
-*/
 
-            if(traj.motion_type == EMotionType::STOP ||
-               traj.motion_type == EMotionType::SPINTURN ||
-               traj.motion_type == EMotionType::CURVE ||
-               traj.motion_type == EMotionType::DIAGONAL ||
-               traj.motion_type == EMotionType::DIAGONAL_CENTER ||
-               traj.motion_type == EMotionType::STRAIGHT ||
-               (isLWall == false && isRWall == false) ||
-               (traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER
-                && 
-                (WallSensor::getInstance().isRight_for_ctrl() == false &&
-                WallSensor::getInstance().isLeft_for_ctrl() == false)
-               )
-            ) { 
-                float target_ang = traj.ang;               
-                if(traj.motion_type == EMotionType::DIAGONAL_CENTER
-                   
-                ){                    
-                    if (WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold){
-                        target_ang -= pm.wall_diagonal_avoid_add_ang;
-                    }
-                    else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold){
-                        target_ang += pm.wall_diagonal_avoid_add_ang;
-                    }
-                }
-               
-                else if( WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold &&
-                          WallSensor::getInstance().ahead_r() <= 100     ){
-                        target_ang -= pm.wall_diagonal_avoid_add_ang;                    
-                }
-                else if(WallSensor::getInstance().ahead_l() <= 100 &&
-                        WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold ){
-                        target_ang += pm.wall_diagonal_avoid_add_ang;
-                }
-                ang_pidf.update(target_ang, esti.getAng());
-                target_rot_v += ang_pidf.getControlVal(); 
+            if( (isRWall || isLWall) &&
+                (WallSensor::getInstance().isRight_for_ctrl() ||
+                 WallSensor::getInstance().isLeft_for_ctrl()) &&
+                 traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ){
+                
+                wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall);                
+                target_rot_x += wall_pidf.getControlVal();
+                pos_pidf.reset();
             }
-            else {
-                ang_pidf.reset();
+            else if( (traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
+                      traj.motion_type == EMotionType::STRAIGHT) &&
+                      fabs(esti.calcWallCenterOffset()) > pm.rot_x_wall_abs_center_offset
+                    ){
+                pos_pidf.update(0.0, esti.calcWallCenterOffset());
+                target_rot_x += pos_pidf.getControlVal();
+                wall_pidf.reset();
+            }
+            else if(traj.motion_type == EMotionType::DIAGONAL_CENTER ){
+                if (WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold){
+                    target_rot_x -= pm.wall_diagonal_avoid_add_ang;
+                }
+                else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold){
+                    target_rot_x += pm.wall_diagonal_avoid_add_ang;
+                }
             }
 
-            if( traj.motion_type != motion_type_pre){
+            ang_pidf.update(target_rot_x, esti.getAng());
+            target_rot_v += ang_pidf.getControlVal(); 
+            
+
+            if( traj.motion_type != motion_type_pre &&
+                motion_type_pre == EMotionType::STOP)
+            {
                 ang_v_pidf.reset();
                 ang_pidf.reset();
                 v_pidf.reset();
-                
-                //printfAsync("reset!!\n");
+                wall_pidf.reset();
+                pos_pidf.reset();
             }
             
-
-
-
             v_pidf.update(target_trans_v, esti.getV());
             ang_v_pidf.update(target_rot_v, esti.getAngV());
 
@@ -224,14 +172,14 @@ namespace umouse {
             duty_ang_v_FF += pt.rotAccDuty(target_rot_a);
             duty_ang_v_FF += pt.rotBackEmfDuty(target_rot_v);
             duty_ang_v_FF += pt.rotFrictionCompensationDuty(target_rot_v);
-            if(pm.rot_v_FF_enable == true) duty+= duty_ang_v_FF;
+            if(pm.rot_v_FF_enable == true) duty += duty_ang_v_FF;
 
             float voltage = BatVoltageMonitor::getInstance().bat_vol;
-            float duty_v_satuation = pm.trans_v_satuation_FF_multiplier * ABS(duty_v_FF(0)) + pm.trans_v_satuation_offset_duty * 4.2f / voltage;
-            float duty_ang_v_satuation = pm.rot_v_satuation_FF_multiplier * ABS(duty_ang_v_FF(0)) + pm.rot_v_satuation_offset_duty * 4.2f / voltage;
+            float duty_v_saturation = pm.trans_v_saturation_FF_multiplier * ABS(duty_v_FF(0)) + pm.trans_v_saturation_offset_duty * 4.2f / voltage;
+            float duty_ang_v_saturation = pm.rot_v_saturation_FF_multiplier * ABS(duty_ang_v_FF(0)) + pm.rot_v_saturation_offset_duty * 4.2f / voltage;
 
-            if(pm.trans_v_PIDF_satuation_enable == true) v_pidf.setSatuation(duty_v_satuation);
-            if(pm.rot_v_PIDF_satuation_enable == true ) ang_v_pidf.setSatuation(duty_ang_v_satuation);
+            if(pm.trans_v_PIDF_saturation_enable == true) v_pidf.setSaturation(duty_v_saturation);
+            if(pm.rot_v_PIDF_saturation_enable == true ) ang_v_pidf.setSaturation(duty_ang_v_saturation);
 
             duty(0) += v_pidf.getControlVal() - ang_v_pidf.getControlVal();
             duty(1) += v_pidf.getControlVal() + ang_v_pidf.getControlVal();
@@ -278,56 +226,60 @@ namespace umouse {
             if(traj.motion_type == EMotionType::STOP || traj.motion_type == EMotionType::SPINTURN) {
                 ang_pidf.set(pm.rot_x_spin_P, pm.rot_x_spin_I, pm.rot_x_spin_D, pm.rot_x_spin_F);
             }
-            else{ //if(traj.motion_type == EMotionType::CURVE){
+            else if(traj.motion_type == EMotionType::STRAIGHT || traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
+                    traj.motion_type == EMotionType::DIAGONAL || traj.motion_type == EMotionType::DIAGONAL_CENTER){
+                ang_pidf.set(pm.rot_x_P, pm.rot_x_I, pm.rot_x_D, pm.rot_x_F);
+            }
+            else if(traj.motion_type == EMotionType::CURVE){
                 ang_pidf.set(pm.rot_x_slalom_P, pm.rot_x_slalom_I, pm.rot_x_slalom_D, pm.rot_x_slalom_F);
             }
 
             // 速度PIDFサチュレーション設定
             if(traj.motion_type == EMotionType::STOP || traj.motion_type == EMotionType::SPINTURN) {
-                v_pidf.setSatuationEnable(false);
+                //v_pidf.setSaturationEnable(false);
+                v_pidf.setSaturationEnable(pm.trans_v_PIDF_saturation_enable);
             }
             else {
-                v_pidf.setSatuationEnable(pm.trans_v_PIDF_satuation_enable);                
+                v_pidf.setSaturationEnable(pm.trans_v_PIDF_saturation_enable);
             }
 
             // 速度PIDFイネーブル設定
             v_pidf.setEnable(pm.trans_v_PIDF_enable);
 
 
-            //角速度サチュレーション設定
+            // 角速度サチュレーション設定
             if(traj.motion_type == EMotionType::STOP || traj.motion_type == EMotionType::SPINTURN) {
-                ang_v_pidf.setSatuationEnable(false);
+                //ang_v_pidf.setSaturationEnable(false);
+                ang_v_pidf.setSaturationEnable(pm.rot_v_PIDF_saturation_enable);
             }
             else {
-                ang_v_pidf.setSatuationEnable(pm.rot_v_PIDF_satuation_enable);
+                ang_v_pidf.setSaturationEnable(pm.rot_v_PIDF_saturation_enable);
             }
 
-
+            // 角速度PIDFイネーブル設定
             ang_v_pidf.setEnable(pm.rot_v_PIDF_enable);
 
-            local_x_pidf.setEnable(pm.pos_PIDF_enable);
-            local_x_pidf.setSatuationEnable(pm.pos_PIDF_satuation_enable);
-            local_x_pidf.setSatuation(pm.pos_satuation_xy_dd);
+            // 位置PIDF設定
+            pos_pidf.setEnable(pm.pos_PIDF_enable);
+            pos_pidf.setSaturationEnable(true);
+            pos_pidf.setSaturation(pm.target_rot_x_saturation);
+            pos_pidf.set(pm.pos_P, pm.pos_I, pm.pos_D, pm.pos_F);
 
-            local_y_pidf.setEnable(pm.pos_PIDF_enable);
-            local_y_pidf.setSatuationEnable(pm.pos_PIDF_satuation_enable);
-            local_y_pidf.setSatuation(pm.pos_satuation_xy_dd);
-
-            if(traj.motion_type == EMotionType::CURVE){
-                local_x_pidf.set(pm.pos_slalom_P, pm.pos_slalom_I, pm.pos_slalom_D, pm.pos_slalom_F);
-                local_y_pidf.set(pm.pos_slalom_P, pm.pos_slalom_I, pm.pos_slalom_D, pm.pos_slalom_F);
-            }else {
-                local_x_pidf.set(pm.pos_P, pm.pos_I, pm.pos_D, pm.pos_F);
-                local_y_pidf.set(pm.pos_P, pm.pos_I, pm.pos_D, pm.pos_F);
-            }
-
-            //ang_pidf.set(pm.rot_x_spin_P, pm.rot_x_spin_I, pm.rot_x_spin_D, pm.rot_x_spin_F);
+            // 角度PIDF設定
             ang_pidf.setEnable(true);
-            ang_pidf.setSatuationEnable(false);
+            ang_pidf.setSaturationEnable(true);
 
+            // 壁PIDF設定
             wall_pidf.set(pm.wall_P, pm.wall_I, pm. wall_D, pm.wall_F);
             wall_pidf.setEnable(pm.wall_PIDF_enable);
+            wall_pidf.setSaturation(pm.target_rot_x_saturation);
 
+            // 積分サチュレーション設定
+            v_pidf.setIntegralSaturation(pm.trans_v_PIDF_integral_saturation);
+            ang_v_pidf.setIntegralSaturation(pm.rot_v_PIDF_integral_saturation);
+            ang_pidf.setIntegralSaturation(pm.rot_x_PIDF_integral_saturation);
+            pos_pidf.setIntegralSaturation(pm.pos_PIDF_integral_saturation);
+            wall_pidf.setIntegralSaturation(pm.wall_PIDF_integral_saturation);
         }
 
     };

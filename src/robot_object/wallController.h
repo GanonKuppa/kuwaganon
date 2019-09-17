@@ -83,12 +83,10 @@ public:
 
         error = (float)(e_fr + e_fl) / 2.0f;
 
-
-
         e_k0 = error;
 
         ud_k0 = F * ud_k1 + (1 - F) * (e_k0 - e_k1);
-        float delta_u_k = (Kp * (e_k0 - e_k1)) +  (Ki * e_k0) + (Kd * (ud_k0 - ud_k1));
+        float delta_u_k = calc_delta_u_k();
         u_k0 = u_k1 + delta_u_k;
 
         u_k1 = u_k0;

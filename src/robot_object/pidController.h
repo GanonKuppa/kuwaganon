@@ -1,32 +1,18 @@
-/*
- * pidController.h
- *
- *  Created on: 2018/11/06
- *      Author: qtfdl
- */
-
 #pragma once
 
+#include <math.h>
 #include "myUtil.h"
 
 namespace umouse {
 
 class VelocityTypePidfController {
 public:
-    float Kp;
-    float Ki;
-    float Kd;
-    float F;
     float e_k0;
     float e_k1;
     float ud_k0;
     float ud_k1;
     float u_k0;
     float u_k1;
-    float satuation;
-    bool enable;
-    bool satuation_enable;
-
 
     VelocityTypePidfController() {
            Kp = 0.0f;
@@ -39,19 +25,24 @@ public:
            u_k1 = 0.0f;
            ud_k0 = 0.0f;
            ud_k1 = 0.0f;
-           satuation = 0.0f;
+           saturation = 0.0f;
+           integral_saturation = 0.0f;
            bool enable = true;
-           bool satuation_enable = true;
+           bool saturation_enable = true;
 
     }
+
+
 
     virtual void update(float target_, float observed_val_) {
         e_k0 = target_ - observed_val_;
 
         ud_k0 = F * ud_k1 + (1.0f - F) * (e_k0 - e_k1);
-        float delta_u_k = (Kp * (e_k0 - e_k1)) +  (Ki * e_k0) + (Kd * (ud_k0 - ud_k1));
+        
+        float delta_u_k = calc_delta_u_k();
+
         u_k0 = u_k1 + delta_u_k;
-        if(satuation != 0.0f && satuation_enable == true)u_k0 = constrain(u_k0, -satuation, satuation);
+        if(saturation != 0.0f && saturation_enable == true)u_k0 = constrain(u_k0, -saturation, saturation);
 
         u_k1 = u_k0;
         e_k1 = e_k0;
@@ -73,17 +64,21 @@ public:
             F = F_;
     }
 
-    void setSatuation(float satuation_){
-        satuation = satuation_;
-        if(satuation != 0.0f && satuation_enable == true)u_k0 = constrain(u_k0, -satuation, satuation);
+    void setIntegralSaturation(float int_saturation){
+        integral_saturation = int_saturation;
+    }
+
+    void setSaturation(float saturation_){
+        saturation = saturation_;
+        if(saturation != 0.0f && saturation_enable == true)u_k0 = constrain(u_k0, -saturation, saturation);
     }
 
     void setEnable(bool enable_){
         enable = enable_;
     }
 
-    void setSatuationEnable(float se){
-        satuation_enable = se;
+    void setSaturationEnable(bool se){
+        saturation_enable = se;
     }
 
     void reset(){
@@ -95,6 +90,26 @@ public:
         ud_k1 = 0.0;
     }
 
+protected:
+    float Kp;
+    float Ki;
+    float Kd;
+    float F;
+    float saturation;
+    bool enable;
+    bool saturation_enable;
+    float integral_saturation;
+    
+    float calc_delta_u_k(){
+        float delta_u_k = 0.0f;
+        if(integral_saturation != 0.0f || integral_saturation > fabs(u_k0)){
+            delta_u_k = (Kp * (e_k0 - e_k1)) + (Kd * (ud_k0 - ud_k1));
+        }
+        else{
+            delta_u_k = (Kp * (e_k0 - e_k1)) +  (Ki * e_k0) + (Kd * (ud_k0 - ud_k1));
+        }
+        return delta_u_k;
+    }
 };
 
 class AngPidfController : public VelocityTypePidfController{
@@ -107,7 +122,9 @@ public:
         e_k0 = ang_diff;
 
         ud_k0 = F * ud_k1 + (1 - F) * (e_k0 - e_k1);
-        float delta_u_k = (Kp * (e_k0 - e_k1)) +  (Ki * e_k0) + (Kd * (ud_k0 - ud_k1));
+
+        float delta_u_k = calc_delta_u_k();
+
         u_k0 = u_k1 + delta_u_k;
 
         u_k1 = u_k0;
