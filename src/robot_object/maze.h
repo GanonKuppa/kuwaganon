@@ -379,6 +379,7 @@ public:
     direction_e getSearchDirection(uint16_t x, uint16_t y, direction_e dir){
         uint8_t min_dir = (uint8_t)getMinDirection(x, y, dir);
         uint8_t unknown_dir = (uint8_t)getUnknownDirection(x, y, dir);
+        return (direction_e)min_dir;
         if(unknown_dir == 255) return (direction_e)min_dir;
         else if(unknown_dir != min_dir) return (direction_e)unknown_dir;
         else return (direction_e)min_dir;

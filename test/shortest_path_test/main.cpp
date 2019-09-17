@@ -22,7 +22,7 @@ int main(int argc, const char *argv[])
     TrajectoryCommander trajCommander;
     
     //----------- 迷路に壁をセット
-    maze_archive::AllJapan2011Final_HF md;
+    maze_archive::Hokushinetsu2019_HF md;
     
     for(int i=0;i<31;i++){
         maze.walls_vertical[i] = md.walls_vertical[i];        
@@ -35,8 +35,8 @@ int main(int argc, const char *argv[])
     //----------- パスを計算
     std::vector<Path> path_vec;
     TurnParameter turn_p;
-    //turn_p.set(3.0, 0.5, 8.0);
-    turn_p.set(3.0, 1.5, 0.7, 0.7, 0.8, 0.8, 0.8, 0.8, 15.0, 3.0);
+    //turn_p.set(3.0, 0.7, 15.0);
+    turn_p.set(3.0, 1.5, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 10.0, 10.0);
     makeMinStepPath(md.goal_x, md.goal_y, maze, path_vec); //(3,2もおかしい)
 
 
@@ -45,17 +45,18 @@ int main(int argc, const char *argv[])
     //translatePathLong(path_vec);
     translatePathDiagonal(path_vec);
     printPath(path_vec);
-    //HF_playPath(turn_p, path_vec, trajCommander);
+    HF_playPath(turn_p, path_vec, trajCommander);
     //HF_playPathSpin(turn_p, path_vec, trajCommander);
-    HF_playPathSpinDiagonal(turn_p, path_vec, trajCommander);
+    //HF_playPathSpinDiagonal(turn_p, path_vec, trajCommander);
     
     long tick_count = 0;
+    double real_time = 0.0;
     while(trajCommander.empty() == false){
         std::chrono::system_clock::time_point  start, end; // 型は auto で可
         start = std::chrono::system_clock::now(); // 計測開始時間
         trajCommander.update();
-
-        if(tick_count % 10 == 0){
+        real_time += 0.0005;
+        if(tick_count % 30 == 0){
             sendRobotPos(trajCommander.x, trajCommander.y, trajCommander.ang, trajCommander.v);
             //sendTargetPos(trajCommander.x, trajCommander.y, trajCommander.ang);                
         }
@@ -70,6 +71,7 @@ int main(int argc, const char *argv[])
         }
         
     }
+    printf("real time:%f\n", real_time);
     finalizeWebAppConnection();
     return 0;
 }
