@@ -333,10 +333,10 @@ void packPidPrmAdjData(uint8_t *buf){
     const uint8_t dataBuffNum = 30;
     //速度
     for(int i= 0; i<dataBuffNum; i++){
-        set2ByteVal(buf, 16+ 2*i, (float)m.t_v_buff.at(i), 3000.0);
-        set2ByteVal(buf, 76+ 2*i, (float)m.v_buff.at(i), 3000.0);
-        set2ByteVal(buf, 136+ 2*i, (float)m.t_ang_v_buff.at(i), 20.0);
-        set2ByteVal(buf, 302+ 2*i, (float)m.ang_v_buff.at(i), 20.0);
+        set2ByteVal(buf, 16+ 2*i, (float)m.t_v_buff.at(i), 10000.0);
+        set2ByteVal(buf, 76+ 2*i, (float)m.v_buff.at(i), 10000.0);
+        set2ByteVal(buf, 136+ 2*i, (float)m.t_ang_v_buff.at(i), 10.0);
+        set2ByteVal(buf, 302+ 2*i, (float)m.ang_v_buff.at(i), 10.0);
     }
 
 

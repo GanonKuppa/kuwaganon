@@ -35,9 +35,9 @@ namespace umouse {
                 activity->start(intent);
                 printfAsync("SUB MODE SELECT RESULT = %d", intent->uint8_t_param["SUB_MODE"]);
                 run_mode = intent->uint8_t_param["SUB_MODE"];
-                if(run_mode == 0) return;
-
                 delete intent;
+                if(run_mode == 0) return;
+                
             }
 
             {
@@ -50,8 +50,9 @@ namespace umouse {
                 activity->start(intent);
                 printfAsync("SUB MODE SELECT RESULT = %d", intent->uint8_t_param["SUB_MODE"]);
                 param_mode = intent->uint8_t_param["SUB_MODE"];
-                if(param_mode == 0) return;
                 delete intent;
+                if(param_mode == 0) return;
+                
             }
 
 

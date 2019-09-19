@@ -102,7 +102,7 @@ protected:
     
     float calc_delta_u_k(){
         float delta_u_k = 0.0f;
-        if(integral_saturation != 0.0f || integral_saturation > fabs(u_k0)){
+        if(integral_saturation != 0.0f && integral_saturation < fabs(u_k0)){
             delta_u_k = (Kp * (e_k0 - e_k1)) + (Kd * (ud_k0 - ud_k1));
         }
         else{

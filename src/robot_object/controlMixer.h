@@ -89,7 +89,7 @@ namespace umouse {
                     ABS(ang_v_pidf.e_k0) > ang_v_error_th ||
                     ABS(icm.omega_f[2] - wodo. getAng_v()) > ang_v_error_th ) error_sec += DELTA_T;
             else error_sec = 0.0f;
-
+            error_sec = 0.0f;
             if(error_sec > error_limit_sec) return true;
             else return false;
 

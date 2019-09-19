@@ -136,14 +136,14 @@ namespace umouse {
 
         ; //78
         ; //79
-        uint8_t trans_v_PIDF_satuation_enable; //80
-        uint8_t rot_v_PIDF_satuation_enable; //81
-        uint8_t pos_PIDF_satuation_enable; //82
-        float trans_v_satuation_offset_duty; //83
-        float trans_v_satuation_FF_multiplier; //84
-        float rot_v_satuation_offset_duty; //85
-        float rot_v_satuation_FF_multiplier; //86
-        float pos_satuation_xy_dd; //87
+        uint8_t trans_v_PIDF_saturation_enable; //80
+        uint8_t rot_v_PIDF_saturation_enable; //81
+        uint8_t pos_PIDF_saturation_enable; //82
+        float trans_v_saturation_offset_duty; //83
+        float trans_v_saturation_FF_multiplier; //84
+        float rot_v_saturation_offset_duty; //85
+        float rot_v_saturation_FF_multiplier; //86
+        float pos_saturation_xy_dd; //87
         float pos_slalom_P; //88
         float pos_slalom_I; //89
         float pos_slalom_D; //90

@@ -156,14 +156,12 @@ public:
     }
 
     void updateBuff() {
-        WheelOdometry &wodo = WheelOdometry::getInstance();
-        ICM20602 &imu = ICM20602::getInstance();
-        t_ang_v_buff.push_front(t_ang_v);
-        ang_v_buff.push_front(imu.omega_f[2]);
-        t_v_buff.push_front(t_v);
-        v_buff.push_front(wodo.getV());
+        t_ang_v_buff.push_front(trajCommander.ang_v);
+        ang_v_buff.push_front(posEsti.getAngV());
+        t_v_buff.push_front(trajCommander.v);
+        v_buff.push_front(posEsti.getV());
         v_acc_buff.push_front(v_acc);
-        acc_y_buff.push_front(imu.acc_f[1]);
+        acc_y_buff.push_front(0.0f);
 
         t_ang_v_buff.pop_back();
         ang_v_buff.pop_back();
@@ -189,21 +187,18 @@ public:
         posEsti.update(wo.getV_double(), adis.omega_f[2], imu.acc_f[1], imu.acc_f[0], trajCommander.getMotionType(), ws);
         trajCommander.update(posEsti);
         
-        if(trajCommander.empty() != true){
-            if(trajCommander.getMotionType() == EMotionType::DIRECT_DUTY_SET){
+        if(!trajCommander.empty() && trajCommander.getMotionType() == EMotionType::DIRECT_DUTY_SET){
                 direct_duty_set_enable = true;
-            }else{
-                direct_duty_set_enable = false;
-            }
         }else{
             direct_duty_set_enable = false;
         }
 
-        if(direct_duty_set_enable != true){
-            if(trajCommander.empty() != true){
+        if(direct_duty_set_enable == false){
+            if(trajCommander.empty() == false){
                 auto traj = trajCommander.getTraj();
                 ctrlMixer.update(traj, posEsti, isRWallControllable(), isLWallControllable());
                 auto duty = ctrlMixer.getDuty();
+                
                 if( ws.getContactWallTime() > 0.1f &&
                    (trajCommander.getMotionType() == EMotionType::STRAIGHT ||
                     trajCommander.getMotionType() == EMotionType::STRAIGHT_WALL_CENTER)
@@ -215,6 +210,7 @@ public:
                     pt.setDuty(duty(0), duty(1));
                 }
             }else{
+                ctrlMixer.reset();
                 PseudoDialL &pdl = PseudoDialL::getInstance();
                 PseudoDialR &pdr = PseudoDialR::getInstance();
                 if(pdl.getEnable() == false && pdr.getEnable() == false ) pt.setDuty(0.0, 0.0);
