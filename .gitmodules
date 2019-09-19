@@ -1,0 +1,3 @@
+[submodule "tool/umouse_webapp_kuwaganon"]
+	path = tool/umouse_webapp_kuwaganon
+	url = https://github.com/GanonKuppa/umouse_webapp_kuwaganon
