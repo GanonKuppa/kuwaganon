@@ -117,14 +117,16 @@ namespace umouse {
             if( (isRWall || isLWall) &&
                 (WallSensor::getInstance().isRight_for_ctrl() ||
                  WallSensor::getInstance().isLeft_for_ctrl()) &&
-                 traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ){
+                 traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER &&
+                 pm.wall_PIDF_enable == true){
                 
                 wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall);                
                 target_rot_x += wall_pidf.getControlVal();
                 pos_pidf.reset();
             }
             else if( (traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
-                      traj.motion_type == EMotionType::STRAIGHT) &&
+                      traj.motion_type == EMotionType::STRAIGHT &&
+                      pm.pos_PIDF_enable == true) &&
                       fabs(esti.calcWallCenterOffset()) > pm.rot_x_wall_abs_center_offset
                     ){
                 pos_pidf.update(0.0, esti.calcWallCenterOffset());
@@ -181,8 +183,8 @@ namespace umouse {
             if(pm.trans_v_PIDF_saturation_enable == true) v_pidf.setSaturation(duty_v_saturation);
             if(pm.rot_v_PIDF_saturation_enable == true ) ang_v_pidf.setSaturation(duty_ang_v_saturation);
 
-            duty(0) += v_pidf.getControlVal() - ang_v_pidf.getControlVal();
-            duty(1) += v_pidf.getControlVal() + ang_v_pidf.getControlVal();
+            duty(0) += (v_pidf.getControlVal() - ang_v_pidf.getControlVal()) * 4.2f / voltage;
+            duty(1) += (v_pidf.getControlVal() + ang_v_pidf.getControlVal()) * 4.2f / voltage;
             motion_type_pre = traj.motion_type;
         }
 
