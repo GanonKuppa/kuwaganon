@@ -459,8 +459,8 @@ void packData(uint8_t *buf) {
     set2ByteVal(buf, 20, getAD_AN105());
 
     set2ByteVal(buf, 22, getDA());
-    set2ByteVal(buf, 24, getDutyMTU4(),65535);
-    set2ByteVal(buf, 26, getDutyMTU3(),65535);
+    set2ByteVal(buf, 24, pt.getDuty_L(), 10000);
+    set2ByteVal(buf, 26, pt.getDuty_R(), 10000);
 
     set2ByteVal(buf, 28, (float)(pt.getDuty_L() * bvm.bat_vol) , 5000.0);
     set2ByteVal(buf, 30, (float)(pt.getDuty_R() * bvm.bat_vol) , 5000.0);
