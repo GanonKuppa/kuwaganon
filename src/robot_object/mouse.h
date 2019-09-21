@@ -184,7 +184,7 @@ public:
         PowerTransmission &pt = PowerTransmission::getInstance();
         WallSensor &ws = WallSensor::getInstance();
 
-        posEsti.update(wo.getV_double(), adis.omega_f[2], imu.acc_f[1], imu.acc_f[0], trajCommander.getMotionType(), ws);
+        posEsti.update(wo.getV_double(), (double)adis.omega_f[2], imu.acc_f[1], imu.acc_f[0], trajCommander.getMotionType(), ws);
         trajCommander.update(posEsti);
         
         if(!trajCommander.empty() && trajCommander.getMotionType() == EMotionType::DIRECT_DUTY_SET){

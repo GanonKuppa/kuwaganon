@@ -240,7 +240,7 @@ namespace umouse {
         ; //189
         int16_t gyro2_x_ref; //190
         int16_t gyro2_y_ref; //191
-        int16_t gyro2_z_ref; //192
+        float gyro2_z_ref; //192
         int16_t acc2_x_ref; //193
         int16_t acc2_y_ref; //194
         int16_t acc2_z_ref; //195
