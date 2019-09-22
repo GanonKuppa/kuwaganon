@@ -42,8 +42,9 @@ public:
         float delta_u_k = calc_delta_u_k();
 
         u_k0 = u_k1 + delta_u_k;
-        if(saturation != 0.0f && saturation_enable == true)u_k0 = constrain(u_k0, -saturation, saturation);
-
+        if(saturation != 0.0f && saturation_enable == true){
+            u_k0 = constrain(u_k0, -saturation, saturation);
+        }
         u_k1 = u_k0;
         e_k1 = e_k0;
         ud_k1 = ud_k0;
@@ -70,7 +71,12 @@ public:
 
     void setSaturation(float saturation_){
         saturation = saturation_;
-        if(saturation != 0.0f && saturation_enable == true)u_k0 = constrain(u_k0, -saturation, saturation);
+        if(saturation != 0.0f && saturation_enable == true){
+            u_k0 = constrain(u_k0, -saturation, saturation);
+            u_k1 = u_k0;
+            e_k1 = e_k0;
+            ud_k1 = ud_k0;
+        }
     }
 
     void setEnable(bool enable_){

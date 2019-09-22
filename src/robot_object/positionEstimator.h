@@ -67,7 +67,11 @@ public:
         // 速度相補フィルタ
         v = (gain)*(v + a_y * DELTA_T) + (1.0 - gain)*(v_);
         if(fabs(a_y) < 1.0 ||  fabs(v_) < 0.05 ) v = v_;
-        
+
+
+        if (ABS(v_) < 0.005) v_acc = 0.0;
+        else v_acc += a_y * DELTA_T;
+
 
         if(v > 0.2) beta_dot =  -a_x / v - ang_v_rad;
         else beta_dot = 0.0;
@@ -78,13 +82,12 @@ public:
         else{
             beta += beta_dot * DELTA_T;
         }
-        beta = 0.0;
-
+        
         ang += calcAdamsBashforthDelta(ang_v, ang_v_1, ang_v_2);        
         ang = fmod(ang + 360.0, 360.0);
 
         double ang_rad = deg2rad(ang);
-        sincos(ang_rad - beta , &sin_val, &cos_val);
+        sincos(ang_rad, &sin_val, &cos_val);
         double x_d = v * cos_val;
         double y_d = v * sin_val;
 
@@ -148,10 +151,12 @@ public:
     }
 
     float getV(){return (float)v;}
-    float getAng(){return (float)ang;}
+    float getVAcc(){return (float)v_acc;}
+    float getAng(){return (float)ang;}    
     float getAngV(){return (float)ang_v;}
     float getX(){return (float)x;}
     float getY(){return (float)y;}
+    float getBeta(){return (float)beta;}
     
     void setV(double v_){
         v = v_;
@@ -175,7 +180,8 @@ public:
 
 private:
 
-    double v;    
+    double v;
+    double v_acc;    
     double ang;
     double beta;
     double x;

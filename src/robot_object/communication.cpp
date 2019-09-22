@@ -509,58 +509,39 @@ void packData(uint8_t *buf) {
     set2ByteVal(buf, 104, m.trajCommander.ang, 100);
 
     set2ByteVal(buf, 106, (float)wo.v, 10000);
-    //set2ByteVal(buf, 108, m.trajCommander.y, 1000);
+    set2ByteVal(buf, 108, (float)m.posEsti.getV(), 10000);
     set2ByteVal(buf, 110, m.trajCommander.v, 10000);
-    set2ByteVal(buf, 112, m.ctrlMixer.target_trans_v, 10000);
+    set2ByteVal(buf, 112, (float)m.posEsti.getVAcc(), 10000);
 
     set2ByteVal(buf, 114, (float)m.posEsti.getAngV(), 10);
     set2ByteVal(buf, 116, m.trajCommander.ang_v, 10);
     set2ByteVal(buf, 118, m.ctrlMixer.target_rot_v, 10);
 
-    //set2ByteVal(buf, 120, m.trajCommander.v, 10000);
-    //set2ByteVal(buf, 122, m.trajCommander.v, 10000);
-
-
-    //set2ByteVal(buf, 106, m.accum_ang, 100.0);
-
+    set2ByteVal(buf, 120, m.trajCommander.x_dd, 1000);
+    set2ByteVal(buf, 122, m.trajCommander.y_dd, 1000);
+    set2ByteVal(buf, 124, icm.acc_f[0], 1000);
+    set2ByteVal(buf, 126, icm.acc_f[1], 1000);
+    set2ByteVal(buf, 128, m.ctrlMixer.target_rot_x, 100);
 
     set2ByteVal(buf, 130, m.ctrlMixer.v_pidf.getControlVal(), 10000);
     set2ByteVal(buf, 132, m.ctrlMixer.ang_v_pidf.getControlVal(), 10000);
+    
+    set2ByteVal(buf, 134, m.ctrlMixer.v_back_emf_FF, 10000);
+    set2ByteVal(buf, 136, m.ctrlMixer.a_acc_FF, 10000);
+    set2ByteVal(buf, 138, m.ctrlMixer.v_fric_FF, 10000);
+    
+    set2ByteVal(buf, 140, m.ctrlMixer.ang_v_back_emf_FF, 10000);
+    set2ByteVal(buf, 142, m.ctrlMixer.ang_a_acc_FF, 10000);
+    set2ByteVal(buf, 144, m.ctrlMixer.ang_v_fric_FF, 10000);
 
+    set2ByteVal(buf, 146, m.ctrlMixer.wall_pidf.getControlVal(), 100);
+    set2ByteVal(buf, 148, m.ctrlMixer.pos_pidf.getControlVal(), 100);
 
-    //set2ByteVal(buf, 104, icm.omega_f[2], 15.0);
-    //set2ByteVal(buf, 106, whOdom.ang_v, 15.0);
+    set2ByteVal(buf, 150, (float)wo.getAng_v(), 10);
+    set2ByteVal(buf, 152, (float)m.posEsti.getBeta(), 100);
 
-    //set2ByteVal(buf, 98, m.t_a, 1000.0);
-    //set2ByteVal(buf, 100, m.t_v, 3000.0);
-    //set2ByteVal(buf, 102, m.t_x, 3000.0);
-    //set2ByteVal(buf, 104, m.accum_x, 3000.0);
+    set2ByteVal(buf, 154, (float)m.ctrlMixer.ang_pidf.getControlVal(), 10);
 
-    //set2ByteVal(buf, 106, icm.acc_f[1], 1500.0); //縦G
-    //set2ByteVal(buf, 108, icm.acc_f[0], 1500.0); //横G
-    //set2ByteVal(buf, 110, whOdom.v, 3000.0 );
-    //set2ByteVal(buf, 112, m.v_acc, 3000.0 );
-
-    //set2ByteVal(buf, 114, whOdom.ab_ang, 80.0 );
-    /*
-    set2ByteVal(buf, 122, m.v_enc, 3000.0 );
-    set2ByteVal(buf, 124, m.wall_P, 20.0);
-    set2ByteVal(buf, 126, m.wall_I, 20.0);
-    set2ByteVal(buf, 128, m.wall_D, 20.0);
-    set2ByteVal(buf, 130, m.v_P, 20.0);
-    set2ByteVal(buf, 132, m.v_I, 20.0);
-    set2ByteVal(buf, 134, m.v_D, 20.0);
-    set2ByteVal(buf, 136, m.ang_P, 20.0);
-    set2ByteVal(buf, 138, m.ang_I, 20.0);
-    set2ByteVal(buf, 140, m.ang_D, 20.0);
-    set2ByteVal(buf, 142, m.ang_v_P, 20.0);
-    set2ByteVal(buf, 144, m.ang_v_I, 20.0);
-    set2ByteVal(buf, 146, m.ang_v_D, 20.0);
-    set2ByteVal(buf, 148, m.v_FF, 20.0);
-    set2ByteVal(buf, 150, m.ang_FF, 20.0);
-
-    set2ByteVal(buf, 152, m.ab_ang, 100.0);
-*/
     //迷路データ
     static uint8_t count = 0;
     packDataMaze(count, &buf[160]);

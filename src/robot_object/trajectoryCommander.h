@@ -20,6 +20,8 @@ public:
     float v;
     float ang;
     float ang_v;
+    float x_dd;
+    float y_dd;
 
 
     TrajectoryCommander(){
@@ -29,6 +31,9 @@ public:
         ang = 90.0f;
         ang_v = 0.0f;
         v = 0.0f;
+        x_dd = 0.0f;
+        y_dd = 0.0f;
+
     }
 
     EMotionType getMotionType() {
@@ -55,6 +60,9 @@ public:
             ang = trajQueue.front()->ang;
             ang_v = trajQueue.front()->ang_v;
             v = trajQueue.front()->v;
+            x_dd = trajQueue.front()->x_dd;
+            y_dd = trajQueue.front()->y_dd;
+
 
             float dist = residualDist(esti);
 
