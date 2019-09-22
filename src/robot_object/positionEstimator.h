@@ -210,22 +210,22 @@ private:
         if(ws.isOnWallCenter() == true && ws.isAhead() == false && v > 0.1f && v < 0.34f && fabsf(ang_v) < 50.0f) {            
 
             if(ang >= 315.0 || ang < 45.0) {                    
-                ang = 0.0f;
+                //ang = 0.0f;
                 y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;
                 SE_POSITION_CHANGE();
             }
             else if(ang >= 45.0 && ang < 135.0) {
-                ang = 90.0f;
+                //ang = 90.0f;
                 x = (uint8_t)(x / 0.09) * 0.09 + 0.09/2.0;
                 SE_POSITION_CHANGE();
             }
             else if(ang >= 135.0 && ang < 225.0) {
-                ang = 180.0f;
+                //ang = 180.0f;
                 y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;
                 SE_POSITION_CHANGE();
             }
             else if(ang >= 225.0 && ang < 315.0) {
-                ang = 270.0f;
+                //ang = 270.0f;
                 x = (uint8_t)(x / 0.09) * 0.09 + 0.09/2.0;
                 SE_POSITION_CHANGE();
             }

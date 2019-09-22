@@ -48,7 +48,7 @@ public:
 
     void update(){
         int16_t ad = startAD_AN105();
-        float bat_vol = ad2Voltage(ad);
+        bat_vol = ad2Voltage(ad);
 
         count ++;
         if(count > 2000) count = 0; //0.25msec割り込み2000回 = 0.5秒

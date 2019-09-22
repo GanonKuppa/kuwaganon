@@ -110,7 +110,22 @@ namespace umouse {
                 ParameterManager &pm = ParameterManager::getInstance();
 
                 if(in_read_wall_area) fcled.turn(0,1,0);
-                else fcled.turn(0,0,1);             
+                else fcled.turn(0,0,1);
+
+                if(m.trajCommander.empty()){
+                    auto traj = StopTrajectory::create(1.0f);
+                    SE_Im7();
+                    m.trajCommander.push(std::move(traj));
+                    m.maze.writeAheadWall(m.coor.x, m.coor.y, m.getDirection(), ws.isAhead());
+                    m.maze.makeSearchMap(desti_coor.x, desti_coor.y);
+                    direction_e dest_dir_next = m.maze.getMinDirection(m.coor.x, m.coor.y, m.direction);
+                    int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
+                    auto traj0 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj1 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
+                    m.trajCommander.push(std::move(traj0));
+                    m.trajCommander.push(std::move(traj1));
+                }
+
 
                 if(in_read_wall_area && pre_in_read_wall_area == false && pre_read_wall_coor != m.coor) {
                     printfAsync("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝\n");
@@ -194,10 +209,13 @@ namespace umouse {
                 if (ws.isAhead() == true) {
                     std::function< void(void) > update_func = [&m, &ws]() {
                         if(ws.getContactWallTime() > 0.1f){
-                            PowerTransmission::getInstance().setDuty(0.4, 0.4);
+                            PowerTransmission::getInstance().setDuty(0.25, 0.25);
+                        }
+                        else if(ws.getContactWallTime() > 0.2f){
+                            PowerTransmission::getInstance().setDuty(0.15, 0.15);
                         }
                         else{
-                            PowerTransmission::getInstance().setDuty(0.5, 0.5);
+                            PowerTransmission::getInstance().setDuty(0.35, 0.35);
                         }
                         m.posEsti.setX(m.trajCommander.x);
                         m.posEsti.setY(m.trajCommander.y);

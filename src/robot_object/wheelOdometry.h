@@ -124,9 +124,11 @@ public:
         //エンコーダより計測された速度
 
         v_R = (ENC_R_DIR * PI * pm.dia_tire / GEAR_RATIO / ENC_RESOLUTION) *
-              calcDiffWithInterpolation(R_count_32bit, R_count_32bit_1, R_count_32bit_2);
+              (double)count_diff_R / DELTA_T;
+              //calcDiffWithInterpolation(R_count_32bit, R_count_32bit_1, R_count_32bit_2);
         v_L = (ENC_L_DIR * PI * pm.dia_tire / GEAR_RATIO / ENC_RESOLUTION) *
-              calcDiffWithInterpolation(L_count_32bit, L_count_32bit_1, L_count_32bit_2);
+              (double)count_diff_L / DELTA_T;
+              //calcDiffWithInterpolation(L_count_32bit, L_count_32bit_1, L_count_32bit_2);
 
         R_count_32bit_2 = R_count_32bit_1;
         L_count_32bit_2 = L_count_32bit_1;
@@ -134,8 +136,7 @@ public:
         L_count_32bit_1 = L_count_32bit;
 
         v = (v_R + v_L) * 0.5;
-        if( fabs(v_R + v_L) > 0.001)
-        kappa = 2.0 * (v_R - v_L) / (pm.tread * (v_R + v_L));
+        if( fabs(v_R + v_L) > 0.001)kappa = 2.0 * (v_R - v_L) / (pm.tread * (v_R + v_L));
         float ang_v_rad = (v_R - v_L) / pm.tread; //v * kappa;
         ang_v = RAD2DEG(ang_v_rad);
 

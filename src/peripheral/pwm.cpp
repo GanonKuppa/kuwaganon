@@ -33,9 +33,9 @@ void initMTU3() {
     MTU3.TCR.BIT.CCLR = 1; //PWM TGRAのコンペアマッチでTCNTクリア TGRDは6
     MTU3.TIORH.BIT.IOA = 1; //初期出力0ンペアマッチ0出力
     MTU3.TIORH.BIT.IOB = 2; //初期出力0コンペアマッチ1出力
-    MTU3.TGRA = 250; //500
+    MTU3.TGRA = 750; //500
     MTU3.TGRB = 1;
-    MTU3.TGRC = 250;
+    MTU3.TGRC = 750;
     MTU3.TGRD = 1;
     MTU3.TMDR1.BIT.MD = 2; //PWM1
     //MTU3.TMDR1.BIT.BFA = 1;	//バッファーモードに設定
@@ -61,9 +61,9 @@ void initMTU4() {
     MTU4.TCR.BIT.CCLR = 1; //PWM TGRAのコンペアマッチでTCNTクリア TGRDは6
     MTU4.TIORH.BIT.IOA = 1; //初期出力0ンペアマッチ0出力
     MTU4.TIORH.BIT.IOB = 2; //初期出力0コンペアマッチ1出力
-    MTU4.TGRA = 250;
+    MTU4.TGRA = 750;
     MTU4.TGRB = 1;
-    MTU4.TGRC = 250;
+    MTU4.TGRC = 750;
     MTU4.TGRD = 1;
     MTU4.TMDR1.BIT.MD = 2; //PWM1
     //MTU4.TMDR1.BIT.BFA = 1;	//バッファーモードに設定
