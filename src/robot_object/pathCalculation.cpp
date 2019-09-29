@@ -151,7 +151,7 @@ void HF_playPath(TurnParameter turn_p, std::vector<Path> &path_vec, TrajectoryCo
             {
                 if(path_vec[i].block_num != 1){
                     auto traj_straight0 = StraightTrajectory::createAsWallCenter(x - 0.045, v_pre, v_max, v_fol, a, a);
-                    auto traj_straight1 = StraightTrajectory::createAsWallCenter(0.045, v_fol, v_fol, v_fol, a, a);
+                    auto traj_straight1 = StraightTrajectory::create(0.045, v_fol, v_fol, v_fol, a, a);
                     trajCommander.push(std::move(traj_straight0));
                     trajCommander.push(std::move(traj_straight1));
                 } else{
@@ -171,8 +171,8 @@ void HF_playPath(TurnParameter turn_p, std::vector<Path> &path_vec, TrajectoryCo
             else v_fol = turn_p.getTurnV(path_vec[i+1].turn_type);
 
             {
-                auto traj_straight0 = StraightTrajectory::createAsDiagonal(x - 0.045, v_pre, v_max, v_fol, a, a);
-                auto traj_straight1 = StraightTrajectory::createAsDiagonalCenter(0.045, v_fol, v_fol, v_fol, a, a);
+                auto traj_straight0 = StraightTrajectory::createAsDiagonalCenter(x - 0.045, v_pre, v_max, v_fol, a, a);
+                auto traj_straight1 = StraightTrajectory::createAsDiagonal(0.045, v_fol, v_fol, v_fol, a, a);
                 trajCommander.push(std::move(traj_straight0));
                 trajCommander.push(std::move(traj_straight1));
             }
