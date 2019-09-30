@@ -272,7 +272,7 @@ namespace umouse {
 
                     auto traj0 = StraightTrajectory::create(0.035f, v, v, 0.1f, a, a);
                     auto traj1 = StraightTrajectory::create(0.01f, 0.1f, 0.1f, 0.1f, a, a);
-                    auto traj2 = StopTrajectory::create(0.1f);
+                    auto traj2 = StopTrajectory::create(0.4f);
                     auto traj3 = UpdateInjectionTrajectory::create(0.35f, update_func);
                     auto traj4 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
                     auto traj5 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
@@ -289,7 +289,7 @@ namespace umouse {
                 else {
                     auto traj0 = StraightTrajectory::createAsWallCenter(0.035f, v, v, 0.1f, a, a);
                     auto traj1 = StraightTrajectory::create(0.01f, 0.1f, 0.1f, 0.1f, a, a);
-                    auto traj2 = StopTrajectory::create(0.2f);
+                    auto traj2 = StopTrajectory::create(0.4f);
                     auto traj3 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
                     auto traj4 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
                     auto traj5 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);

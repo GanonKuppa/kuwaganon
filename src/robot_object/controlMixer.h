@@ -150,12 +150,21 @@ namespace umouse {
                       traj.motion_type == EMotionType::STRAIGHT &&
                       pm.pos_PIDF_enable == true) &&
                       fabs(esti.calcWallCenterOffset()) > pm.rot_x_wall_abs_center_offset
-                    ){
-                pos_pidf.update(0.0, esti.calcWallCenterOffset());
+            ){
+                pos_pidf.update(0.0, - esti.calcWallCenterOffset());
                 target_rot_x += pos_pidf.getControlVal();
                 wall_pidf.reset();
             }
-            else if(traj.motion_type == EMotionType::DIAGONAL_CENTER ){
+            else if(traj.motion_type == EMotionType::DIAGONAL_CENTER &&
+                    pm.pos_PIDF_enable == true 
+            ){
+                pos_pidf.update(0.0, - esti.calcDiagWallCenterOffset());
+                target_rot_x += pos_pidf.getControlVal();
+            }
+
+            //衝突回避
+            if(traj.motion_type == EMotionType::DIAGONAL_CENTER
+            ){
                 if (WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold){
                     target_rot_x -= pm.wall_diagonal_avoid_add_ang;
                 }
@@ -164,12 +173,14 @@ namespace umouse {
                 }
             }
 
+
             ang_pidf.update(target_rot_x, esti.getAng());
             target_rot_v += ang_pidf.getControlVal(); 
             
 
-            if( traj.motion_type != motion_type_pre &&
+            if( (traj.motion_type != motion_type_pre &&
                 motion_type_pre == EMotionType::STOP)
+                || traj.motion_type == EMotionType::DIRECT_DUTY_SET)
             {
                 ang_v_pidf.reset();
                 ang_pidf.reset();

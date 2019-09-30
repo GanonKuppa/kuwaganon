@@ -210,8 +210,8 @@ registration<float>(178, gyro2_scaler_left);
 ;//187
 ;//188
 ;//189
-registration<int16_t>(190, gyro2_x_ref);
-registration<int16_t>(191, gyro2_y_ref);
+registration<float>(190, gyro2_x_ref);
+registration<float>(191, gyro2_y_ref);
 registration<float>(192, gyro2_z_ref);
 registration<int16_t>(193, acc2_x_ref);
 registration<int16_t>(194, acc2_y_ref);

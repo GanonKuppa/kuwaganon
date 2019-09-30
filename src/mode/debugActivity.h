@@ -8,6 +8,7 @@
 #include "fcLed.h"
 #include "sound.h"
 #include "ICM20602.h"
+#include "adis16470.h"
 
 
 namespace umouse{
@@ -41,10 +42,13 @@ protected:
         
 
         UMouse &m = UMouse::getInstance();
-        waitmsec(3000);
+
         ICM20602 &icm = ICM20602::getInstance();
+        adis16470 &adis = adis16470::getInstance();
         icm.calibOmegaOffset(800);
         icm.calibAccOffset(800);
+        adis.calibOmegaOffset(1600);
+        SEF();
 
         float x = 0.09f/2.0f;
         float y = 0.09f/2.0f - m.WALL2MOUSE_CENTER_DIST;
@@ -54,7 +58,7 @@ protected:
         m.posEsti.reset(x,y,ang);
         m.trajCommander.reset(x,y,ang);
         m.ctrlMixer.reset();
-
+        waitmsec(3000);
         ParameterManager &pm = ParameterManager::getInstance();
       
 
@@ -116,13 +120,61 @@ protected:
         }
         else if(mode == 6){
 
+            auto traj1 = StraightTrajectory::createAsWallCenter(0.09f * 8.0f, 0.0, 0.1f, 0.1f, 1.0f ,1.0f);
+            auto traj2 = StopTrajectory::create(1.0);
+            m.trajCommander.push(std::move(traj1));
+            m.trajCommander.push(std::move(traj2));
+
         }
         else if(mode == 7){
+            SEF();
+            icm.calibOmegaOffset(800);
+            icm.calibAccOffset(800);
+            adis.calibOmegaOffset(1600);
+
+            float v_slalom = pm.v_search_run;
+            float a = pm.a_search_run;
+            auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, 0.0, v_slalom, v_slalom, a , a);
+            m.trajCommander.push(std::move(traj0));
+
+            for(int i=0;i<100;i++){
+                straight_n_blocks(5.0f);
+                slalom90(turn_dir_e::CW);
+            }
+
+            auto traj1 = StraightTrajectory::createAsWallCenter(0.045f, v_slalom, v_slalom, 0.1f, a , a);
+            m.trajCommander.push(std::move(traj1));
+
+            auto traj2 = StopTrajectory::create(1.0);
+            m.trajCommander.push(std::move(traj2));
 
         }
 
 
     };
+
+    void slalom90(turn_dir_e dir){
+        ParameterManager &pm = ParameterManager::getInstance();
+        float v_slalom = pm.v_search_run;
+        float a = pm.a_search_run;
+        UMouse &m = UMouse::getInstance();
+        auto traj1 = StraightTrajectory::create(CurveFactory::getPreDist(turn_type_e::TURN_90), v_slalom, v_slalom, v_slalom, a, a);
+        auto traj2 = CurveTrajectory::createAsNoStraght(v_slalom, turn_type_e::TURN_90, dir);
+        auto traj3 = StraightTrajectory::create(CurveFactory::getFolDist(turn_type_e::TURN_90), v_slalom, v_slalom, v_slalom, a, a);
+        m.trajCommander.push(std::move(traj1));
+        m.trajCommander.push(std::move(traj2));
+        m.trajCommander.push(std::move(traj3));
+    }
+
+    void straight_n_blocks(float n_blocks){
+        ParameterManager &pm = ParameterManager::getInstance();
+        float v_slalom = pm.v_search_run;
+        float v_max = pm.test_run_v;
+        float a = pm.test_run_a;
+        UMouse &m = UMouse::getInstance();
+        auto traj0 = StraightTrajectory::createAsWallCenter(0.09f * n_blocks, v_slalom, v_max, v_slalom, a, a);
+        m.trajCommander.push(std::move(traj0));
+    }
 
 
     ELoopStatus loop(){

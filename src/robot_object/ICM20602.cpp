@@ -141,12 +141,12 @@ void ICM20602::update() {
     uint8_t gyro_yout_l = readReg(0x46);
     uint8_t gyro_zout_h = readReg(0x47);
     uint8_t gyro_zout_l = readReg(0x48);
-    acc_raw[0] = concatenate2Byte_int(accel_xout_h, accel_xout_l);
-    acc_raw[1] = concatenate2Byte_int(accel_yout_h, accel_yout_l);
+    acc_raw[0] =  concatenate2Byte_int(accel_xout_h, accel_xout_l);
+    acc_raw[1] =  concatenate2Byte_int(accel_yout_h, accel_yout_l);
     acc_raw[2] = - concatenate2Byte_int(accel_zout_h, accel_zout_l);
 
     omega_raw[0] = concatenate2Byte_int(gyro_xout_h, gyro_xout_l);
-    omega_raw[1] = - concatenate2Byte_int(gyro_yout_h, gyro_yout_l);
+    omega_raw[1] = concatenate2Byte_int(gyro_yout_h, gyro_yout_l);
     omega_raw[2] = concatenate2Byte_int(gyro_zout_h, gyro_zout_l);
 
     omega_ref[0] = pm.gyro_x_ref;
@@ -169,13 +169,16 @@ void ICM20602::update() {
 
     for (int i = 0; i < 3; i++) {
         acc_c[i] = acc_raw[i] - acc_ref[i];
-        acc_f[i] = 0.02 * (acc_c[i] * ACC_2g * G) + 0.98 * acc_f[i];
+        acc_f[i] = 0.3 * (acc_c[i] * ACC_2g * G) + 0.7 * acc_f[i];
     }
 
     temp_raw = concatenate2Byte_int(temp_out_h, temp_out_l);
     temp_f =  temp_raw * T_25degC + RoomTemp_Offset;
 
-    if(ABS(omega_f[0]) < 5.0 && ABS(omega_f[1]) < 5.0 && ABS(omega_f[2]) < 5.0) stop_count ++;
+    if(ABS(omega_f[0]) < 5.0 && ABS(omega_f[1]) < 5.0 && ABS(omega_f[2]) < 5.0 &&
+       ABS(acc_f[0]) < 0.2 && ABS(acc_f[1]) < 0.2){
+           stop_count ++;
+      }
     else stop_count = 0;
 
     if(acc_f[2]> G * 0.85) upsideDown_count++;

@@ -238,8 +238,8 @@ namespace umouse {
         ; //187
         ; //188
         ; //189
-        int16_t gyro2_x_ref; //190
-        int16_t gyro2_y_ref; //191
+        float gyro2_x_ref; //190
+        float gyro2_y_ref; //191
         float gyro2_z_ref; //192
         int16_t acc2_x_ref; //193
         int16_t acc2_y_ref; //194

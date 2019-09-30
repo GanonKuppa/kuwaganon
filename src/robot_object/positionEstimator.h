@@ -20,6 +20,9 @@ public:
         ang = 90.0;
         ang_v = 0.0;
         v = 0.0;
+        x_d = 0.0;
+        y_d = 0.0;
+
         contact_wall_cool_down_time = 0.0f;
     }
 
@@ -29,6 +32,9 @@ public:
         ang = (double)ang_;
         ang_v = 0.0;
         v = 0.0;
+        x_d = 0.0;
+        y_d = 0.0;
+
         contact_wall_cool_down_time = 0.0f;
     }
 
@@ -42,6 +48,9 @@ public:
 
         ang_v_1 = 0.0;
         ang_v_2 = 0.0;
+
+        x_d = 0.0;
+        y_d = 0.0;
 
         x_d_1 = 0.0;
         x_d_2 = 0.0;
@@ -64,9 +73,13 @@ public:
         double cos_val;
         double beta_dot;
 
+
+        //v = v_;//(gain)*(v + a_y * DELTA_T) + (1.0 - gain)*(v_);
+        //if(fabs(a_y) < 1.0 ||  fabs(v_) < 0.05 ) v = v_;
         // 速度相補フィルタ
+
+        if(ABS(a_y) < 3.0) gain = 0.0;
         v = (gain)*(v + a_y * DELTA_T) + (1.0 - gain)*(v_);
-        if(fabs(a_y) < 1.0 ||  fabs(v_) < 0.05 ) v = v_;
 
 
         if (ABS(v_) < 0.005) v_acc = 0.0;
@@ -87,17 +100,42 @@ public:
         ang = fmod(ang + 360.0, 360.0);
 
         double ang_rad = deg2rad(ang);
-        sincos(ang_rad, &sin_val, &cos_val);
-        double x_d = v * cos_val;
-        double y_d = v * sin_val;
+        //sincos(ang_rad, &sin_val, &cos_val);
+        sin_val = sin(ang_rad);
+        cos_val = cos(ang_rad);
+
+        if(motion_type == EMotionType::SPINTURN || motion_type == EMotionType::CURVE){
+            if(ABS(a_x) < 1.0) a_x = 0.0;
+            gain = pm.v_comp_gain;
+        }else{
+            if(ABS(a_y) > 3.0)gain = pm.v_comp_gain;
+            else gain = 0.0;
+            a_x = 0.0;
+        }
+
+        double x_dd =   a_x * sin_val + a_y * cos_val;
+        double y_dd = - a_x * cos_val + a_y * sin_val;
+        x_d = gain * (x_d + x_dd * DELTA_T) + (1.0 - gain) * v_ * cos_val;
+        y_d = gain * (y_d + y_dd * DELTA_T) + (1.0 - gain) * v_ * sin_val;
+
+/*
+        if(icm.isStop()){
+            x_d = 0.0f;
+            y_d = 0.0f;
+        }
+*/
 
         if(fabs(ang_v) > 10.0){
             x += x_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
             y += y_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
+
         } else{
+
             x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);
             y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
         }
+
+
 
         ang_v_2 = ang_v_1;
         ang_v_1 = ang_v;
@@ -115,6 +153,56 @@ public:
         diagCornerLCorrection(ws);
         //contactWallCorrection(motion_type, ws);
     }
+
+    float calcDiagWallCenterOffset(){
+        float ang_ = getAng();
+        float x_ = getX();
+        float y_ = getY();
+
+        float fmod_x = fmodf(x_, 0.09f);
+        float fmod_y = fmodf(y_, 0.09f);         
+            
+        if(ang_ >= 0.0f && ang_ < 90.0f) //45deg
+        { 
+            if(fmod_y > fmod_x){
+                return (fmod_x - fmod_y + 0.045f) / SQRT_2;
+            }
+            else{
+                return (fmod_x - fmod_y - 0.045f) / SQRT_2;
+            }
+        }
+        else if(ang_ >= 90.0f && ang_ < 180.0f) // 135deg
+        { 
+            if(fmod_y > - fmod_x + 0.09f){
+                return - (fmod_x + fmod_y - 0.135f) / SQRT_2;
+            }
+            else{
+                return - (fmod_x + fmod_y - 0.045f) / SQRT_2;
+            }
+        }
+        else if(ang_ >= 180.0f && ang_ < 270.0f)    //225deg
+        { 
+            if(fmod_y > fmod_x){
+                return - (fmod_x - fmod_y + 0.045f) / SQRT_2;
+            }
+            else{
+                return - (fmod_x - fmod_y - 0.045f) / SQRT_2;
+            }
+        }
+        else if(ang_ >= 270.0f && ang_ < 360.0f)   // 315deg
+        { 
+            if(fmod_y > - fmod_x + 0.09f){
+                return (fmod_x + fmod_y - 0.135f) / SQRT_2;
+            }
+            else{
+                return (fmod_x + fmod_y - 0.135f) / SQRT_2;
+            }
+        }
+        else{
+            return 0.0f;
+        }
+    }
+
 
     float calcWallCenterOffset() {
         float ang_ = getAng();
@@ -194,11 +282,15 @@ private:
     float diag_corner_l_cool_down_time;
     
     const double DELTA_T = 0.0005;
+    const float SQRT_2 = 1.4142356f;
     const double PI = 3.14159265358979323846264338327950288;
 
     double ang_v;
     double ang_v_1;
     double ang_v_2;
+
+    double x_d;
+    double y_d;
 
     double x_d_1;
     double y_d_1;

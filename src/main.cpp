@@ -132,7 +132,7 @@ void timeInterrupt(void) {
         if (getElapsedMsec() > 5000){
             std::function< void(void) > w1 = [&icm]() {icm.update();};
             std::function< void(void) > w2 = [&wallSen]() {wallSen.update();};
-            std::function< void(void) > w3 = []() {waitusec_sub(10);};
+            std::function< void(void) > w3 = [&mouse]() {mouse.update();};
             std::function< void(void) > w4 = []() {waitusec_sub(10);};
             adis.update(w1, w2, w3, w4);
         }
@@ -144,15 +144,15 @@ void timeInterrupt(void) {
     if (int_tick_count % 4 == 0) {
         wheelOdometry.update();
         gamepad.update();
-        mouse.update();
+        
     }
     //スロット2
     if (int_tick_count % 4 == 2) {
         if (getElapsedMsec() > 5000){
             std::function< void(void) > w1 = [&icm]() {icm.update();};
             std::function< void(void) > w2 = [&wallSen]() {wallSen.update();};
-            std::function< void(void) > w3 = []() {waitusec_sub(10);};
-            std::function< void(void) > w4 = []() {waitusec_sub(10);};
+            std::function< void(void) > w3 = [&mouse]() {mouse.update();};
+            std::function< void(void) > w4 = []() {waitusec_sub(20);};
             adis.update(w1, w2, w3, w4);
         }
         else{
@@ -165,8 +165,6 @@ void timeInterrupt(void) {
         dialL.update();
         dialR.update();
         fcled.update();
-        mouse.update();
-
     }
 
     /////毎回行う処理/////

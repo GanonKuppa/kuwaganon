@@ -184,7 +184,9 @@ public:
         PowerTransmission &pt = PowerTransmission::getInstance();
         WallSensor &ws = WallSensor::getInstance();
 
-        posEsti.update(wo.getV_double(), (double)adis.omega_f[2], imu.acc_f[1], imu.acc_f[0], trajCommander.getMotionType(), ws);
+        //posEsti.update(wo.getV_double(), (double)adis.omega_f[2], (double)adis.originOffsetCompAy(), (double)adis.originOffsetCompAx(), trajCommander.getMotionType(), ws);
+        posEsti.update(wo.getV_double(), (double)adis.omega_f[2], (double)imu.acc_f[1], (double)imu.acc_f[0], trajCommander.getMotionType(), ws);
+
         trajCommander.update(posEsti);
         
         if(!trajCommander.empty() && trajCommander.getMotionType() == EMotionType::DIRECT_DUTY_SET){
@@ -317,7 +319,7 @@ public:
     bool isRWallControllable(){
         // マウスと同じ角度の座標系における区画の入口からの距離
         float fmod_x = fmodf(posEsti.getX(), 0.09f);
-        float fmod_y = fmodf(posEsti.getY(), 0.09f);        
+        float fmod_y = fmodf(posEsti.getY(), 0.09f);
         float dist = 0.0f;
         if(getDirection() == direction_e::E){
             dist = fmod_x;
