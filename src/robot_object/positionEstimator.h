@@ -63,29 +63,125 @@ public:
 
     void update(double v_, double ang_v_, double a_y, double a_x, EMotionType motion_type, WallSensor &ws) {
         ICM20602 &icm = ICM20602::getInstance();
-        ParameterManager &pm = ParameterManager::getInstance();
+        ParameterManager &pm = ParameterManager::getInstance();        
 
-        ang_v = ang_v_;
-
-        double gain = (double)pm.v_comp_gain;
-        double ang_v_rad = deg2rad(ang_v);       
+        double ang_v_rad = deg2rad(ang_v);
         double sin_val;
         double cos_val;
         double beta_dot;
 
+        // 角度算出
+        alpha = (ang_v_ - ang_v) / DELTA_T;
+        ang_v = ang_v_;        
+        ang += calcAdamsBashforthDelta(ang_v, ang_v_1, ang_v_2);
+        ang = fmod(ang + 360.0, 360.0);
 
-        //v = v_;//(gain)*(v + a_y * DELTA_T) + (1.0 - gain)*(v_);
-        //if(fabs(a_y) < 1.0 ||  fabs(v_) < 0.05 ) v = v_;
-        // 速度相補フィルタ
+        double ang_rad = deg2rad(ang);
+        sincos(ang_rad, &sin_val, &cos_val);
+        
+        if(motion_type == EMotionType::STRAIGHT ||
+           motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
+           motion_type == EMotionType::DIAGONAL ||
+           motion_type == EMotionType::DIAGONAL_CENTER){
+            // 並進速度算出
+            double gain = (double)pm.v_comp_gain;
+            if(fabs(a_y) < 3.0) gain = 0.0;
+            else if(fabs(v_acc - v) > 0.75) gain = 1.0;
+            v = (gain)*(v + a_y * DELTA_T) + (1.0 - gain)*(v_);
+            
+            // 加速度積分速度算出
+            v_acc += a_y * DELTA_T;
+            if(fabs(v_) < 0.05 || fabs(a_y) < 0.25) v_acc = v_;
 
-        if(ABS(a_y) < 3.0) gain = 0.0;
-        v = (gain)*(v + a_y * DELTA_T) + (1.0 - gain)*(v_);
+            // グローバル座標系速度算出
+            x_d = v * cos_val;
+            y_d = v * sin_val;
+            
+            // グローバル座標系位置算出
+            if(fabs(ang_v) > 10.0){
+                x += x_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
+                y += y_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
+
+            } else{
+                x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);
+                y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
+            }
+        }
+        else if(motion_type == EMotionType::CURVE){
+            // 並進速度算出
+            v = v_;
+
+            // 加速度積分速度算出
+            v_acc += a_y * DELTA_T;
+            if(fabs(v_) < 0.005 || fabs(a_y) < 0.25) v_acc = v_;
+
+            // グローバル座標系速度算出
+
+            double x_dd =   a_x * sin_val + a_y * cos_val;
+            double y_dd = - a_x * cos_val + a_y * sin_val;
+
+            if (ABS(v_) < 0.005){
+                x_d = 0.0;
+                y_d = 0.0;
+            } 
+            else if(fabs(v_acc - v_) > 0.25){
+                x_d += x_dd * DELTA_T;
+                y_d += y_dd * DELTA_T;
+                v_acc = sqrt(x_d * x_d + y_d * y_d);
+            }
+            else{
+                x_d = v * cos_val;
+                y_d = v * sin_val;
+            } 
+
+            // グローバル座標系位置算出
+            if(fabs(ang_v) > 10.0 && fabs(v_acc - v_) <= 0.25){
+                x += x_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
+                y += y_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
+
+            } else{
+                x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);
+                y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
+            }
 
 
-        if (ABS(v_) < 0.005) v_acc = 0.0;
-        else v_acc += a_y * DELTA_T;
+        }
+        else if(motion_type == EMotionType::STOP ||
+                motion_type == EMotionType::SPINTURN ||
+                motion_type == EMotionType::DIRECT_DUTY_SET)
+        {
+            // 並進速度算出
+            v = v_;
+            // 加速度積分速度算出 グローバル座標系速度算出
 
+            double x_dd =   a_x * sin_val + a_y * cos_val;
+            double y_dd = - a_x * cos_val + a_y * sin_val;
 
+            if (ABS(v_) < 0.005){
+                v_acc = 0.0;
+                x_d = 0.0;
+                y_d = 0.0;
+            } 
+            else if(motion_type == EMotionType::SPINTURN){
+                x_d += x_dd * DELTA_T;
+                y_d += y_dd * DELTA_T;
+                v_acc = sqrt(x_d * x_d + y_d * y_d);
+            } 
+            else if(motion_type == EMotionType::STOP){
+                x_d = v * cos_val;
+                y_d = v * sin_val;
+
+                v_acc += a_y * DELTA_T;
+                if(fabs(v_) < 0.05 || fabs(a_y) < 0.25) v_acc = v_;
+            }
+
+            // グローバル座標系位置算出
+            x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);
+            y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
+
+        }        
+
+        // スリップ角算出
         if(v > 0.2) beta_dot =  -a_x / v - ang_v_rad;
         else beta_dot = 0.0;
 
@@ -96,47 +192,8 @@ public:
             beta += beta_dot * DELTA_T;
         }
         
-        ang += calcAdamsBashforthDelta(ang_v, ang_v_1, ang_v_2);        
-        ang = fmod(ang + 360.0, 360.0);
 
-        double ang_rad = deg2rad(ang);
-        //sincos(ang_rad, &sin_val, &cos_val);
-        sin_val = sin(ang_rad);
-        cos_val = cos(ang_rad);
-
-        if(motion_type == EMotionType::SPINTURN || motion_type == EMotionType::CURVE){
-            if(ABS(a_x) < 1.0) a_x = 0.0;
-            gain = pm.v_comp_gain;
-        }else{
-            if(ABS(a_y) > 3.0)gain = pm.v_comp_gain;
-            else gain = 0.0;
-            a_x = 0.0;
-        }
-
-        double x_dd =   a_x * sin_val + a_y * cos_val;
-        double y_dd = - a_x * cos_val + a_y * sin_val;
-        x_d = gain * (x_d + x_dd * DELTA_T) + (1.0 - gain) * v_ * cos_val;
-        y_d = gain * (y_d + y_dd * DELTA_T) + (1.0 - gain) * v_ * sin_val;
-
-/*
-        if(icm.isStop()){
-            x_d = 0.0f;
-            y_d = 0.0f;
-        }
-*/
-
-        if(fabs(ang_v) > 10.0){
-            x += x_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
-            y += y_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
-
-        } else{
-
-            x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);
-            y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
-        }
-
-
-
+        // 次回計算用の変数保持
         ang_v_2 = ang_v_1;
         ang_v_1 = ang_v;
 
@@ -244,7 +301,7 @@ public:
     float getAngV(){return (float)ang_v;}
     float getX(){return (float)x;}
     float getY(){return (float)y;}
-    float getBeta(){return (float)beta;}
+    float getBeta(){return (float)RAD2DEG(beta);}
     
     void setV(double v_){
         v = v_;
@@ -270,10 +327,14 @@ private:
 
     double v;
     double v_acc;    
+    double alpha;
     double ang;
     double beta;
     double x;
     double y;
+    double x_d_;
+    double y_d_;
+
 
     float contact_wall_cool_down_time;
     float corner_r_cool_down_time;

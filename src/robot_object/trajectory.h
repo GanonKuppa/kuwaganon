@@ -47,6 +47,8 @@ public:
     float cumulative_ang;
     float cumulative_t;
     EMotionType motion_type;
+    turn_dir_e turn_dir;
+    turn_type_e turn_type;
     uint16_t hash;
     const float DELTA_T = 0.0005;
 
@@ -97,7 +99,10 @@ public:
         x_dd = 0.0f;
         y_d = 0.0f;
         y_dd = 0.0f;
-        motion_type =EMotionType::STOP;
+        
+        turn_dir = turn_dir_e::NO_TURN;
+        turn_type = turn_type_e::STOP;
+        motion_type = EMotionType::STOP;
         hash = (uint16_t)xor32();
     }
 
@@ -110,6 +115,7 @@ public:
         else if(motion_type == EMotionType::SPINTURN) str = "SPINTURN";
         else if(motion_type == EMotionType::CURVE) str = "CURVE";
         else if(motion_type == EMotionType::STOP) str = "STOP";
+        else if(motion_type == EMotionType::DIRECT_DUTY_SET) str = "DIRECT_DUTY_SET";
         return str;
     }
 
@@ -162,6 +168,8 @@ public:
         wall_contact = false;
         init(x_, y_, v_0_, a_acc, ang_, 0.0f, 0.0f);
         motion_type = EMotionType::STRAIGHT;
+        turn_type = turn_type_e::STRAIGHT;
+        turn_dir = turn_dir_e::NO_TURN;
 
     }
 
@@ -179,6 +187,9 @@ public:
         wall_contact = false;
         init(x_, y_, v_0_, a_acc, ang_, 0.0f, 0.0f);
         motion_type = EMotionType::STRAIGHT;
+        turn_type = turn_type_e::STRAIGHT;
+        turn_dir = turn_dir_e::NO_TURN;
+
     }
 
     static std::unique_ptr<BaseTrajectory> create(float target_dist_, float v_0_){
@@ -204,37 +215,41 @@ public:
 
     static std::unique_ptr<BaseTrajectory> createAsWallCenter(float target_dist_, float v_0_){
         auto traj = new StraightTrajectory(target_dist_, v_0_);
-        traj->motion_type=EMotionType::STRAIGHT_WALL_CENTER;
+        traj->motion_type = EMotionType::STRAIGHT_WALL_CENTER;
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
     static std::unique_ptr<BaseTrajectory> createAsWallCenter(float target_dist_, float v_0_, float v_max_, float v_end_, float a_acc_, float a_dec_){
         auto traj = new StraightTrajectory(target_dist_, v_0_, v_max_, v_end_, a_acc_, a_dec_  );
-        traj->motion_type=EMotionType::STRAIGHT_WALL_CENTER;
+        traj->motion_type = EMotionType::STRAIGHT_WALL_CENTER;
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
     static std::unique_ptr<BaseTrajectory> createAsDiagonal(float target_dist_, float v_0_){
         auto traj = new StraightTrajectory(target_dist_, v_0_);
-        traj->motion_type=EMotionType::DIAGONAL;
+        traj->motion_type = EMotionType::DIAGONAL;
+        traj->turn_type = turn_type_e::D_STRAIGHT;
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
     static std::unique_ptr<BaseTrajectory> createAsDiagonal(float target_dist_, float v_0_, float v_max_, float v_end_, float a_acc_, float a_dec_){
         auto traj = new StraightTrajectory(target_dist_, v_0_, v_max_, v_end_, a_acc_, a_dec_  );
-        traj->motion_type=EMotionType::DIAGONAL;
+        traj->motion_type = EMotionType::DIAGONAL;
+        traj->turn_type = turn_type_e::D_STRAIGHT;
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
     static std::unique_ptr<BaseTrajectory> createAsDiagonalCenter(float target_dist_, float v_0_){
         auto traj = new StraightTrajectory(target_dist_, v_0_);
         traj->motion_type=EMotionType::DIAGONAL_CENTER;
+        traj->turn_type = turn_type_e::D_STRAIGHT;        
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
     static std::unique_ptr<BaseTrajectory> createAsDiagonalCenter(float target_dist_, float v_0_, float v_max_, float v_end_, float a_acc_, float a_dec_){
         auto traj = new StraightTrajectory(target_dist_, v_0_, v_max_, v_end_, a_acc_, a_dec_  );
         traj->motion_type=EMotionType::DIAGONAL_CENTER;
+        traj->turn_type = turn_type_e::D_STRAIGHT;
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
@@ -352,6 +367,8 @@ public:
         float ang_ = 0.0;
         init(x_, y_, 0.0f, 0.0f, ang_, 0.0f, SIGN(target_cumulative_ang_) * abs_ang_a_);
         motion_type = EMotionType::SPINTURN;
+        turn_type = turn_type_e::STOP;
+        turn_dir = (turn_dir_e)SIGN(target_cumulative_ang_);
         target_cumulative_ang = target_cumulative_ang_;
         abs_ang_v_max = abs_ang_v_max_;
         abs_ang_a = abs_ang_a_;
@@ -430,6 +447,8 @@ public:
         alp_curve = CurveFactory::create(turn_type_);
         turn_dir = turn_dir_;
         motion_type = EMotionType::CURVE;
+        turn_type = turn_type_;
+        turn_dir = turn_dir_;
     }
 
 
@@ -532,9 +551,6 @@ public:
         else return false;
     }
     ArcLengthParameterizedCurve *alp_curve;
-private:
-
-    turn_dir_e turn_dir;
 };
 
 
@@ -547,6 +563,8 @@ public:
 
         init(x_, y_, 0.0f, 0.0f, ang_, 0.0f, 0.0f);
         motion_type = EMotionType::STOP;
+        turn_type = turn_type_e::STOP;
+        turn_dir = turn_dir_e::NO_TURN;
         stop_time = stop_time_;
     }
 
@@ -606,6 +624,9 @@ public:
 
         init(x_, y_, 0.0f, 0.0f, ang_, 0.0f, 0.0f);
         motion_type = EMotionType::DIRECT_DUTY_SET;
+        turn_type = turn_type_e::STOP;
+        turn_dir = turn_dir_e::NO_TURN;
+
         stop_time = stop_time_;
         injection_func = injection_func_;
     }

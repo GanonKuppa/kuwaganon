@@ -162,13 +162,37 @@ namespace umouse {
                 target_rot_x += pos_pidf.getControlVal();
             }
 
-            //衝突回避
-            if(traj.motion_type == EMotionType::DIAGONAL_CENTER
-            ){
+            // 斜め直進時の衝突回避
+            if(traj.motion_type == EMotionType::DIAGONAL_CENTER){
                 if (WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold){
                     target_rot_x -= pm.wall_diagonal_avoid_add_ang;
                 }
                 else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold){
+                    target_rot_x += pm.wall_diagonal_avoid_add_ang;
+                }
+            }
+            // 斜めターン時の衝突回避
+            if(traj.motion_type == EMotionType::CURVE &&
+              (( esti.getAng() > 30.0f  && esti.getAng() < 60.0f  ) ||
+              ( esti.getAng() > 120.0f && esti.getAng() < 150.0f ) ||
+              ( esti.getAng() > 210.0f && esti.getAng() < 240.0f ) ||
+              ( esti.getAng() > 300.0f && esti.getAng() < 330.0f )) &&
+              
+              (traj.turn_type == turn_type_e::TURN_D_90 ||
+              traj.turn_type == turn_type_e::TURN_D2S_135 ||
+              traj.turn_type == turn_type_e::TURN_S2D_135 ||
+              traj.turn_type == turn_type_e::TURN_D2S_45 ||
+              traj.turn_type == turn_type_e::TURN_S2D_45)
+
+
+              ){
+                if (WallSensor::getInstance().ahead_l() > 150
+                   && WallSensor::getInstance().ahead_l() < pm.wall_diagonal_ahead_l_threshold){
+                    target_rot_x -= pm.wall_diagonal_avoid_add_ang;
+                }
+                else if (WallSensor::getInstance().ahead_r() > 150 &&
+                         WallSensor::getInstance().ahead_r() < pm.wall_diagonal_ahead_l_threshold
+                ){
                     target_rot_x += pm.wall_diagonal_avoid_add_ang;
                 }
             }

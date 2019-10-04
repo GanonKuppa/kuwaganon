@@ -82,13 +82,13 @@ namespace umouse {
             if (param_mode == 0) return;
             //                                  v   turn_v a
             else if(param_mode == 1) turn_p.set(0.36, 0.36, 4.0);
-            else if(param_mode == 2) turn_p.set(0.6, 0.36, 4.0);
-            //                                  v    v_d  90    l90   180  d90  45   135  a    a_diag
-            else if(param_mode == 3) turn_p.set(1.0, 0.45, 0.36, 0.4, 0.4, 0.4, 0.4, 0.4, 5.0, 3.0);
-            else if(param_mode == 4) turn_p.set(3.0, 0.45, 0.36, 0.4, 0.4, 0.4, 0.4, 0.4, 10.0, 3.0);
-            else if(param_mode == 5) turn_p.set(3.0, 0.45, 0.36, 0.4, 0.4, 0.4, 0.4, 0.4, 11.0, 3.0);
-            else if(param_mode == 6) turn_p.set(3.0, 0.45, 0.36 , 0.4, 0.4, 0.4, 0.4, 0.4, 12.0, 3.0);
-            else if(param_mode == 7) turn_p.set(3.0, 0.45, 0.36 , 0.4, 0.4, 0.4, 0.4, 0.4, 13.0, 3.0);
+            else if(param_mode == 2) turn_p.set(1.0, 0.36, 4.0);
+            //                                  v    v_d   90     l90   180   d90   45    135   a    a_diag
+            else if(param_mode == 3) turn_p.set(1.0, 0.40, 0.40, 0.4 , 0.4 , 0.4 , 0.4 , 0.4 , 5.0, 3.0);
+            else if(param_mode == 4) turn_p.set(1.0, 0.45, 0.45, 0.45, 0.38, 0.45, 0.45, 0.45, 5.0, 3.0);
+            else if(param_mode == 5) turn_p.set(1.0, 0.50, 0.50, 0.47, 0.38, 0.47, 0.47, 0.47, 5.0, 3.0);
+            else if(param_mode == 6) turn_p.set(1.0, 0.55, 0.55, 0.55, 0.45, 0.55, 0.55, 0.55, 5.0, 3.0);
+            else if(param_mode == 7) turn_p.set(1.0, 0.60, 0.60, 0.60, 0.48, 0.60, 0.60, 0.60, 5.0, 3.0);
 
             std::vector<Path> path_vec;
             makeMinStepPath(pm.goal_x, pm.goal_y, m.maze, path_vec);

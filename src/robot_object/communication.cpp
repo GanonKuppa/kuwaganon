@@ -518,7 +518,7 @@ void packData(uint8_t *buf) {
     set2ByteVal(buf, 116, m.trajCommander.ang_v, 10);
     set2ByteVal(buf, 118, m.ctrlMixer.target_rot_v, 10);
 
-    float a_x =  - m.trajCommander.v * DEG2RAD(m.trajCommander.ang_v);
+    float a_x = - m.trajCommander.v * DEG2RAD(m.trajCommander.ang_v);
     set2ByteVal(buf, 120, a_x, 1000);
     set2ByteVal(buf, 122, m.trajCommander.a, 1000);
     set2ByteVal(buf, 124, icm.acc_f[0], 1000);
