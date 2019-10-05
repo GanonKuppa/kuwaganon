@@ -53,6 +53,7 @@ static void set4ByteVal(uint8_t *buf, uint16_t index, uint32_t val);
 namespace umouse{
 
 static const uint16_t PERIODIC_MSG_LEN = 400;
+static const uint16_t PARAM_MNG_PART_NUM = 40;
 static const uint16_t CMD_SIZE  = 16;
 static std::queue<uint8_t> printfBuff;
 static uint8_t periodicMsg[PERIODIC_MSG_LEN];
@@ -261,7 +262,7 @@ void packWallSenAdjData(uint8_t *buf){
     static uint8_t count_paramMng = 0;
     packDataParamMng(count_paramMng, &buf[250]);
     count_paramMng++;
-    if (count_paramMng == 20) count_paramMng = 0;
+    if (count_paramMng == PARAM_MNG_PART_NUM) count_paramMng = 0;
 
     const uint8_t dataBuffNum = 30;
     //壁センサ値1kHz
@@ -328,7 +329,7 @@ void packPidPrmAdjData(uint8_t *buf){
     static uint8_t count_paramMng = 0;
     packDataParamMng(count_paramMng, &buf[250]);
     count_paramMng++;
-    if(count_paramMng == 20) count_paramMng = 0;
+    if(count_paramMng == PARAM_MNG_PART_NUM) count_paramMng = 0;
 
     const uint8_t dataBuffNum = 30;
     //速度
@@ -384,7 +385,7 @@ void packVelocityAdjData(uint8_t *buf){
     static uint8_t count_paramMng = 0;
     packDataParamMng(count_paramMng, &buf[250]);
     count_paramMng++;
-    if(count_paramMng == 20) count_paramMng = 0;
+    if(count_paramMng == PARAM_MNG_PART_NUM) count_paramMng = 0;
 
     const uint8_t dataBuffNum = 30;
     //速度
@@ -554,7 +555,7 @@ void packData(uint8_t *buf) {
     static uint8_t count_paramMng = 0;
     packDataParamMng(count_paramMng, &buf[250]);
     count_paramMng++;
-    if(count_paramMng == 20) count_paramMng = 0;
+    if(count_paramMng == PARAM_MNG_PART_NUM) count_paramMng = 0;
 
     //printf Data
     uint16_t start_byte = PERIODIC_MSG_LEN - printfFieldNum;
