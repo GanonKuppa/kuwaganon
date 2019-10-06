@@ -189,8 +189,9 @@ uint16_t startAD_AN000(void) {
 
     S12AD.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD.ADCSR.BIT.ADST == 1)
-        ;
+    int dummy = 0;
+    while (S12AD.ADCSR.BIT.ADST == 1) dummy ++;
+        
     return S12AD.ADDR0;
 }
 
@@ -202,8 +203,9 @@ uint16_t startAD_AN001(void) {
 
     S12AD.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD.ADCSR.BIT.ADST == 1)
-        ;
+    volatile int dummy = 0;
+    while (S12AD.ADCSR.BIT.ADST == 1) dummy ++;
+        
     return S12AD.ADDR1;
 }
 
@@ -215,8 +217,9 @@ uint16_t startAD_AN002(void) {
 
     S12AD.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD.ADCSR.BIT.ADST == 1)
-        ;
+    volatile int dummy = 0;
+    while (S12AD.ADCSR.BIT.ADST == 1) dummy ++;
+        
     return S12AD.ADDR2;
 }
 
@@ -228,8 +231,9 @@ uint16_t startAD_AN003(void) {
 
     S12AD.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD.ADCSR.BIT.ADST == 1)
-        ;
+    int dummy = 0;
+    while (S12AD.ADCSR.BIT.ADST == 1) dummy ++;
+
     return S12AD.ADDR3;
 }
 
@@ -241,8 +245,9 @@ uint16_t startAD_AN004(void) {
 
     S12AD.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD.ADCSR.BIT.ADST == 1)
-        ;
+    int dummy = 0;
+    while (S12AD.ADCSR.BIT.ADST == 1)dummy ++;
+        
     return S12AD.ADDR4;
 }
 
@@ -254,8 +259,9 @@ uint16_t startAD_AN005(void) {
 
     S12AD.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD.ADCSR.BIT.ADST == 1)
-        ;
+    int dummy = 0;
+    while (S12AD.ADCSR.BIT.ADST == 1) dummy ++;
+    
     return S12AD.ADDR5;
 }
 
@@ -267,8 +273,9 @@ uint16_t startAD_AN006(void) {
 
     S12AD.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD.ADCSR.BIT.ADST == 1)
-        ;
+    int dummy = 0;
+    while (S12AD.ADCSR.BIT.ADST == 1) dummy ++;
+
     return S12AD.ADDR6;
 }
 
@@ -280,8 +287,9 @@ uint16_t startAD_AN007(void) {
 
     S12AD.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD.ADCSR.BIT.ADST == 1)
-        ;
+    int dummy = 0;
+    while (S12AD.ADCSR.BIT.ADST == 1) dummy ++;
+    
     return S12AD.ADDR7;
 }
 
@@ -293,8 +301,9 @@ uint16_t startAD_AN100(void) {
 
     S12AD1.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD1.ADCSR.BIT.ADST == 1)
-        ;
+    volatile int dummy = 0;
+    while (S12AD1.ADCSR.BIT.ADST == 1) dummy ++;
+
     return S12AD1.ADDR0;
 }
 
@@ -306,8 +315,9 @@ uint16_t startAD_AN101(void) {
 
     S12AD1.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD1.ADCSR.BIT.ADST == 1)
-        ;
+    volatile int dummy = 0;
+    while (S12AD1.ADCSR.BIT.ADST == 1) dummy ++;
+
     return S12AD1.ADDR1;
 }
 
@@ -319,8 +329,9 @@ uint16_t startAD_AN102(void) {
 
     S12AD1.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD1.ADCSR.BIT.ADST == 1)
-        ;
+    volatile int dummy = 0;
+    while (S12AD1.ADCSR.BIT.ADST == 1) dummy ++;
+
     return S12AD1.ADDR2;
 }
 
@@ -332,8 +343,9 @@ uint16_t startAD_AN103(void) {
 
     S12AD1.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD1.ADCSR.BIT.ADST == 1)
-        ;
+    int dummy = 0;
+    while (S12AD1.ADCSR.BIT.ADST == 1)dummy ++;
+
     return S12AD1.ADDR3;
 }
 
@@ -345,8 +357,9 @@ uint16_t startAD_AN104(void) {
 
     S12AD1.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD1.ADCSR.BIT.ADST == 1)
-        ;
+    int dummy = 0;
+    while (S12AD1.ADCSR.BIT.ADST == 1) dummy ++;
+
     return S12AD1.ADDR4;
 }
 
@@ -358,8 +371,9 @@ uint16_t startAD_AN105(void) {
 
     S12AD1.ADCSR.BIT.ADST = 1;
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
-    while (S12AD1.ADCSR.BIT.ADST == 1)
-        ;
+    volatile int dummy = 0;
+    while (S12AD1.ADCSR.BIT.ADST == 1) dummy ++;
+
     return S12AD1.ADDR5;
 }
 

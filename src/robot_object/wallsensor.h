@@ -299,8 +299,12 @@ namespace umouse {
 
         void updateAllOffVal() {
             ahead_l_off = startAD_AN101(); //AD_SLED1
+            ahead_l_off = startAD_AN101(); //AD_SLED1
+            right_off = startAD_AN100();//AD_SLED2
             right_off = startAD_AN100();//AD_SLED2
             left_off = startAD_AN001();//AD_SLED3
+            left_off = startAD_AN001();//AD_SLED3
+            ahead_r_off = startAD_AN002();//AD_SLED4
             ahead_r_off = startAD_AN002();//AD_SLED4
         }
 
@@ -312,10 +316,22 @@ namespace umouse {
         }
 
         void updateOnVal(bool sled1, bool sled2, bool sled3, bool sled4) {
-            if(sled1 == true) ahead_l_on = startAD_AN101(); //AD_SLED1
-            if(sled2 == true) right_on = startAD_AN100();//AD_SLED2
-            if(sled3 == true) left_on = startAD_AN001();//AD_SLED3
-            if(sled4 == true) ahead_r_on = startAD_AN002();//AD_SLED4
+            if(sled1 == true){
+                ahead_l_on = startAD_AN101(); //AD_SLED1
+                ahead_l_on = startAD_AN101(); //AD_SLED1
+            }
+            if(sled2 == true){
+                right_on = startAD_AN100();//AD_SLED2
+                right_on = startAD_AN100();//AD_SLED2
+            }
+            if(sled3 == true){
+                left_on = startAD_AN001();//AD_SLED3
+                left_on = startAD_AN001();//AD_SLED3
+            } 
+            if(sled4 == true){
+                ahead_r_on = startAD_AN002();//AD_SLED4
+                ahead_r_on = startAD_AN002();//AD_SLED4
+            }
         }
 
         void turnLed(bool sled1, bool sled2, bool sled3, bool sled4) {
