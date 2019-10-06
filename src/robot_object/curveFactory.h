@@ -28,6 +28,7 @@ public:
     static ArcLengthParameterizedCurve* create(turn_type_e turn_type_);
     static float getPreDist(turn_type_e turn_type_);
     static float getFolDist(turn_type_e turn_type_);
+    static float getPreDistWithOffset(turn_type_e turn_type_, float v);
 };
 
 }

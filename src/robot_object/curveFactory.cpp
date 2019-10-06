@@ -1,6 +1,8 @@
 #include "curveFactory.h"
 #include "arcLengthParameterizedCurve.h"
 #include "kappa.h"
+#include "parameterManager.h"
+#include "myUtil.h"
 
 namespace umouse{
 
@@ -82,6 +84,131 @@ float CurveFactory::getPreDist(turn_type_e turn_type_){
             return 0.0;
     }
 };
+
+float CurveFactory::getPreDistWithOffset(turn_type_e turn_type_, float v){
+    if(v < 0.34) return getPreDist(turn_type_);
+
+    ParameterManager &pm = ParameterManager::getInstance(); 
+    uint8_t v_int = (uint8_t)(v * 10);
+    float offset = 0.0f;
+    switch(turn_type_){
+        case turn_type_e::TURN_90 :
+            if(v_int == 35) offset = pm.turn_90_v_35_d_pre_offset;
+            else if(v_int == 40) offset = pm.turn_90_v_40_d_pre_offset;
+            else if(v_int == 45) offset = pm.turn_90_v_45_d_pre_offset;
+            else if(v_int == 50) offset = pm.turn_90_v_50_d_pre_offset;
+            else if(v_int == 55) offset = pm.turn_90_v_55_d_pre_offset;
+            else if(v_int == 60) offset = pm.turn_90_v_60_d_pre_offset;
+            else if(v_int == 65) offset = pm.turn_90_v_65_d_pre_offset;
+            else if(v_int == 70) offset = pm.turn_90_v_70_d_pre_offset;
+            else if(v_int == 75) offset = pm.turn_90_v_75_d_pre_offset;
+            else if(v_int == 80) offset = pm.turn_90_v_80_d_pre_offset;
+            else offset = pm.turn_90_v_80_d_pre_offset;
+            return constrainL(FOL_90DEG_HALF + offset, 0.0f);
+
+        case turn_type_e::TURN_L_90 :
+            if(v_int == 35) offset = pm.turn_l90_v_35_d_pre_offset;
+            else if(v_int == 40) offset = pm.turn_l90_v_40_d_pre_offset;
+            else if(v_int == 45) offset = pm.turn_l90_v_45_d_pre_offset;
+            else if(v_int == 50) offset = pm.turn_l90_v_50_d_pre_offset;
+            else if(v_int == 55) offset = pm.turn_l90_v_55_d_pre_offset;
+            else if(v_int == 60) offset = pm.turn_l90_v_60_d_pre_offset;
+            else if(v_int == 65) offset = pm.turn_l90_v_65_d_pre_offset;
+            else if(v_int == 70) offset = pm.turn_l90_v_70_d_pre_offset;
+            else if(v_int == 75) offset = pm.turn_l90_v_75_d_pre_offset;
+            else if(v_int == 80) offset = pm.turn_l90_v_80_d_pre_offset;
+            else offset = pm.turn_l90_v_80_d_pre_offset;
+            return constrainL(FOL_L90DEG_HALF + offset, 0.0f);
+
+        case turn_type_e::TURN_180 :
+            if(v_int == 35) offset = pm.turn_180_v_35_d_pre_offset;
+            else if(v_int == 40) offset = pm.turn_180_v_40_d_pre_offset;
+            else if(v_int == 45) offset = pm.turn_180_v_45_d_pre_offset;
+            else if(v_int == 50) offset = pm.turn_180_v_50_d_pre_offset;
+            else if(v_int == 55) offset = pm.turn_180_v_55_d_pre_offset;
+            else if(v_int == 60) offset = pm.turn_180_v_60_d_pre_offset;
+            else if(v_int == 65) offset = pm.turn_180_v_65_d_pre_offset;
+            else if(v_int == 70) offset = pm.turn_180_v_70_d_pre_offset;
+            else if(v_int == 75) offset = pm.turn_180_v_75_d_pre_offset;
+            else if(v_int == 80) offset = pm.turn_180_v_80_d_pre_offset;
+            else offset = pm.turn_180_v_80_d_pre_offset;
+            return constrainL(FOL_180DEG_HALF + offset, 0.0f);
+
+        case turn_type_e::TURN_S2D_45 :
+            if(v_int == 35) offset = pm.turn_s2d45_v_35_d_pre_offset;
+            else if(v_int == 40) offset = pm.turn_s2d45_v_40_d_pre_offset;
+            else if(v_int == 45) offset = pm.turn_s2d45_v_45_d_pre_offset;
+            else if(v_int == 50) offset = pm.turn_s2d45_v_50_d_pre_offset;
+            else if(v_int == 55) offset = pm.turn_s2d45_v_55_d_pre_offset;
+            else if(v_int == 60) offset = pm.turn_s2d45_v_60_d_pre_offset;
+            else if(v_int == 65) offset = pm.turn_s2d45_v_65_d_pre_offset;
+            else if(v_int == 70) offset = pm.turn_s2d45_v_70_d_pre_offset;
+            else if(v_int == 75) offset = pm.turn_s2d45_v_75_d_pre_offset;
+            else if(v_int == 80) offset = pm.turn_s2d45_v_80_d_pre_offset;
+            else offset = pm.turn_s2d45_v_80_d_pre_offset;
+            return constrainL(FOL_S2D45DEG_HALF + offset, 0.0f);
+        
+        case turn_type_e::TURN_S2D_135 :
+            if(v_int == 35) offset = pm.turn_s2d135_v_35_d_pre_offset;
+            else if(v_int == 40) offset = pm.turn_s2d135_v_40_d_pre_offset;
+            else if(v_int == 45) offset = pm.turn_s2d135_v_45_d_pre_offset;
+            else if(v_int == 50) offset = pm.turn_s2d135_v_50_d_pre_offset;
+            else if(v_int == 55) offset = pm.turn_s2d135_v_55_d_pre_offset;
+            else if(v_int == 60) offset = pm.turn_s2d135_v_60_d_pre_offset;
+            else if(v_int == 65) offset = pm.turn_s2d135_v_65_d_pre_offset;
+            else if(v_int == 70) offset = pm.turn_s2d135_v_70_d_pre_offset;
+            else if(v_int == 75) offset = pm.turn_s2d135_v_75_d_pre_offset;
+            else if(v_int == 80) offset = pm.turn_s2d135_v_80_d_pre_offset;
+            else offset = pm.turn_s2d135_v_80_d_pre_offset;
+            return constrainL(FOL_S2D135DEG_HALF + offset, 0.0f);
+
+        case turn_type_e::TURN_D_90 :
+            if(v_int == 35) offset = pm.turn_d90_v_35_d_pre_offset;
+            else if(v_int == 40) offset = pm.turn_d90_v_40_d_pre_offset;
+            else if(v_int == 45) offset = pm.turn_d90_v_45_d_pre_offset;
+            else if(v_int == 50) offset = pm.turn_d90_v_50_d_pre_offset;
+            else if(v_int == 55) offset = pm.turn_d90_v_55_d_pre_offset;
+            else if(v_int == 60) offset = pm.turn_d90_v_60_d_pre_offset;
+            else if(v_int == 65) offset = pm.turn_d90_v_65_d_pre_offset;
+            else if(v_int == 70) offset = pm.turn_d90_v_70_d_pre_offset;
+            else if(v_int == 75) offset = pm.turn_d90_v_75_d_pre_offset;
+            else if(v_int == 80) offset = pm.turn_d90_v_80_d_pre_offset;
+            else offset = pm.turn_d90_v_80_d_pre_offset;
+            return constrainL(FOL_D90DEG_HALF + offset, 0.0f);
+
+        case turn_type_e::TURN_D2S_45 :
+            if(v_int == 35) offset = pm.turn_d2s45_v_35_d_pre_offset;
+            else if(v_int == 40) offset = pm.turn_d2s45_v_40_d_pre_offset;
+            else if(v_int == 45) offset = pm.turn_d2s45_v_45_d_pre_offset;
+            else if(v_int == 50) offset = pm.turn_d2s45_v_50_d_pre_offset;
+            else if(v_int == 55) offset = pm.turn_d2s45_v_55_d_pre_offset;
+            else if(v_int == 60) offset = pm.turn_d2s45_v_60_d_pre_offset;
+            else if(v_int == 65) offset = pm.turn_d2s45_v_65_d_pre_offset;
+            else if(v_int == 70) offset = pm.turn_d2s45_v_70_d_pre_offset;
+            else if(v_int == 75) offset = pm.turn_d2s45_v_75_d_pre_offset;
+            else if(v_int == 80) offset = pm.turn_d2s45_v_80_d_pre_offset;
+            else offset = pm.turn_d2s45_v_80_d_pre_offset;
+            return constrainL(FOL_D2S45DEG_HALF + offset, 0.0f);
+
+        case turn_type_e::TURN_D2S_135 :
+            if(v_int == 35) offset = pm.turn_d2s135_v_35_d_pre_offset;
+            else if(v_int == 40) offset = pm.turn_d2s135_v_40_d_pre_offset;
+            else if(v_int == 45) offset = pm.turn_d2s135_v_45_d_pre_offset;
+            else if(v_int == 50) offset = pm.turn_d2s135_v_50_d_pre_offset;
+            else if(v_int == 55) offset = pm.turn_d2s135_v_55_d_pre_offset;
+            else if(v_int == 60) offset = pm.turn_d2s135_v_60_d_pre_offset;
+            else if(v_int == 65) offset = pm.turn_d2s135_v_65_d_pre_offset;
+            else if(v_int == 70) offset = pm.turn_d2s135_v_70_d_pre_offset;
+            else if(v_int == 75) offset = pm.turn_d2s135_v_75_d_pre_offset;
+            else if(v_int == 80) offset = pm.turn_d2s135_v_80_d_pre_offset;
+            else offset = pm.turn_d2s135_v_80_d_pre_offset;
+            return constrainL(FOL_D2S135DEG_HALF + offset, 0.0f);
+
+        default:
+            return 0.0;
+    }
+}
+
 
 float CurveFactory::getFolDist(turn_type_e turn_type_){
     switch(turn_type_){

@@ -220,16 +220,16 @@ void ParameterManager::init() {
     ;//197
     ;//198
     ;//199
-    registration<>(200, shortest_0_v);
-    registration<>(201, shortest_0_v_d);
-    registration<>(202, shortest_0_v_90);
-    registration<>(203, shortest_0_v_l90);
-    registration<>(204, shortest_0_v_180);
-    registration<>(205, shortest_0_v_d90);
-    registration<>(206, shortest_0_v_45);
-    registration<>(207, shortest_0_v_135);
-    registration<>(208, shortest_0_a);
-    registration<>(209, shortest_0_a_diag);
+    registration<float>(200, shortest_0_v);
+    registration<float>(201, shortest_0_v_d);
+    registration<float>(202, shortest_0_v_90);
+    registration<float>(203, shortest_0_v_l90);
+    registration<float>(204, shortest_0_v_180);
+    registration<float>(205, shortest_0_v_d90);
+    registration<float>(206, shortest_0_v_45);
+    registration<float>(207, shortest_0_v_135);
+    registration<float>(208, shortest_0_a);
+    registration<float>(209, shortest_0_a_diag);
     ;//210
     ;//211
     ;//212
@@ -360,46 +360,46 @@ void ParameterManager::init() {
     registration<float>(337, turn_d90_v_70_d_pre_offset);
     registration<float>(338, turn_d90_v_75_d_pre_offset);
     registration<float>(339, turn_d90_v_80_d_pre_offset);
-    registration<float>(340, turn_45_v_35_d_pre_offset);
-    registration<float>(341, turn_45_v_40_d_pre_offset);
-    registration<float>(342, turn_45_v_45_d_pre_offset);
-    registration<float>(343, turn_45_v_50_d_pre_offset);
-    registration<float>(344, turn_45_v_55_d_pre_offset);
-    registration<float>(345, turn_45_v_60_d_pre_offset);
-    registration<float>(346, turn_45_v_65_d_pre_offset);
-    registration<float>(347, turn_45_v_70_d_pre_offset);
-    registration<float>(348, turn_45_v_75_d_pre_offset);
-    registration<float>(349, turn_45_v_80_d_pre_offset);
-    registration<float>(350, turn_135_v_35_d_pre_offset);
-    registration<float>(351, turn_135_v_40_d_pre_offset);
-    registration<float>(352, turn_135_v_45_d_pre_offset);
-    registration<float>(353, turn_135_v_50_d_pre_offset);
-    registration<float>(354, turn_135_v_55_d_pre_offset);
-    registration<float>(355, turn_135_v_60_d_pre_offset);
-    registration<float>(356, turn_135_v_65_d_pre_offset);
-    registration<float>(357, turn_135_v_70_d_pre_offset);
-    registration<float>(358, turn_135_v_75_d_pre_offset);
-    registration<float>(359, turn_135_v_80_d_pre_offset);
-    ;//360
-    ;//361
-    ;//362
-    ;//363
-    ;//364
-    ;//365
-    ;//366
-    ;//367
-    ;//368
-    ;//369
-    ;//370
-    ;//371
-    ;//372
-    ;//373
-    ;//374
-    ;//375
-    ;//376
-    ;//377
-    ;//378
-    ;//379
+    registration<float>(340, turn_s2d45_v_35_d_pre_offset);
+    registration<float>(341, turn_s2d45_v_40_d_pre_offset);
+    registration<float>(342, turn_s2d45_v_45_d_pre_offset);
+    registration<float>(343, turn_s2d45_v_50_d_pre_offset);
+    registration<float>(344, turn_s2d45_v_55_d_pre_offset);
+    registration<float>(345, turn_s2d45_v_60_d_pre_offset);
+    registration<float>(346, turn_s2d45_v_65_d_pre_offset);
+    registration<float>(347, turn_s2d45_v_70_d_pre_offset);
+    registration<float>(348, turn_s2d45_v_75_d_pre_offset);
+    registration<float>(349, turn_s2d45_v_80_d_pre_offset);
+    registration<float>(350, turn_s2d135_v_35_d_pre_offset);
+    registration<float>(351, turn_s2d135_v_40_d_pre_offset);
+    registration<float>(352, turn_s2d135_v_45_d_pre_offset);
+    registration<float>(353, turn_s2d135_v_50_d_pre_offset);
+    registration<float>(354, turn_s2d135_v_55_d_pre_offset);
+    registration<float>(355, turn_s2d135_v_60_d_pre_offset);
+    registration<float>(356, turn_s2d135_v_65_d_pre_offset);
+    registration<float>(357, turn_s2d135_v_70_d_pre_offset);
+    registration<float>(358, turn_s2d135_v_75_d_pre_offset);
+    registration<float>(359, turn_s2d135_v_80_d_pre_offset);
+    registration<float>(360, turn_d2s45_v_35_d_pre_offset);
+    registration<float>(361, turn_d2s45_v_40_d_pre_offset);
+    registration<float>(362, turn_d2s45_v_45_d_pre_offset);
+    registration<float>(363, turn_d2s45_v_50_d_pre_offset);
+    registration<float>(364, turn_d2s45_v_55_d_pre_offset);
+    registration<float>(365, turn_d2s45_v_60_d_pre_offset);
+    registration<float>(366, turn_d2s45_v_65_d_pre_offset);
+    registration<float>(367, turn_d2s45_v_70_d_pre_offset);
+    registration<float>(368, turn_d2s45_v_75_d_pre_offset);
+    registration<float>(369, turn_d2s45_v_80_d_pre_offset);
+    registration<float>(370, turn_d2s135_v_35_d_pre_offset);
+    registration<float>(371, turn_d2s135_v_40_d_pre_offset);
+    registration<float>(372, turn_d2s135_v_45_d_pre_offset);
+    registration<float>(373, turn_d2s135_v_50_d_pre_offset);
+    registration<float>(374, turn_d2s135_v_55_d_pre_offset);
+    registration<float>(375, turn_d2s135_v_60_d_pre_offset);
+    registration<float>(376, turn_d2s135_v_65_d_pre_offset);
+    registration<float>(377, turn_d2s135_v_70_d_pre_offset);
+    registration<float>(378, turn_d2s135_v_75_d_pre_offset);
+    registration<float>(379, turn_d2s135_v_80_d_pre_offset);
     ;//380
     ;//381
     ;//382
