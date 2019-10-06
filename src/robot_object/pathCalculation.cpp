@@ -194,15 +194,15 @@ void HF_playPath(TurnParameter turn_p, std::vector<Path> &path_vec, TrajectoryCo
                 std::unique_ptr<BaseTrajectory> traj2;
 
                 if(path_vec[i].isStraightStart()){
-                    traj0 = StraightTrajectory::create(CurveFactory::getPreDist(path_vec[i].turn_type), v_pre, v, v, a_pre, a_pre);
+                    traj0 = StraightTrajectory::createAsWallCenter(CurveFactory::getPreDistWithOffset(path_vec[i].turn_type, v), v_pre, v, v, a_pre, a_pre);
                 }
                 else{
-                    traj0 = StraightTrajectory::createAsDiagonal(CurveFactory::getPreDist(path_vec[i].turn_type), v_pre, v, v, a_pre, a_pre);
+                    traj0 = StraightTrajectory::createAsDiagonal(CurveFactory::getPreDistWithOffset(path_vec[i].turn_type, v), v_pre, v, v, a_pre, a_pre);
 
                 }
                 auto traj1 = CurveTrajectory::createAsNoStraght(v, path_vec[i].turn_type, dir);
                 if(path_vec[i].isStraightEnd()){
-                    traj2 = StraightTrajectory::create(CurveFactory::getFolDist(path_vec[i].turn_type), v, v, v_fol, a_fol, a_fol);
+                    traj2 = StraightTrajectory::createAsWallCenter(CurveFactory::getFolDist(path_vec[i].turn_type), v, v, v_fol, a_fol, a_fol);
                 }
                 else{
                     traj2 = StraightTrajectory::createAsDiagonal(CurveFactory::getFolDist(path_vec[i].turn_type), v, v, v_fol, a_fol, a_fol);

@@ -77,7 +77,7 @@ protected:
             float v_slalom = pm.v_search_run;
             float a = pm.a_search_run;
             auto traj0 = StraightTrajectory::createAsWallCenter(0.045f + m.WALL2MOUSE_CENTER_DIST, 0.0, v_slalom, v_slalom, a , a);
-            auto traj1 = StraightTrajectory::create(CurveFactory::getPreDist(turn_type_e::TURN_90), v_slalom, v_slalom, v_slalom, a, a);
+            auto traj1 = StraightTrajectory::create(CurveFactory::getPreDistWithOffset(turn_type_e::TURN_90, v_slalom), v_slalom, v_slalom, v_slalom, a, a);
             auto traj2 = CurveTrajectory::createAsNoStraght(v_slalom, turn_type_e::TURN_90, (turn_dir_e)SIGN(rot_times));
             auto traj3 = StraightTrajectory::create(CurveFactory::getFolDist(turn_type_e::TURN_90), v_slalom, v_slalom, v_slalom, a, a);
             auto traj4 = StraightTrajectory::createAsWallCenter(0.045f, v_slalom, v_slalom, 0.1f, a , a);
@@ -158,7 +158,7 @@ protected:
         float v_slalom = pm.v_search_run;
         float a = pm.a_search_run;
         UMouse &m = UMouse::getInstance();
-        auto traj1 = StraightTrajectory::create(CurveFactory::getPreDist(turn_type_e::TURN_90), v_slalom, v_slalom, v_slalom, a, a);
+        auto traj1 = StraightTrajectory::create(CurveFactory::getPreDistWithOffset(turn_type_e::TURN_90, v_slalom), v_slalom, v_slalom, v_slalom, a, a);
         auto traj2 = CurveTrajectory::createAsNoStraght(v_slalom, turn_type_e::TURN_90, dir);
         auto traj3 = StraightTrajectory::create(CurveFactory::getFolDist(turn_type_e::TURN_90), v_slalom, v_slalom, v_slalom, a, a);
         m.trajCommander.push(std::move(traj1));

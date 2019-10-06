@@ -190,7 +190,7 @@ namespace umouse {
             }
 
             void slalom90(int8_t rot_times){
-                auto traj0 = StraightTrajectory::create(CurveFactory::getPreDist(turn_type_e::TURN_90), v, v, v, a, a);
+                auto traj0 = StraightTrajectory::create(CurveFactory::getPreDistWithOffset(turn_type_e::TURN_90, v), v, v, v, a, a);
                 auto traj1 = CurveTrajectory::createAsNoStraght(v, turn_type_e::TURN_90, (turn_dir_e)SIGN(rot_times));
                 auto traj2 = StraightTrajectory::create(CurveFactory::getFolDist(turn_type_e::TURN_90), v, v, v, a, a);
 
