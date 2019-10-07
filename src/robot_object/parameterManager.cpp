@@ -1,10 +1,3 @@
-/*
- * parameterManager.cpp
- *
- *  Created on: 2017/08/27
- *      Author: ryota
- */
-
 #include <stdint.h>
 #include <string>
 #include <map>
@@ -463,7 +456,8 @@ bool ParameterManager::write(uint16_t val_num, T val) {
     //val_numに変数が登録されている場合はその変数を書き換え
     if (adrMap.find(val_num) != adrMap.end()) {
         *reinterpret_cast<T*>(adrMap[val_num]) = val;
-        printfAsync("write: %f %f \n", val, *reinterpret_cast<T*>(adrMap[val_num]));
+        printfAsync("%d | write f: %f %f", val_num, val, *reinterpret_cast<T*>(adrMap[val_num]));
+        printfAsync("|| write d: %d %d \n", val, *reinterpret_cast<T*>(adrMap[val_num]));
     }
     return rtn;
 }

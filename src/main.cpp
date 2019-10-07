@@ -130,8 +130,8 @@ void timeInterrupt(void) {
     //スロット0
     if (int_tick_count % 4 == 0) {
         if (getElapsedMsec() > 5000){
-            std::function< void(void) > w1 = [&icm]() {icm.update();};
-            std::function< void(void) > w2 = [&wallSen]() {wallSen.update();};
+            std::function< void(void) > w1 = [&wallSen]() {wallSen.update();};
+            std::function< void(void) > w2 = [&icm]() {icm.update();};
             std::function< void(void) > w3 = [&mouse]() {mouse.update();};
             std::function< void(void) > w4 = []() {waitusec_sub(10);};
             adis.update(w1, w2, w3, w4);
@@ -149,8 +149,8 @@ void timeInterrupt(void) {
     //スロット2
     if (int_tick_count % 4 == 2) {
         if (getElapsedMsec() > 5000){
-            std::function< void(void) > w1 = [&icm]() {icm.update();};
-            std::function< void(void) > w2 = [&wallSen]() {wallSen.update();};
+            std::function< void(void) > w1 = [&wallSen]() {wallSen.update();};
+            std::function< void(void) > w2 = [&icm]() {icm.update();};
             std::function< void(void) > w3 = [&mouse]() {mouse.update();};
             std::function< void(void) > w4 = []() {waitusec_sub(20);};
             adis.update(w1, w2, w3, w4);

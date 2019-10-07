@@ -12,6 +12,7 @@
 #include "parameterManager.h"
 #include "powerTransmission.h"
 #include "adis16470.h"
+#include "fcled.h"
 
 namespace umouse {
 
@@ -129,8 +130,7 @@ namespace umouse {
 
                 if(in_read_wall_area && pre_in_read_wall_area == false && pre_read_wall_coor != m.coor) {
                     printfAsync("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝\n");
-                    pre_read_wall_coor = m.coor;
-                    m.maze.makeSearchMap(desti_coor.x, desti_coor.y);
+                    pre_read_wall_coor = m.coor;                    
                     uint8_t x_next = m.coor.x;
                     uint8_t y_next = m.coor.y;
                     if (m.direction == direction_e::E) x_next++;
@@ -138,9 +138,10 @@ namespace umouse {
                     else if (m.direction == direction_e::W) x_next--;
                     else if (m.direction == direction_e::S) y_next--;
 
-                    //printfAsync("msg_flag:%f,%f,壁|| 左 %d 前 (%d %d) 右 %d\n", m.posEsti.getX(), m.posEsti.getY(), ws.left(), ws.ahead_l(), ws.ahead_r(), ws.right());
+                    printfAsync("msg_flag:%f,%f,壁|| 左 %d 前 (%d %d) 右 %d\n", m.posEsti.getX(), m.posEsti.getY(), ws.left(), ws.ahead_l(), ws.ahead_r(), ws.right());
 
                     m.maze.updateWall(x_next, y_next, m.direction, ws);
+                    m.maze.makeSearchMap(desti_coor.x, desti_coor.y);
                     direction_e dest_dir_next = m.maze.getMinDirection(x_next, y_next, m.direction);
                     int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
 
@@ -160,8 +161,8 @@ namespace umouse {
                             spin180(rot_times);
                         }
 
-                        else if (ABS(m.posEsti.calcDiffAngle()) > 3.0f ||
-                                ABS(m.posEsti.calcWallCenterOffset()) > 0.003f ||
+                        else if (ABS(m.posEsti.calcDiffAngle()) > 10.0f ||
+                                ABS(m.posEsti.calcWallCenterOffset()) > 0.1f ||
                                 mode == ESearchMode::SPIN_TURN_SERCH ||
                                 mode == ESearchMode::SPIN_TURN_SERCH_BOTHWAYS
                         ) {
@@ -198,7 +199,6 @@ namespace umouse {
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));
                 m.trajCommander.push(std::move(traj2));
-
             }
 
             void spin90(int8_t rot_times){
@@ -206,7 +206,7 @@ namespace umouse {
                 WallSensor &ws = WallSensor::getInstance();
                 ParameterManager &pm = ParameterManager::getInstance();
 
-                if (ws.isAhead() == true) {
+                if (ws.isAhead() == true && false) {
                     std::function< void(void) > update_func = [&m, &ws]() {
                         if(ws.getContactWallTime() > 0.1f){
                             PowerTransmission::getInstance().setDuty(0.25, 0.25);
@@ -260,10 +260,13 @@ namespace umouse {
                 if (ws.isAhead() == true) {
                     std::function< void(void) > update_func = [&m, &ws]() {
                         if(ws.getContactWallTime() > 0.1f){
-                            PowerTransmission::getInstance().setDuty(0.4, 0.4);
+                            PowerTransmission::getInstance().setDuty(0.25, 0.25);
+                        }
+                        else if(ws.getContactWallTime() > 0.2f){
+                            PowerTransmission::getInstance().setDuty(0.15, 0.15);
                         }
                         else{
-                            PowerTransmission::getInstance().setDuty(0.5, 0.5);
+                            PowerTransmission::getInstance().setDuty(0.35, 0.35);
                         }
                         m.posEsti.setX(m.trajCommander.x);
                         m.posEsti.setY(m.trajCommander.y);

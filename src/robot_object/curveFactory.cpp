@@ -104,7 +104,7 @@ float CurveFactory::getPreDistWithOffset(turn_type_e turn_type_, float v){
             else if(v_int == 75) offset = pm.turn_90_v_75_d_pre_offset;
             else if(v_int == 80) offset = pm.turn_90_v_80_d_pre_offset;
             else offset = pm.turn_90_v_80_d_pre_offset;
-            return constrainL(FOL_90DEG_HALF + offset, 0.0f);
+            return constrainL(PRE_90DEG_HALF + offset, 0.0f);
 
         case turn_type_e::TURN_L_90 :
             if(v_int == 35) offset = pm.turn_l90_v_35_d_pre_offset;
@@ -118,7 +118,7 @@ float CurveFactory::getPreDistWithOffset(turn_type_e turn_type_, float v){
             else if(v_int == 75) offset = pm.turn_l90_v_75_d_pre_offset;
             else if(v_int == 80) offset = pm.turn_l90_v_80_d_pre_offset;
             else offset = pm.turn_l90_v_80_d_pre_offset;
-            return constrainL(FOL_L90DEG_HALF + offset, 0.0f);
+            return constrainL(PRE_L90DEG_HALF + offset, 0.0f);
 
         case turn_type_e::TURN_180 :
             if(v_int == 35) offset = pm.turn_180_v_35_d_pre_offset;
@@ -132,7 +132,7 @@ float CurveFactory::getPreDistWithOffset(turn_type_e turn_type_, float v){
             else if(v_int == 75) offset = pm.turn_180_v_75_d_pre_offset;
             else if(v_int == 80) offset = pm.turn_180_v_80_d_pre_offset;
             else offset = pm.turn_180_v_80_d_pre_offset;
-            return constrainL(FOL_180DEG_HALF + offset, 0.0f);
+            return constrainL(PRE_180DEG_HALF + offset, 0.0f);
 
         case turn_type_e::TURN_S2D_45 :
             if(v_int == 35) offset = pm.turn_s2d45_v_35_d_pre_offset;
@@ -146,7 +146,7 @@ float CurveFactory::getPreDistWithOffset(turn_type_e turn_type_, float v){
             else if(v_int == 75) offset = pm.turn_s2d45_v_75_d_pre_offset;
             else if(v_int == 80) offset = pm.turn_s2d45_v_80_d_pre_offset;
             else offset = pm.turn_s2d45_v_80_d_pre_offset;
-            return constrainL(FOL_S2D45DEG_HALF + offset, 0.0f);
+            return constrainL(PRE_S2D45DEG_HALF + offset, 0.0f);
         
         case turn_type_e::TURN_S2D_135 :
             if(v_int == 35) offset = pm.turn_s2d135_v_35_d_pre_offset;
@@ -160,7 +160,7 @@ float CurveFactory::getPreDistWithOffset(turn_type_e turn_type_, float v){
             else if(v_int == 75) offset = pm.turn_s2d135_v_75_d_pre_offset;
             else if(v_int == 80) offset = pm.turn_s2d135_v_80_d_pre_offset;
             else offset = pm.turn_s2d135_v_80_d_pre_offset;
-            return constrainL(FOL_S2D135DEG_HALF + offset, 0.0f);
+            return constrainL(PRE_S2D135DEG_HALF + offset, 0.0f);
 
         case turn_type_e::TURN_D_90 :
             if(v_int == 35) offset = pm.turn_d90_v_35_d_pre_offset;
@@ -174,7 +174,7 @@ float CurveFactory::getPreDistWithOffset(turn_type_e turn_type_, float v){
             else if(v_int == 75) offset = pm.turn_d90_v_75_d_pre_offset;
             else if(v_int == 80) offset = pm.turn_d90_v_80_d_pre_offset;
             else offset = pm.turn_d90_v_80_d_pre_offset;
-            return constrainL(FOL_D90DEG_HALF + offset, 0.0f);
+            return constrainL(PRE_D90DEG_HALF + offset, 0.0f);
 
         case turn_type_e::TURN_D2S_45 :
             if(v_int == 35) offset = pm.turn_d2s45_v_35_d_pre_offset;
@@ -188,7 +188,7 @@ float CurveFactory::getPreDistWithOffset(turn_type_e turn_type_, float v){
             else if(v_int == 75) offset = pm.turn_d2s45_v_75_d_pre_offset;
             else if(v_int == 80) offset = pm.turn_d2s45_v_80_d_pre_offset;
             else offset = pm.turn_d2s45_v_80_d_pre_offset;
-            return constrainL(FOL_D2S45DEG_HALF + offset, 0.0f);
+            return constrainL(PRE_D2S45DEG_HALF + offset, 0.0f);
 
         case turn_type_e::TURN_D2S_135 :
             if(v_int == 35) offset = pm.turn_d2s135_v_35_d_pre_offset;
@@ -202,7 +202,7 @@ float CurveFactory::getPreDistWithOffset(turn_type_e turn_type_, float v){
             else if(v_int == 75) offset = pm.turn_d2s135_v_75_d_pre_offset;
             else if(v_int == 80) offset = pm.turn_d2s135_v_80_d_pre_offset;
             else offset = pm.turn_d2s135_v_80_d_pre_offset;
-            return constrainL(FOL_D2S135DEG_HALF + offset, 0.0f);
+            return constrainL(PRE_D2S135DEG_HALF + offset, 0.0f);
 
         default:
             return 0.0;

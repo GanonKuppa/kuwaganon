@@ -355,6 +355,7 @@ public:
         else if(potential_min == potential_W) min_dir = direction_e::W;
         else if(potential_min == potential_S) min_dir = direction_e::S;
         
+        #ifdef MAZE_DEBUG
         printfAsync("■■■ x:%d, y%d, dir:%d, mindir: %d p(x,y): %d|| Ep:%d, Np:%d, Wp:%d, Sp:%d\n",
         x, y, dir, min_dir,p_map[x][y] , potential_E, potential_N, potential_W, potential_S);
         printfAsync("(%d, %d)|",x, y);
@@ -367,7 +368,7 @@ public:
         readWall(x , y + 1).print();
         printfAsync("(%d, %d-1)|",x, y);
         readWall(x ,y - 1).print();
-
+        #endif    
         return min_dir;
     };
 

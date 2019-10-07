@@ -169,7 +169,7 @@ void ICM20602::update() {
 
     for (int i = 0; i < 3; i++) {
         acc_c[i] = acc_raw[i] - acc_ref[i];
-        acc_f[i] = 0.3 * (acc_c[i] * ACC_2g * G) + 0.7 * acc_f[i];
+        acc_f[i] = 0.1 * (acc_c[i] * ACC_2g * G) + 0.9 * acc_f[i];
     }
 
     temp_raw = concatenate2Byte_int(temp_out_h, temp_out_l);
@@ -295,15 +295,15 @@ void ICM20602::calibAccOffset(uint32_t ref_num) {
     acc_ref[0] = (int16_t) (acc_x_sum / (float) ref_num);
     acc_ref[1] = (int16_t) (acc_y_sum / (float) ref_num);
     acc_ref[2] = (int16_t) (acc_z_sum / (float) ref_num);
-
+    int16_t ref_y_ = (int16_t) (acc_y_sum / (float) ref_num);
     //writeEEPROMOffsetaccInt(&acc_offset_vec[0]);
-    printfAsync("=====ICM20602=====\n gyro offset %d, %d, %d\n", acc_ref[0],
+    printfAsync("=====ICM20602=====\n acc offset %d, %d, %d\n", acc_ref[0],
             acc_ref[1], acc_ref[2]);
 
     ParameterManager &pm = ParameterManager::getInstance();
-    pm.write<int16_t>(153, acc_ref[0]);
-    pm.write<int16_t>(154, acc_ref[1]);
-    pm.write<int16_t>(155, 0);
+    pm.write<int16_t>(153, (int16_t)acc_ref[0]);
+    pm.write<int16_t>(154, ref_y_);
+    pm.write<int16_t>(155, (int16_t)0);
     pm.acc_x_ref = acc_ref[0];
     pm.acc_y_ref = acc_ref[1];
     pm.acc_z_ref = 0;

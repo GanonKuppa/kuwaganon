@@ -69,7 +69,7 @@ public:
 class UMouse {
 public:
     static constexpr float WALL2MOUSE_CENTER_DIST = 0.01765;
-    static constexpr float READ_WALL_OFFSET = 0.01;
+    static constexpr float READ_WALL_OFFSET = 0.0125;
     static constexpr float DELTA_T = 0.0005;
 
     // -32768 から 32767
@@ -183,6 +183,9 @@ public:
         WheelOdometry &wo = WheelOdometry::getInstance();
         PowerTransmission &pt = PowerTransmission::getInstance();
         WallSensor &ws = WallSensor::getInstance();
+        PseudoDialL &pdl = PseudoDialL::getInstance();
+        PseudoDialR &pdr = PseudoDialR::getInstance();
+
 
         //posEsti.update(wo.getV_double(), (double)adis.omega_f[2], (double)adis.originOffsetCompAy(), (double)adis.originOffsetCompAx(), trajCommander.getMotionType(), ws);
         posEsti.update(wo.getV_double(), (double)adis.omega_f[2], (double)imu.acc_f[1], (double)imu.acc_f[0], trajCommander.getMotionType(), ws);
@@ -213,8 +216,6 @@ public:
                 }
             }else{
                 ctrlMixer.reset();
-                PseudoDialL &pdl = PseudoDialL::getInstance();
-                PseudoDialR &pdr = PseudoDialR::getInstance();
                 if(pdl.getEnable() == false && pdr.getEnable() == false ) pt.setDuty(0.0, 0.0);
             }
         }
@@ -234,13 +235,10 @@ public:
             SEH();
         }
 
-
-        ParameterManager &pm = ParameterManager::getInstance();
-        //ws.isCorner();
-
-        //if (ABS(wo.v) < 0.005) v_acc = 0.0;
-        //else
-            v_acc += imu.acc_f[1] * DELTA_T;
+        if(direct_duty_set_enable == false && trajCommander.empty() 
+           && pdl.getEnable() == false && pdr.getEnable() == false){
+            pt.setDuty(0.0f, 0.0f);
+        }
 
         updateBuff();
 

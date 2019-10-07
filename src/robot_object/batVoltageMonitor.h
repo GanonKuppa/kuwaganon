@@ -48,8 +48,7 @@ public:
 
     void update(){
         int16_t ad = startAD_AN105();
-        ad = startAD_AN105(); // 電荷を抜くために複数回AD変換
-        ad = startAD_AN105(); //
+        ad = startAD_AN105(); // 電荷を抜くために複数回AD変換        
         bat_vol = ad2Voltage(ad);
 
         count ++;

@@ -22,7 +22,7 @@ public:
 
 
     TrajectoryCommander(){
-        motion_type = EMotionType::STOP;
+        motion_type = EMotionType::SPINTURN;
         x = 0.09f/2.0f;
         y = 0.09f/2.0f - 0.01765;
         ang = 90.0f;

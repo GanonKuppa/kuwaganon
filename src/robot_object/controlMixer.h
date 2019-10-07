@@ -213,7 +213,8 @@ namespace umouse {
                 pos_pidf.reset();
             }
             
-            v_pidf.update(target_trans_v, esti.getV());
+            WheelOdometry &wodo = WheelOdometry::getInstance();
+            v_pidf.update(target_trans_v, wodo.getV());
             ang_v_pidf.update(target_rot_v, esti.getAngV());
 
             PowerTransmission &pt = PowerTransmission::getInstance();
