@@ -167,10 +167,14 @@ void ICM20602::update() {
     else omega_f[2] *= pm.gyro_scaler_right;
 
 
-    for (int i = 0; i < 3; i++) {
-        acc_c[i] = acc_raw[i] - acc_ref[i];
-        acc_f[i] = 0.1 * (acc_c[i] * ACC_2g * G) + 0.9 * acc_f[i];
-    }
+    
+    acc_c[0] = acc_raw[0] - acc_ref[0];
+    acc_f[0] = 0.1 * (acc_c[0] * ACC_2g * G * pm.acc_x_scaler) + 0.9 * acc_f[0];
+    acc_c[0] = acc_raw[0] - acc_ref[0];
+    acc_f[0] = 0.1 * (acc_c[0] * ACC_2g * G * pm.acc_y_scaler) + 0.9 * acc_f[0];
+    acc_c[0] = acc_raw[0] - acc_ref[0];
+    acc_f[0] = 0.1 * (acc_c[0] * ACC_2g * G) + 0.9 * acc_f[0];
+    
 
     temp_raw = concatenate2Byte_int(temp_out_h, temp_out_l);
     temp_f =  temp_raw * T_25degC + RoomTemp_Offset;

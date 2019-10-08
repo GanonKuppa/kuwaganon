@@ -227,8 +227,8 @@ float gyro_scaler_left; //175
 float v_comp_gain; //176
 float gyro2_scaler_right; //177
 float gyro2_scaler_left; //178
- ; //179
- ; //180
+float acc_x_scaler; //179
+float acc_y_scaler; //180
  ; //181
  ; //182
  ; //183
@@ -240,7 +240,7 @@ float gyro2_scaler_left; //178
  ; //189
 int16_t gyro2_x_ref; //190
 int16_t gyro2_y_ref; //191
-int16_t gyro2_z_ref; //192
+float gyro2_z_ref; //192
 int16_t acc2_x_ref; //193
 int16_t acc2_y_ref; //194
 int16_t acc2_z_ref; //195

@@ -88,8 +88,7 @@ public:
             // 並進速度算出
             double gain = (double)pm.v_comp_gain;
             //a_y = (double)adis.acc_f[2];
-            if(fabs(v_acc - v) > 0.5) gain = 1.0;
-            else if(fabs(a_y) < 0.15) gain = 0.0;
+            if(fabs(a_y) < 3.0) gain = 0.0;
             v = (gain)*(v + a_y * DELTA_T) + (1.0 - gain)*(v_);
             
             // 加速度積分速度算出
@@ -127,7 +126,7 @@ public:
                 x_d = 0.0;
                 y_d = 0.0;
             } 
-            else if(fabs(v_acc - v_) > 0.15){
+            else if(fabs(v_acc - v_) > 0.3){
                 x_d += x_dd * DELTA_T;
                 y_d += y_dd * DELTA_T;
                 v_acc = sqrt(x_d * x_d + y_d * y_d);
@@ -138,7 +137,7 @@ public:
             } 
 
             // グローバル座標系位置算出
-            if(fabs(ang_v) > 10.0 && fabs(v_acc - v_) <= 0.15){
+            if(fabs(ang_v) > 10.0 && fabs(v_acc - v_) <= 0.1){
                 x += x_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
                 y += y_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
 
@@ -160,7 +159,7 @@ public:
             double x_dd =   a_x * sin_val + a_y * cos_val;
             double y_dd = - a_x * cos_val + a_y * sin_val;
 
-            if (ABS(v_) < 0.0001){
+            if (ABS(v_) < 0.001){
                 v_acc = 0.0;
                 x_d = 0.0;
                 y_d = 0.0;
