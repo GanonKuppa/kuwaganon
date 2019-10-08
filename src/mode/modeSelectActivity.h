@@ -78,7 +78,17 @@ namespace umouse {
                 SE_CURSOR_MOVE();
             }
 
-            if(dial_position_R_now == 4 || (gamepad.B > 50 && gamepad.B < 150)) {
+            // タイヤ掃除用に前壁センサONのときは制御をかけない
+            if(ws.isAhead()){
+                dial_L.setEnable(false);
+                dial_R.setEnable(false);
+            }
+            else{
+                dial_L.setEnable(true);
+                dial_R.setEnable(true);
+            }
+
+            if(dial_position_R_now == 4 || (gamepad.B > 50 && gamepad.B < 150) && !ws.isAhead()) {
                 SE_CONFIRM();
                 waitmsec(500);
 
