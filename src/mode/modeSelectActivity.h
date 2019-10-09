@@ -46,18 +46,9 @@ namespace umouse {
             dial_position_R_pre = 0;
             dial_position_L_now = 0;
             dial_position_L_pre = 0;
+            was_gamepad_input = false;
             turnFcled();
-/*
-            while(1){
-                waitmsec(1000);
-                adis16470 &adis = adis16470::getInstance();
-                printfAsync("◇◇\n raw32 = %d\n", adis.omega_raw_32bit[2]  );
-                printfAsync("raw16 val = %d\n", adis.omega_raw[2]  );
-                printfAsync("raw16 val = %d\n", adis.omega_raw[1]  );
-                printfAsync("float val = %f\n", adis.omega_f[2]  );
 
-            }
-*/
         }
 
         ELoopStatus loop() {
@@ -83,7 +74,11 @@ namespace umouse {
                 dial_L.setEnable(false);
                 dial_R.setEnable(false);
             }
-            else{
+            else if(!was_gamepad_input && !dial_L.getEnable() && !dial_R.getEnable()){
+                PseudoDialL &dial_L = PseudoDialL::getInstance();
+                PseudoDialR &dial_R = PseudoDialR::getInstance();
+                dial_L.reset();
+                dial_R.reset();
                 dial_L.setEnable(true);
                 dial_R.setEnable(true);
             }
@@ -123,12 +118,14 @@ namespace umouse {
                 dial_L.setEnable(false);
                 dial_R.setEnable(false);
                 dial_L.incrementPosition();
+                was_gamepad_input = true;
                 waitmsec(200);
             }
             if(gamepad.cross_y == -1 ) {
                 dial_L.setEnable(false);
                 dial_R.setEnable(false);
                 dial_L.decrementPosition();
+                was_gamepad_input = true;
                 waitmsec(200);
             }
 
@@ -155,6 +152,7 @@ namespace umouse {
         uint8_t dial_position_R_pre;
         uint8_t dial_position_L_now;
         uint8_t dial_position_L_pre;
+        bool was_gamepad_input;
 
         void turnFcled() {
             PseudoDialL &dial_L = PseudoDialL::getInstance();
