@@ -123,8 +123,8 @@ void timeInterrupt(void) {
         }
     }
 
-    //30msec毎の処理 120  20msec毎 80 10msec 40
-    if (int_tick_count % 120 == 3) {
+    //30msec毎の処理=120  20msec毎=80 10msec=40 7.5msec=30
+    if (int_tick_count % 40 == 0) {
         umouse::sendPeriodicMsg();
     }
     //スロット0
@@ -133,8 +133,9 @@ void timeInterrupt(void) {
             std::function< void(void) > w1 = [&wallSen]() {wallSen.update();};
             std::function< void(void) > w2 = [&icm]() {icm.update();};
             std::function< void(void) > w3 = [&mouse]() {mouse.update();};
-            std::function< void(void) > w4 = []() {waitusec_sub(10);};
+            std::function< void(void) > w4 = []() {waitusec_sub(20);};
             adis.update(w1, w2, w3, w4);
+            sendDataSCIFA9();
         }
         else{
             wallSen.update();            
@@ -154,6 +155,7 @@ void timeInterrupt(void) {
             std::function< void(void) > w3 = [&mouse]() {mouse.update();};
             std::function< void(void) > w4 = []() {waitusec_sub(20);};
             adis.update(w1, w2, w3, w4);
+            sendDataSCIFA9();
         }
         else{
             wallSen.update();            
@@ -164,7 +166,7 @@ void timeInterrupt(void) {
         wheelOdometry.update();
         dialL.update();
         dialR.update();
-        fcled.update();
+        fcled.update();        
     }
 
     /////毎回行う処理/////
@@ -175,10 +177,8 @@ void timeInterrupt(void) {
         SYSTEM.SWRR = 0xA501;
     }
 
-    batVolMan.update();
-    sendDataSCIFA9();
-    soundUpdate();
-    sendDataSCIFA9();
+    batVolMan.update();    
+    soundUpdate();    
     endTimeuCountIntCMT0();
 
     int_tick_count++;

@@ -145,7 +145,7 @@ void sendDataSCIFA9() {
         SCIFA9.FTDR = transBuff.front();
         transBuff.pop();
         count++;
-        if (count == 32) return;
+        if (count == 16) return;
     }
 }
 
