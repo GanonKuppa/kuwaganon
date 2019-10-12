@@ -39,6 +39,7 @@ private:
 
     WheelOdometry() {
         v = 0.0;
+        a = 0.0;
         kappa = 0.0;
         ang_v = 0.0;
         r = BIG_R;
@@ -84,6 +85,7 @@ private:
 
 public:
     double v;
+    double a;
     double v_R;
     double v_L;
     float rpm_R;
@@ -134,8 +136,10 @@ public:
         L_count_32bit_2 = L_count_32bit_1;
         R_count_32bit_1 = R_count_32bit;
         L_count_32bit_1 = L_count_32bit;
-
+        
+        double v_pre = v;
         v = (v_R + v_L) * 0.5;
+        a = (v - v_pre) / 0.0005;
         if( fabs(v_R + v_L) > 0.001)kappa = 2.0 * (v_R - v_L) / (pm.tread * (v_R + v_L));
         float ang_v_rad = (v_R - v_L) / pm.tread; //v * kappa;
         ang_v = RAD2DEG(ang_v_rad);
@@ -168,6 +172,10 @@ public:
     float getV() {
         return (float)v;
     };
+
+    float getA() {
+        return (float)a;
+    }
 
     double getV_double(){
         return v;

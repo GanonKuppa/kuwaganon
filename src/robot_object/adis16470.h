@@ -113,6 +113,10 @@ public:
         return acc_f[1] - alpha_rad * ORIGIN_OFFSET_X + omega_rad * omega_rad * ORIGIN_OFFSET_Y;
     }
 
+    float getAlpha(){
+        return alpha;
+    }
+
 
     void calibOmegaOffset(uint32_t ref_num){
 

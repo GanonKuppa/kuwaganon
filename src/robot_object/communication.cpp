@@ -495,10 +495,10 @@ void packData(uint8_t *buf) {
     set2ByteVal(buf, 78, adis.acc_raw[1]);
     
 
-    set2ByteVal(buf, 80, m.start.x);
-    set2ByteVal(buf, 82, m.start.y);
-    set2ByteVal(buf, 84, m.goal.x);
-    set2ByteVal(buf, 86, m.goal.y);
+    set2ByteVal(buf, 80, (uint16_t)m.trajCommander.getMotionType());
+    set2ByteVal(buf, 82, (uint16_t)m.trajCommander.getTurnType());
+    set2ByteVal(buf, 84, m.trajCommander.getTrajHash());
+    set2ByteVal(buf, 86, (uint16_t)0);
     set2ByteVal(buf, 88, m.coor.x);
     set2ByteVal(buf, 90, m.coor.y);
 
@@ -544,6 +544,8 @@ void packData(uint8_t *buf) {
     set2ByteVal(buf, 152, (float)m.posEsti.getBeta(), 100);
 
     set2ByteVal(buf, 154, (float)m.ctrlMixer.ang_pidf.getControlVal(), 10);
+    set2ByteVal(buf, 156, adis.getAlpha(), 2);
+    set2ByteVal(buf, 158, wo.getA(), 1000);
 
     //迷路データ
     static uint8_t count = 0;

@@ -27,6 +27,8 @@ public:
 
     TrajectoryCommander(){
         motion_type = EMotionType::STOP;
+        turn_type = turn_type_e::STOP;
+        traj_hash = 0xBEAF;
         x = 0.09f/2.0f;
         y = 0.09f/2.0f;
         ang = 90.0f;
@@ -41,6 +43,16 @@ public:
     EMotionType getMotionType() {
         return motion_type;
     }
+
+    turn_type_e getTurnType(){
+        return turn_type;
+    }
+
+    uint16_t getTrajHash(){
+        return traj_hash;
+    }
+
+
 
     bool isStraight(){
         if(motion_type == EMotionType::STRAIGHT ||
@@ -57,6 +69,8 @@ public:
            
             trajQueue.front()->update();
             motion_type = trajQueue.front()->motion_type;
+            turn_type = trajQueue.front()->turn_type;
+            traj_hash = trajQueue.front()->hash;
             x = trajQueue.front()->x;
             y = trajQueue.front()->y;
             ang = trajQueue.front()->ang;
@@ -242,6 +256,8 @@ public:
     }
 private:
     EMotionType motion_type;
+    turn_type_e turn_type;
+    uint16_t traj_hash;
     std::deque< std::unique_ptr<BaseTrajectory> > trajQueue;
     std::unique_ptr<BaseTrajectory> trajPrevious;
 
