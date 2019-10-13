@@ -10,7 +10,7 @@ import paho.mqtt.client as mqtt
 # 設定系変数(デフォルト値で初期化)
 MQTT_BROKER_IP = "DEVNOTEPC"
 MQTT_BROKER_PORT = 1883
-VAL_NUM = 400
+
 
 
 V_L = 0.0
@@ -38,12 +38,75 @@ def parse_float(val1, val0, division_scaler):
     int_val = parse_int(val1, val0)
     return int_val / division_scaler
 
+    
+
+def stop_traj_cmd(client_, stop_time):
+    cmd_array = [99,109,100,0,0,0,0,0,0,0,0,0,0,0,0,0]    
+    cmd_array[3] = 100 # id
+    stop_time_int = int(stop_time * 1000)
+    cmd_array[5] = stop_time_int & 0x00FF
+    cmd_array[6] = (stop_time_int >> 8) & 0x00FF
+    checksum = sum(cmd_array[5:]) % 256
+    cmd_array[4] = checksum
+    client_.publish("cmd", bytearray(cmd_array))
+
+
+def straight_traj_cmd(client_, x, v_0, v_max, v_end, a):
+    cmd_array = [99,109,100,0,0,0,0,0,0,0,0,0,0,0,0,0]    
+    cmd_array[3] = 101 # id
+
+    x_int = int(x * 1000)
+    cmd_array[5] = x_int & 0x00FF
+    cmd_array[6] = (x_int >> 8) & 0x00FF
+
+    v_0_int = int(v_0 * 1000)
+    cmd_array[7] = v_0_int & 0x00FF
+    cmd_array[8] = (v_0_int >> 8) & 0x00FF
+
+    v_max_int = int(v_max * 1000)
+    cmd_array[9] = v_max_int & 0x00FF
+    cmd_array[10] = (v_max_int >> 8) & 0x00FF
+
+    v_end_int = int(v_end * 1000)
+    cmd_array[11] = v_end_int & 0x00FF
+    cmd_array[12] = (v_end_int >> 8) & 0x00FF
+
+    a_int = int(a * 1000)
+    cmd_array[13] = a_int & 0x00FF
+    cmd_array[14] = (a_int >> 8) & 0x00FF
+
+    checksum = sum(cmd_array[5:]) % 256
+
+    cmd_array[4] = checksum
+    client_.publish("cmd", bytearray(cmd_array))
+
+def spinturn_traj_cmd(client_, ang, ang_v, ang_a):
+    cmd_array = [99,109,100,0,0,0,0,0,0,0,0,0,0,0,0,0]    
+    cmd_array[3] = 102 # id
+
+    ang_int = int(ang * 1)
+    cmd_array[5] = ang_int & 0x00FF
+    cmd_array[6] = (ang_int >> 8) & 0x00FF
+
+    ang_v_int = int(ang_v * 1)
+    cmd_array[7] = ang_v_int & 0x00FF
+    cmd_array[8] = (ang_v_int >> 8) & 0x00FF
+
+    ang_a_int = int(ang_a * 1)
+    cmd_array[9] = ang_a_int & 0x00FF
+    cmd_array[10] = (ang_a_int >> 8) & 0x00FF
+
+    checksum = sum(cmd_array[5:]) % 256
+
+    cmd_array[4] = checksum
+    client_.publish("cmd", bytearray(cmd_array))
+
 
 
 def on_message(client, userdata, msg):    
     if msg.topic == "mouse":
         check_sum = 0
-        for i in range(7,400):
+        for i in range(7,240):
             check_sum += msg.payload[i]
         check_sum = check_sum % 256
         if check_sum != msg.payload[6]:
@@ -86,6 +149,16 @@ def main():
     # MQTTクライアントの初期化
     client = create_mqtt_client()
     client.loop_start()
+    v_0 = 0.0
+    v_end = 0.1
+    v_max = 0.2
+    a = 1.0
+    x = 15 * 0.09
+    straight_traj_cmd(client, x, v_0, v_max, v_end, a)
+    stop_traj_cmd(client, 3)
+    spinturn_traj_cmd(client, 180.0, 1200.0, 1200.0)
+    straight_traj_cmd(client, x, v_0, v_max, v_end, a)
+    stop_traj_cmd(client, 3)
 
 
     print("V_L, V_R, v, a, omega, alpha")
