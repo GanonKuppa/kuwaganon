@@ -33,7 +33,7 @@
 #include "maze.h"
 #include "parameterManager.h"
 #include "powerTransmission.h"
-
+#include "offboardCommand.h"
 
 #include <queue>
 
@@ -52,9 +52,11 @@ static void set4ByteVal(uint8_t *buf, uint16_t index, uint32_t val);
 
 namespace umouse{
 
-static const uint16_t PERIODIC_MSG_LEN = 400;
-static const uint16_t PARAM_MNG_PART_NUM = 40;
+static const uint16_t PERIODIC_MSG_LEN = 240;
+static const uint16_t PARAM_MNG_PART_NUM = 80;
 static const uint16_t CMD_SIZE  = 16;
+static const uint16_t part_num  = 5;
+
 static std::queue<uint8_t> printfBuff;
 static uint8_t periodicMsg[PERIODIC_MSG_LEN];
 
@@ -113,16 +115,13 @@ void fetchCommand() {
                 first_recieve_flag = true;
             }
 
-            if(recieveBuff[i+3] == 254 && recieveBuff[i+4] == 253){
-                Gamepad &gamepad = Gamepad::getInstance();
-                gamepad.updateCommand(&recieveBuff[i]);
-            }
-
-            if(recieveBuff[i+3] == 251){
-                ParameterManager &pm = ParameterManager::getInstance();
-
-                pm.writeCommand(&recieveBuff[i]);
-            }
+            if(recieveBuff[i+3] == 100) id_100_exec(&recieveBuff[i]);
+            else if(recieveBuff[i+3] == 101) id_101_exec(&recieveBuff[i]);
+            else if (recieveBuff[i+3] == 102) id_102_exec(&recieveBuff[i]);
+            else if (recieveBuff[i+3] == 103) id_103_exec(&recieveBuff[i]);
+            else if(recieveBuff[i+3] == 251) id_251_exec(&recieveBuff[i]);
+            else if(recieveBuff[i+3] == 254) id_254_exec(&recieveBuff[i]);
+            else if (recieveBuff[i+3] == 255) id_254_exec(&recieveBuff[i]);
 
             last_cmd_index = i;
             break;
@@ -152,7 +151,7 @@ void sendPeriodicMsg() {
 }
 
 //迷路の壁情報を送る
-//32 x 32の迷路データを4つに分割
+//32 x 32の迷路データを8つに分割
 void packDataMaze(uint8_t part_num, uint8_t *buf) {
     buf[0] = part_num;
     UMouse &mouse = UMouse::getInstance();
@@ -212,14 +211,14 @@ void packDataMaze(uint8_t part_num, uint8_t *buf) {
 }
 
 //パラメータマネージャーに登録された変数を配列に格納
-//52byteを占有 型情報  パート番号2byte + (1byte + 変数値 4byte) *10 = 52byte
+//27byteを占有 型情報  パート番号2byte + (1byte + 変数値 4byte) *5 = 27byte
 void packDataParamMng(uint8_t part_num, uint8_t *buf) {
     buf[0] = part_num;
     buf[1] = 255;
     ParameterManager &pm = ParameterManager::getInstance();
-    for(uint8_t i=0;i<10;i++){
-        if(pm.typeMap.find(10*part_num + i) != pm.typeMap.end()){
-            uint16_t val_num = 10*part_num +i;
+    for(uint8_t i=0;i<5;i++){
+        if(pm.typeMap.find(5*part_num + i) != pm.typeMap.end()){
+            uint16_t val_num = 5*part_num +i;
             Type_e type = pm.typeMap[val_num];
             buf[2+i*5] = (uint8_t)type;
             if(type == Type_e::FLOAT) *reinterpret_cast<float*>(&buf[2+i*5+1]) = *reinterpret_cast<float*>(pm.adrMap[val_num]);
@@ -239,7 +238,7 @@ void packDataParamMng(uint8_t part_num, uint8_t *buf) {
 
 void packWallSenAdjData(uint8_t *buf){
     uint8_t printfDataNum = 0;
-    const uint8_t printfFieldNum = 20;
+    const uint8_t printfFieldNum = 10;
 
     UMouse &m = UMouse::getInstance();
 //    FrontWallSensor &fws = FrontWallSensor::getInstance();
@@ -430,7 +429,7 @@ void packVelocityAdjData(uint8_t *buf){
 
 void packData(uint8_t *buf) {
     uint8_t printfDataNum = 0;
-    const uint8_t printfFieldNum = 60;
+    const uint8_t printfFieldNum = 20;
 
 //    TactSw& tsw = TactSw::getInstance();
     UMouse &m = UMouse::getInstance();
@@ -549,13 +548,13 @@ void packData(uint8_t *buf) {
 
     //迷路データ
     static uint8_t count = 0;
-    packDataMaze(count, &buf[160]);
+    //packDataMaze(count, &buf[160]);
     count++;
-    if (count == 4) count = 0;
+    if (count == 8) count = 0;
 
     //パラメータマネージャのデータ
     static uint8_t count_paramMng = 0;
-    packDataParamMng(count_paramMng, &buf[250]);
+    packDataParamMng(count_paramMng, &buf[192]);
     count_paramMng++;
     if(count_paramMng == PARAM_MNG_PART_NUM) count_paramMng = 0;
 

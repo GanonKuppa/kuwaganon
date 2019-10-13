@@ -7,6 +7,7 @@
 #include "arcLengthParameterizedCurve.h"
 #include "kappa.h"
 #include "myUtil.h"
+#include "wallsensor.h"
 
 namespace umouse
 {

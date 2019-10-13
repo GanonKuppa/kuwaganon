@@ -124,7 +124,7 @@ void timeInterrupt(void) {
     }
 
     //30msec毎の処理=120  20msec毎=80 10msec=40 7.5msec=30
-    if (int_tick_count % 40 == 0) {
+    if (int_tick_count % 20 == 0) {
         umouse::sendPeriodicMsg();
     }
     //スロット0
