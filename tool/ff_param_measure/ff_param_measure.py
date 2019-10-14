@@ -17,8 +17,10 @@ V_L = 0.0
 V_R = 0.0
 v = 0.0
 a = 0.0
+target_ang_v = 0.0
 omega = 0.0
 alpha = 0.0
+output_list = []
 
 def load_config():
     with open('config.json', 'r') as f:
@@ -78,6 +80,7 @@ def straight_traj_cmd(client_, x, v_0, v_max, v_end, a):
     checksum = sum(cmd_array[5:]) % 256
 
     cmd_array[4] = checksum
+    print(x_int, v_0_int, v_max_int, v_end_int, a_int)
     client_.publish("cmd", bytearray(cmd_array))
 
 def spinturn_traj_cmd(client_, ang, ang_v, ang_a):
@@ -117,11 +120,19 @@ def on_message(client, userdata, msg):
         V_R = parse_float(msg.payload[31], msg.payload[30], 5000.0)
         v = parse_float(msg.payload[107], msg.payload[106], 10000.0)
         a = parse_float(msg.payload[159], msg.payload[158], 1000.0)
+        target_v = parse_float(msg.payload[111], msg.payload[110], 10000.0)
+        target_a = parse_float(msg.payload[123], msg.payload[122], 1000.0)
+        target_ang_v = parse_float(msg.payload[117], msg.payload[116], 10.0)
+        target_ang_a = parse_float(msg.payload[87], msg.payload[86], 1.0)
+        traj_type = parse_int(msg.payload[81], msg.payload[80])
         omega = parse_float(msg.payload[115], msg.payload[114], 10.0) * 3.14159265 / 180.0
         alpha = parse_float(msg.payload[157], msg.payload[156], 2.0) * 3.14159265 / 180.0
+        #print("%f, %f, %f, %f, %f, %f" % (V_L, V_R, v, a, target_v, target_a))
 
-        if not (-0.01 < V_L < 0.01) or not (-0.01 < V_R < 0.01):
-            print("%f, %f, %f, %f, %f, %f" % (V_L, V_R, v, a, omega, alpha))
+        if (not (-0.01 < V_L < 0.01) or not (-0.01 < V_R < 0.01) ) and \
+           ( -0.01 < target_ang_a < 0.01) and \
+           ((traj_type == 4)):
+            output_list.append("%f, %f, %f, %f, %f, %f\n" % (V_L, V_R, v, a, target_ang_v, target_ang_a))
 
 
 
@@ -142,7 +153,7 @@ def create_mqtt_client():
 
 
 
-def main():
+def main_trans():
     # コンフィグファイルの読み込み
     load_config()
 
@@ -151,23 +162,77 @@ def main():
     client.loop_start()
     v_0 = 0.0
     v_end = 0.1
-    v_max = 0.2
+    v_max = 2.0
     a = 1.0
-    x = 15 * 0.09
-    straight_traj_cmd(client, x, v_0, v_max, v_end, a)
-    stop_traj_cmd(client, 3)
-    spinturn_traj_cmd(client, 180.0, 1200.0, 1200.0)
-    straight_traj_cmd(client, x, v_0, v_max, v_end, a)
-    stop_traj_cmd(client, 3)
+    x = 7 * 0.09
+    stop_time = 0.3
+    save_file_name = "trans_acc_measure.csv"
+    
+    for ele in range(0,160):
+        straight_traj_cmd(client, x, v_0, v_max, v_end, a)
+        stop_traj_cmd(client, stop_time)
+        spinturn_traj_cmd(client, 180.0, 1200.0, 1200.0)
+        stop_traj_cmd(client, stop_time)
+        a = a + 0.025
 
 
-    print("V_L, V_R, v, a, omega, alpha")
+    time_count = 0
+    output_list_len = 0
+    stop_count = 0
     while True:
-        time.sleep(0.1)
+        time.sleep(1.0)
+        print(len(output_list))
+        if output_list_len == len(output_list):
+            stop_count = stop_count + 1
+        else:
+            stop_count = 0
         
+        output_list_len = len(output_list)
+        
+        if stop_count > 20:
+            break
+    with open(save_file_name, "w") as f:
+        f.writelines(output_list)
+        
+def main_rot():
+    # コンフィグファイルの読み込み
+    load_config()
+
+    # MQTTクライアントの初期化
+    client = create_mqtt_client()
+    client.loop_start()
+    ang = 360 * 4
+    ang_v_max = 90.0
+    ang_a = 1200.0
+    stop_time = 0.3
+    save_file_name = "rot_measure.csv"
+    
+    for ele in range(0,40):
+        spinturn_traj_cmd(client, ang, ang_v_max, ang_a)
+        stop_traj_cmd(client, stop_time)
+        ang_v_max = ang_v_max + 90.0
+
+    time_count = 0
+    output_list_len = 0
+    stop_count = 0
+
+    while True:
+        time.sleep(1.0)
+        print(len(output_list))
+        if output_list_len == len(output_list):
+            stop_count = stop_count + 1
+        else:
+            stop_count = 0
+        
+        output_list_len = len(output_list)
+        
+        if stop_count > 20:
+            break
+    with open(save_file_name, "w") as f:
+        f.writelines(output_list)
         
                 
 
 
 if __name__ == "__main__":
-    main()
+    main_rot()
