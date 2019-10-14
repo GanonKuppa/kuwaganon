@@ -64,10 +64,10 @@ float circuit_res_right; //7
  ; //13
  ; //14
  ; //15
- ; //16
- ; //17
- ; //18
- ; //19
+float ff_v_coef; //16
+float ff_v_offset; //17
+float ff_a_coef; //18
+float ff_a_offset; //19
 float trans_friction_coef; //20
 float trans_friction_offset; //21
 float trans_v_P; //22
@@ -82,15 +82,15 @@ float trans_v_slalom_P; //30
 float trans_v_slalom_I; //31
 float trans_v_slalom_D; //32
 float trans_v_slalom_F; //33
- ; //34
- ; //35
- ; //36
- ; //37
+float ff_rot_v_coef; //34
+float ff_rot_v_offset; //35
+float ff_rot_a_coef; //36
+float ff_rot_a_offset; //37
 float rot_friction_coef; //38
 float rot_friction_offset; //39
 float rot_v_P; //40
 float rot_v_I; //41
-float  rot_v_D; //42
+float rot_v_D; //42
 float rot_v_F; //43
 float rot_v_spin_P; //44
 float rot_v_spin_I; //45
@@ -238,8 +238,8 @@ float acc_y_scaler; //180
  ; //187
  ; //188
  ; //189
-int16_t gyro2_x_ref; //190
-int16_t gyro2_y_ref; //191
+float gyro2_x_ref; //190
+float gyro2_y_ref; //191
 float gyro2_z_ref; //192
 int16_t acc2_x_ref; //193
 int16_t acc2_y_ref; //194
@@ -248,16 +248,16 @@ int16_t acc2_z_ref; //195
  ; //197
  ; //198
  ; //199
- float shortest_0_v; //200
- float shortest_0_v_d; //201
- float shortest_0_v_90; //202
- float shortest_0_v_l90; //203
- float shortest_0_v_180; //204
- float shortest_0_v_d90; //205
- float shortest_0_v_45; //206
- float shortest_0_v_135; //207
- float shortest_0_a; //208
- float shortest_0_a_diag; //209
+float shortest_0_v; //200
+float shortest_0_v_d; //201
+float shortest_0_v_90; //202
+float shortest_0_v_l90; //203
+float shortest_0_v_180; //204
+float shortest_0_v_d90; //205
+float shortest_0_v_45; //206
+float shortest_0_v_135; //207
+float shortest_0_a; //208
+float shortest_0_a_diag; //209
  ; //210
  ; //211
  ; //212
@@ -448,7 +448,7 @@ float turn_d2s135_v_80_d_pre_offset; //379
  ; //397
  ; //398
  ; //399
-        //----管理下においた変数たち-----
+         //----管理下においた変数たち-----
 
     private:
 

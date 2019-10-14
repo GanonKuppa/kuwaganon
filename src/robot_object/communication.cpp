@@ -497,7 +497,7 @@ void packData(uint8_t *buf) {
     set2ByteVal(buf, 80, (uint16_t)m.trajCommander.getMotionType());
     set2ByteVal(buf, 82, (uint16_t)m.trajCommander.getTurnType());
     set2ByteVal(buf, 84, m.trajCommander.getTrajHash());
-    set2ByteVal(buf, 86, (uint16_t)0);
+    set2ByteVal(buf, 86, m.trajCommander.ang_a, 1.0);
     set2ByteVal(buf, 88, m.coor.x);
     set2ByteVal(buf, 90, m.coor.y);
 

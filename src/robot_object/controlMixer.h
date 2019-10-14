@@ -226,20 +226,24 @@ namespace umouse {
             v_back_emf_FF = pt.transBackEmfDuty(target_trans_v)(0);
             a_acc_FF = pt.transAccDuty(target_trans_a)(0);
             v_fric_FF = pt.transFrictionCompensationDuty(target_trans_v)(0);
-
+/*
             duty_v_FF += pt.transAccDuty(target_trans_a);
             duty_v_FF += pt.transBackEmfDuty(target_trans_v);
             duty_v_FF += pt.transFrictionCompensationDuty(target_trans_v);
+*/
+            duty_v_FF += pt.transFFWithParamDuty(target_trans_v, target_trans_a);
             if(pm.trans_v_FF_enable == true) duty += duty_v_FF;
 
             Eigen::Vector2f duty_ang_v_FF(0.0f, 0.0f);
             ang_v_back_emf_FF = pt.rotBackEmfDuty(target_rot_v)(0);
             ang_a_acc_FF = pt.rotAccDuty(target_rot_a)(0);
             ang_v_fric_FF = pt.rotFrictionCompensationDuty(target_rot_v)(0);
-
+/*
             duty_ang_v_FF += pt.rotAccDuty(target_rot_a);
             duty_ang_v_FF += pt.rotBackEmfDuty(target_rot_v);
             duty_ang_v_FF += pt.rotFrictionCompensationDuty(target_rot_v);
+*/
+            duty_ang_v_FF += pt.rotFFWithParamDuty(target_rot_v, target_rot_a);
             if(pm.rot_v_FF_enable == true) duty += duty_ang_v_FF;
 
             float voltage = BatVoltageMonitor::getInstance().bat_vol;

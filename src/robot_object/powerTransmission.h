@@ -102,6 +102,8 @@ public:
         return duty;
     }
 
+
+
     Eigen::Vector2f transBackEmfDuty(float v){
         Eigen::Vector2f duty;
         ParameterManager &pm = ParameterManager::getInstance();
@@ -168,6 +170,32 @@ public:
         duty(0) = SIGN(v) * (pm.trans_friction_coef * v + pm.trans_friction_offset) * 4.2f / Vcc;
         duty(1) = SIGN(v) * (pm.trans_friction_coef * v + pm.trans_friction_offset) * 4.2f / Vcc;
         return duty;
+    }
+
+
+    Eigen::Vector2f transFFWithParamDuty(float v, float a){
+        Eigen::Vector2f duty_v;
+        Eigen::Vector2f duty_a;
+        float Vcc = getVoltage();
+        ParameterManager &pm = ParameterManager::getInstance();
+        duty_v(0) = SIGN(v) * (pm.ff_v_coef * ABS(v) + pm.ff_v_offset) / Vcc;
+        duty_v(1) = SIGN(v) * (pm.ff_v_coef * ABS(v) + pm.ff_v_offset) / Vcc;
+        duty_a(0) = SIGN(a) * (pm.ff_a_coef * ABS(a) + pm.ff_a_offset) / Vcc;
+        duty_a(1) = SIGN(a) * (pm.ff_a_coef * ABS(a) + pm.ff_a_offset) / Vcc;
+        return duty_v + duty_a;
+    }
+
+
+    Eigen::Vector2f rotFFWithParamDuty(float rot_v, float rot_a){
+        Eigen::Vector2f duty_rot_v;
+        Eigen::Vector2f duty_rot_a;
+        float Vcc = getVoltage();
+        ParameterManager &pm = ParameterManager::getInstance();
+        duty_rot_v(0) = - SIGN(rot_v) * (pm.ff_rot_v_coef * ABS(rot_v) + pm.ff_rot_v_offset) / Vcc;
+        duty_rot_v(1) =   SIGN(rot_v) * (pm.ff_rot_v_coef * ABS(rot_v) + pm.ff_rot_v_offset) / Vcc;
+        duty_rot_a(0) = - SIGN(rot_a) * (pm.ff_rot_a_coef * ABS(rot_a) + pm.ff_rot_a_offset) / Vcc;
+        duty_rot_a(1) =   SIGN(rot_a) * (pm.ff_rot_a_coef * ABS(rot_a) + pm.ff_rot_a_offset) / Vcc;
+        return duty_rot_v + duty_rot_a;
     }
 
 

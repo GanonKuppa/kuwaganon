@@ -21,6 +21,7 @@ public:
     float a;
     float ang;
     float ang_v;
+    float ang_a;
     float x_dd;
     float y_dd;
 
@@ -33,6 +34,7 @@ public:
         y = 0.09f/2.0f;
         ang = 90.0f;
         ang_v = 0.0f;
+        ang_a = 0.0f;
         v = 0.0f;
         a = 0.0f;
         x_dd = 0.0f;
@@ -75,6 +77,7 @@ public:
             y = trajQueue.front()->y;
             ang = trajQueue.front()->ang;
             ang_v = trajQueue.front()->ang_v;
+            ang_a = trajQueue.front()->ang_a;
             v = trajQueue.front()->v;
             a = trajQueue.front()->a;
             x_dd = trajQueue.front()->x_dd;
