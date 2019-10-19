@@ -104,6 +104,26 @@ def spinturn_traj_cmd(client_, ang, ang_v, ang_a):
     cmd_array[4] = checksum
     client_.publish("cmd", bytearray(cmd_array))
 
+def steady_state_circular_traj_cmd(client_, ang, ang_v, v):
+    cmd_array = [99,109,100,0,0,0,0,0,0,0,0,0,0,0,0,0]    
+    cmd_array[3] = 104 # id
+
+    ang_int = int(ang * 1)
+    cmd_array[5] = ang_int & 0x00FF
+    cmd_array[6] = (ang_int >> 8) & 0x00FF
+
+    ang_v_int = int(ang_v * 1)
+    cmd_array[7] = ang_v_int & 0x00FF
+    cmd_array[8] = (ang_v_int >> 8) & 0x00FF
+
+    v_int = int(v * 1000)
+    cmd_array[9] = v_int & 0x00FF
+    cmd_array[10] = (v_int >> 8) & 0x00FF
+
+    checksum = sum(cmd_array[5:]) % 256
+
+    cmd_array[4] = checksum
+    client_.publish("cmd", bytearray(cmd_array))
 
 
 def on_message(client, userdata, msg):    
@@ -129,10 +149,8 @@ def on_message(client, userdata, msg):
         alpha = parse_float(msg.payload[157], msg.payload[156], 2.0) * 3.14159265 / 180.0
         #print("%f, %f, %f, %f, %f, %f" % (V_L, V_R, v, a, target_v, target_a))
 
-        if (not (-0.01 < V_L < 0.01) or not (-0.01 < V_R < 0.01) ) and \
-           ( -0.01 < target_ang_a < 0.01) and \
-           ((traj_type == 4)):
-            output_list.append("%f, %f, %f, %f, %f, %f\n" % (V_L, V_R, v, a, target_ang_v, target_ang_a))
+#        if (not (-0.01 < V_L < 0.01) or not (-0.01 < V_R < 0.01) ):
+#            output_list.append("%f, %f, %f, %f, %f, %f\n" % (V_L, V_R, v, a, target_ang_v, target_ang_a))
 
 
 
@@ -191,8 +209,8 @@ def main_trans():
         
         if stop_count > 20:
             break
-    with open(save_file_name, "w") as f:
-        f.writelines(output_list)
+#    with open(save_file_name, "w") as f:
+#        f.writelines(output_list)
         
 def main_rot():
     # コンフィグファイルの読み込み
@@ -206,11 +224,16 @@ def main_rot():
     ang_a = 1200.0
     stop_time = 0.3
     save_file_name = "rot_measure.csv"
+    r = 0.175
+
     
-    for ele in range(0,40):
-        spinturn_traj_cmd(client, ang, ang_v_max, ang_a)
+    for ele in range(0,6):
+        # spinturn_traj_cmd(client, ang, ang_v_max, ang_a)
+        v = r * ang_v_max * 3.14159265 / 180.0
+        print(v,ang_v_max)
+        steady_state_circular_traj_cmd(client, ang, ang_v_max, v)
         stop_traj_cmd(client, stop_time)
-        ang_v_max = ang_v_max + 90.0
+        ang_v_max = ang_v_max + 45.0
 
     time_count = 0
     output_list_len = 0
@@ -235,4 +258,4 @@ def main_rot():
 
 
 if __name__ == "__main__":
-    main_rot()
+    main_trans()

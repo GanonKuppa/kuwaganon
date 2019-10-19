@@ -94,6 +94,20 @@ void id_103_exec(uint8_t* buf){
     m.trajCommander.push(std::move(traj2));
 }
 
+// id:104 CurveTrajectory挿入
+void id_104_exec(uint8_t* buf){
+    uint8_t sum = calcCheckSum(buf, 5, 15);
+    if(sum != buf[4]) return;
+    float ang = parseFloat(buf[5], buf[6], 1.0f);    
+    float ang_v = parseFloat(buf[7], buf[8], 1.0f);
+    float v = parseFloat(buf[9], buf[10], 1000.0f);
+    UMouse &m = UMouse::getInstance();
+    auto traj = SteadyStateCircularTrajectory::create(ang, ang_v, v);
+
+    m.trajCommander.push(std::move(traj));
+}
+
+
 //id:251 パラメータ書換
 void id_251_exec(uint8_t* buf){
     ParameterManager &pm = ParameterManager::getInstance();

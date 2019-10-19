@@ -140,7 +140,9 @@ namespace umouse {
                 (WallSensor::getInstance().isRight_for_ctrl() ||
                  WallSensor::getInstance().isLeft_for_ctrl()) &&
                  traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER &&
-                 pm.wall_PIDF_enable == true){
+                 pm.wall_PIDF_enable == true 
+                 //fabs(esti.calcWallCenterOffset()) > 0.001
+                 ){
                 
                 wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall);                
                 target_rot_x += wall_pidf.getControlVal();
@@ -243,7 +245,11 @@ namespace umouse {
             duty_ang_v_FF += pt.rotBackEmfDuty(target_rot_v);
             duty_ang_v_FF += pt.rotFrictionCompensationDuty(target_rot_v);
 */
-            duty_ang_v_FF += pt.rotFFWithParamDuty(target_rot_v, target_rot_a);
+            if(ABS(target_rot_v) < 45.0f){
+
+            }else{
+                duty_ang_v_FF += pt.rotFFWithParamDuty(target_rot_v, target_rot_a);
+            }
             if(pm.rot_v_FF_enable == true) duty += duty_ang_v_FF;
 
             float voltage = BatVoltageMonitor::getInstance().bat_vol;

@@ -15,6 +15,7 @@
 #include "adis16470.h"
 #include "wallsensor.h"
 #include "mouse.h"
+#include "parameterManager.h"
 
 namespace umouse {
 
@@ -158,15 +159,31 @@ namespace umouse {
             PseudoDialL &dial_L = PseudoDialL::getInstance();
             FcLed &fcled = FcLed::getInstance();
             uint8_t mode = dial_L.getDialPosition();
+            UMouse &m = UMouse::getInstance(); 
+            ParameterManager &pm = ParameterManager::getInstance();
+            m.maze.makeFastestMap(0, 0);
+            bool ableGoal = m.maze.isExistPath(pm.goal_x, pm.goal_y);
 
-            if (mode == 0) fcled.turn(0, 0, 0); //BLACK
-            else if (mode == 1) fcled.turn(1, 0, 0);//RED
-            else if (mode == 2) fcled.turn(0, 1, 0);//GREEN
-            else if (mode == 3) fcled.turn(1, 1, 0);//YELLOW
-            else if (mode == 4) fcled.turn(0, 0, 1);//BLUE
-            else if (mode == 5) fcled.turn(1, 0, 1);//MAGENTA
-            else if (mode == 6) fcled.turn(0, 1, 1);//CYAN
-            else if (mode == 7) fcled.turn(1, 1, 1);//WHITE
+            if(ableGoal){
+                if (mode == 0) fcled.turn(0, 0, 0); //BLACK
+                else if (mode == 1) fcled.flash(1, 0, 0, 400, 100);//RED
+                else if (mode == 2) fcled.flash(0, 1, 0, 400, 100);//GREEN
+                else if (mode == 3) fcled.flash(1, 1, 0, 400, 100);//YELLOW
+                else if (mode == 4) fcled.flash(0, 0, 1, 400, 100);//BLUE
+                else if (mode == 5) fcled.flash(1, 0, 1, 400, 100);//MAGENTA
+                else if (mode == 6) fcled.flash(0, 1, 1, 400, 100);//CYAN
+                else if (mode == 7) fcled.flash(1, 1, 1, 400, 100);//WHITE
+            }
+            else{
+                if (mode == 0) fcled.turn(0, 0, 0); //BLACK
+                else if (mode == 1) fcled.turn(1, 0, 0);//RED
+                else if (mode == 2) fcled.turn(0, 1, 0);//GREEN
+                else if (mode == 3) fcled.turn(1, 1, 0);//YELLOW
+                else if (mode == 4) fcled.turn(0, 0, 1);//BLUE
+                else if (mode == 5) fcled.turn(1, 0, 1);//MAGENTA
+                else if (mode == 6) fcled.turn(0, 1, 1);//CYAN
+                else if (mode == 7) fcled.turn(1, 1, 1);//WHITE
+            }
         }
 
         EActivityColor modeNum2Color(uint8_t mode) {

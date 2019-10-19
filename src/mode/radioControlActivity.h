@@ -30,8 +30,8 @@ protected:
         }
         else limit = 0.65;
 
-        float l_duty = constrain(gamepad.L3D_y/128.0,-limit, limit);
-        float r_duty = constrain(gamepad.R3D_y/128.0,-limit, limit);
+        float l_duty = constrain(gamepad.R3D_y/128.0 + gamepad.R3D_x/128.0  ,-limit, limit);
+        float r_duty = constrain(gamepad.R3D_y/128.0 - gamepad.R3D_x/128.0,-limit, limit);
 
         if(m.trajCommander.empty() == true){
             pt.setDuty(l_duty, r_duty);

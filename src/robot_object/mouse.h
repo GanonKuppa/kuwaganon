@@ -193,7 +193,7 @@ public:
         trajCommander.update(posEsti);
         
         if(!trajCommander.empty() && trajCommander.getMotionType() == EMotionType::DIRECT_DUTY_SET){
-                direct_duty_set_enable = true;
+            direct_duty_set_enable = true;
         }else{
             direct_duty_set_enable = false;
         }
@@ -220,7 +220,9 @@ public:
             }
         }
         if( imu.isUpsideDown() == true ||
-            (ctrlMixer.isOutOfControl() == true && (ABS(pt.getDuty_R()) > 0.1f || ABS(pt.getDuty_L()) > 0.1f))
+            (ctrlMixer.isOutOfControl() == true && (ABS(pt.getDuty_R()) > 0.1f || ABS(pt.getDuty_L()) > 0.1f )) ||
+            (ABS(ctrlMixer.ang_pidf.e_k0) > 30.0f )
+
         ) {
             printfAsync("◇◇◇◇ OutOfControl!\n");
             printfAsync("motion_type: %d\n", trajCommander.getTraj().motion_type);

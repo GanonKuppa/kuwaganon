@@ -49,7 +49,7 @@ registration<float>(32, trans_v_slalom_D);
 registration<float>(33, trans_v_slalom_F);
 registration<float>(34, ff_rot_v_coef);
 registration<float>(35, ff_rot_v_offset);
-registration<float>(36, ff_rot_v_coef);
+registration<float>(36, ff_rot_a_coef);
 registration<float>(37, ff_rot_a_offset);
 registration<float>(38, rot_friction_coef);
 registration<float>(39, rot_friction_offset);

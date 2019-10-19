@@ -15,7 +15,8 @@ enum class turn_type_e {
     TURN_D2S_45,
     TURN_D2S_135,
     D_STRAIGHT,
-    STOP
+    STOP,
+    CIRCULAR
 };
 
 enum class turn_dir_e {

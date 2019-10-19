@@ -83,6 +83,12 @@ namespace umouse {
                 turnOffAllLed();
             }
 
+            float right_err = ABS(right() - center_r());
+            float left_err = ABS(left() - center_l());
+            if(right_err < 50 || left_err < 50) in_wall_center_time += DELTA_T;
+            else in_wall_center_time = 0.0f;
+
+
             if(isAhead() == true) ahead_on_time += DELTA_T;
             else ahead_on_time = 0.0f;
 
@@ -198,18 +204,17 @@ namespace umouse {
         }
 
         bool isOnWallCenter() {
-            float right_err = ABS(right() - center_r());
-            float left_err = ABS(left() - center_l());
-            if(right_err < 50 || left_err < 50) in_wall_center_time+= DELTA_T;
-            else in_wall_center_time = 0.0f;
-
-            if(in_wall_center_time > 0.2) {
-                if(in_wall_center_time > 0.21) in_wall_center_time = 0.0f;
+            if(in_wall_center_time > 0.1) {
                 return true;
             }
             else return false;
 
-        };
+        }
+
+        float getOnWallCenterTime(){
+            return in_wall_center_time;
+        }
+
         void setWallCenterVal() {
             ParameterManager &pm = ParameterManager::getInstance();
             pm.wall_center_r = right();

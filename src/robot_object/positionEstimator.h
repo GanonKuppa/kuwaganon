@@ -7,6 +7,7 @@
 #include "communication.h"
 #include "parameterManager.h"
 #include "wallSensor.h"
+#include "fcled.h"
 
 namespace umouse
 {
@@ -210,6 +211,7 @@ public:
         cornerRCorrection(ws);
         diagCornerRCorrection(ws);
         diagCornerLCorrection(ws);
+        //aheadWallCorrection(ws, motion_type);
         //contactWallCorrection(motion_type, ws);
     }
 
@@ -259,6 +261,73 @@ public:
         }
         else{
             return 0.0f;
+        }
+    }
+
+    float calcAheadWallDist(WallSensor &ws){        
+        int16_t ahead_l = ws.ahead_l();
+        int16_t ahead_r = ws.ahead_r();
+        float dist = 0.0;
+        if(ws.isAhead() && !ws.isLeft()){
+            dist = hornerMethod(ahead_l, WALL_LA_POLY6_CONSTANT, 7);
+        }
+        else if(ws.isAhead() && !ws.isRight()){
+            dist = hornerMethod(ahead_r, WALL_RA_POLY6_CONSTANT, 7);
+        }
+        else{
+            dist = (hornerMethod(ahead_l, WALL_LA_POLY6_CONSTANT, 7) + 
+                    hornerMethod(ahead_r, WALL_RA_POLY6_CONSTANT, 7)) * 0.5;
+        }
+        return constrainL(dist, 0.045);
+    }
+
+    void aheadWallCorrection(WallSensor &ws, EMotionType motion_type){
+        float gain = 0.8;
+        float ang_ = getAng();
+        float x_ = getX();
+        float y_ = getY();
+        float wall_dist = calcAheadWallDist(ws);
+        bool good_posture = (ang >= 355.0 || ang < 5.0)  || 
+            (ang_ >= 85.0 && ang_ < 95.0) ||
+            (ang_ >= 175.0 && ang_ < 185.0) ||
+            (ang_ >= 265.0 && ang_ < 275.0);
+
+        bool is_straight = (motion_type == EMotionType::STRAIGHT || 
+                            motion_type == EMotionType::STRAIGHT_WALL_CENTER);
+
+        if( !good_posture ||
+            !(ws.isAhead()) ||
+             (wall_dist > 0.135 - 0.015) ||
+             (ws.isLeft() && ws.isRight()) ||
+            !(is_straight)
+        ){
+            //FcLed::getInstance().turn(1,0,1);
+            return;
+        }
+        //FcLed::getInstance().turn(1,0,0);
+        if(ang_ >= 315.0 || ang_ < 45.0) {
+            uint8_t x_coor = (uint8_t)((x_ + 0.045) / 0.09f);
+            float nearest_wall_x = (x_coor + 1) * 0.09;
+            float x__ = nearest_wall_x - wall_dist;
+            x = x_ * (1.0 - gain) + x__ * gain;
+        }
+        else if(ang_ >= 45.0 && ang_ < 135.0) {
+            uint8_t y_coor = (uint8_t)((y_ + 0.045) / 0.09f);
+            float nearest_wall_y = (y_coor + 1) * 0.09;
+            float y__ = nearest_wall_y - wall_dist;
+            y = y_ * (1.0 - gain) + y__ * gain;
+        }
+        else if(ang_ >= 135.0 && ang_ < 225.0) {
+            uint8_t x_coor = (uint8_t)((x_ + 0.045) / 0.09f);
+            float nearest_wall_x = (x_coor - 1) * 0.09;
+            float x__ = nearest_wall_x + wall_dist;
+            x = x_ * (1.0 - gain) + x__ * gain;
+        }
+        else if(ang_ >= 225.0 && ang_ < 315.0) {
+            uint8_t y_coor = (uint8_t)((y_ + 0.045) / 0.09f);
+            float nearest_wall_y = (y_coor - 1) * 0.09;
+            float y__ = nearest_wall_y + wall_dist;
+            y = y_ * (1.0 - gain) + y__ * gain;
         }
     }
 
@@ -365,25 +434,22 @@ private:
         if(ws.isOnWallCenter() == true && ws.isAhead() == false && v > 0.1f && v < 0.34f && fabsf(ang_v) < 50.0f) {            
 
             if(ang >= 315.0 || ang < 45.0) {                    
-                //ang = 0.0f;
-                y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;
-                SE_POSITION_CHANGE();
+                //if(ws.getOnWallCenterTime() > 0.3) ang = 0.0f;
+                y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;                
             }
             else if(ang >= 45.0 && ang < 135.0) {
-                //ang = 90.0f;
-                x = (uint8_t)(x / 0.09) * 0.09 + 0.09/2.0;
-                SE_POSITION_CHANGE();
+                //if(ws.getOnWallCenterTime() > 0.4) ang = 90.0f;
+                x = (uint8_t)(x / 0.09) * 0.09 + 0.09/2.0;                
             }
             else if(ang >= 135.0 && ang < 225.0) {
-                //ang = 180.0f;
+                //if(ws.getOnWallCenterTime() > 0.3) ang = 180.0f;
                 y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;
-                SE_POSITION_CHANGE();
             }
             else if(ang >= 225.0 && ang < 315.0) {
-                //ang = 270.0f;
-                x = (uint8_t)(x / 0.09) * 0.09 + 0.09/2.0;
-                SE_POSITION_CHANGE();
+                //if(ws.getOnWallCenterTime() > 0.3) ang = 270.0f;
+                x = (uint8_t)(x / 0.09) * 0.09 + 0.09/2.0;                
             }
+            if(ws.getOnWallCenterTime() > 0.1 && ws.getOnWallCenterTime() < 0.11)SE_POSITION_CHANGE();
         }
     }
 
@@ -583,6 +649,40 @@ private:
     double deg2rad(double deg){
         return PI * deg/180.0;
     }
+
+    //y = 2E-21x6 - 3E-17x5 + 2E-13x4 - 4E-10x3 + 5E-07x2 - 0.0003x + 0.1612                  
+    const float WALL_LA_POLY6_CONSTANT[7] =
+    {
+        0.000000000000000000002496979705f, 
+        -0.000000000000000031343123812308f, 
+        0.000000000000152350727274190000f,
+        -0.000000000364670883847464000000f, 
+        0.000000455240592245447000000000f, 
+        -0.000300062017225004000000000000f, 
+        0.161200042128944000000000000000f 
+    };
+
+
+    // ra
+    //y = 3E-21x6 - 4E-17x5 + 2E-13x4 - 4E-10x3 + 5E-07x2 - 0.0003x + 0.1679
+    const float WALL_RA_POLY6_CONSTANT[7] =
+    {
+        0.000000000000000000003120871021f,
+        -0.000000000000000037347282693124f,
+        0.000000000000173869092712112000f,
+        -0.000000000401311698062999000000f,
+        0.000000488601588712184000000000f,
+        -0.000320169565262498000000000000f,
+        0.167931370815903000000000000000f
+    };
+
+    float hornerMethod(float x, const float a[], int n){
+        float f = a[0];
+        for (int i = 1; i < n; i++)
+            f = f*x + a[i];
+        return f;
+    }
+
 
 };
 

@@ -119,9 +119,10 @@ void fetchCommand() {
             else if(recieveBuff[i+3] == 101) id_101_exec(&recieveBuff[i]);
             else if (recieveBuff[i+3] == 102) id_102_exec(&recieveBuff[i]);
             else if (recieveBuff[i+3] == 103) id_103_exec(&recieveBuff[i]);
+            else if (recieveBuff[i+3] == 104) id_104_exec(&recieveBuff[i]);
             else if(recieveBuff[i+3] == 251) id_251_exec(&recieveBuff[i]);
             else if(recieveBuff[i+3] == 254) id_254_exec(&recieveBuff[i]);
-            else if (recieveBuff[i+3] == 255) id_254_exec(&recieveBuff[i]);
+            else if (recieveBuff[i+3] == 255) id_255_exec(&recieveBuff[i]);
 
             last_cmd_index = i;
             break;

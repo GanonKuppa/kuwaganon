@@ -142,7 +142,7 @@ namespace umouse {
 
                     m.maze.updateWall(x_next, y_next, m.direction, ws);
                     m.maze.makeSearchMap(desti_coor.x, desti_coor.y);
-                    direction_e dest_dir_next = m.maze.getMinDirection(x_next, y_next, m.direction);
+                    direction_e dest_dir_next = m.maze.getSearchDirection(x_next, y_next, m.direction);
                     int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
 
                     printfAsync("XXXXX read wall. rot_times=%d\n",rot_times);
@@ -259,27 +259,42 @@ namespace umouse {
 
                 if (ws.isAhead() == true) {
                     std::function< void(void) > update_func = [&m, &ws]() {
-                        if(ws.getContactWallTime() > 0.1f){
-                            PowerTransmission::getInstance().setDuty(0.25, 0.25);
-                        }
-                        else if(ws.getContactWallTime() > 0.2f){
-                            PowerTransmission::getInstance().setDuty(0.15, 0.15);
+                        if(m.posEsti.getV() > 0.05){
+                            PowerTransmission::getInstance().setDuty(0.35, 0.35);
                         }
                         else{
-                            PowerTransmission::getInstance().setDuty(0.35, 0.35);
+                            PowerTransmission::getInstance().setDuty(0.45, 0.45);
                         }
                         m.posEsti.setX(m.trajCommander.x);
                         m.posEsti.setY(m.trajCommander.y);
+                        //m.posEsti.setAng(m.trajCommander.ang);
                         m.ctrlMixer.reset();
                     };
 
+                    std::function< void(void) > update_func2 = [&m, &ws]() {
+                        if(ws.isAhead() == true){
+                            if(m.posEsti.getV() > 0.05){
+                                PowerTransmission::getInstance().setDuty(0.35, 0.35);
+                            }
+                            else{
+                                PowerTransmission::getInstance().setDuty(0.45, 0.45);
+                            }
+                        }
+                        m.posEsti.setX(m.trajCommander.x);
+                        m.posEsti.setY(m.trajCommander.y);
+                        //m.posEsti.setAng(m.trajCommander.ang);
+                        m.ctrlMixer.reset();
+                    };
+
+
                     auto traj0 = StraightTrajectory::create(0.035f, v, v, 0.1f, a, a);
                     auto traj1 = StraightTrajectory::create(0.01f, 0.1f, 0.1f, 0.1f, a, a);
-                    auto traj2 = StopTrajectory::create(0.4f);
+                    auto traj2 = StopTrajectory::create(0.05f);
                     auto traj3 = UpdateInjectionTrajectory::create(0.35f, update_func);
                     auto traj4 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj5 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj6 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
+                    auto traj5 = UpdateInjectionTrajectory::create(0.35f, update_func2);
+                    auto traj6 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj7 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
                     m.trajCommander.push(std::move(traj0));
                     m.trajCommander.push(std::move(traj1));
                     m.trajCommander.push(std::move(traj2));
@@ -287,6 +302,7 @@ namespace umouse {
                     m.trajCommander.push(std::move(traj4));
                     m.trajCommander.push(std::move(traj5));
                     m.trajCommander.push(std::move(traj6));
+                    m.trajCommander.push(std::move(traj7));
                     SEG();
                 }
                 else {
@@ -320,12 +336,14 @@ namespace umouse {
 
                 if (ws.isAhead() == true) {
                     std::function< void(void) > update_func = [&m, &ws]() {
-                        if(ws.getContactWallTime() > 0.1f){
-                            PowerTransmission::getInstance().setDuty(0.4, 0.4);
+                        if(m.posEsti.getV() > 0.05){
+                            PowerTransmission::getInstance().setDuty(0.35, 0.35);
                         }
                         else{
-                            PowerTransmission::getInstance().setDuty(0.5, 0.5);
+                            PowerTransmission::getInstance().setDuty(0.45, 0.45);
                         }
+
+
                         m.posEsti.setX(m.trajCommander.x);
                         m.posEsti.setY(m.trajCommander.y);
                         m.ctrlMixer.reset();

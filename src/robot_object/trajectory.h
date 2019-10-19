@@ -676,6 +676,61 @@ private:
 
 };
 
+class SteadyStateCircularTrajectory : public BaseTrajectory
+{
+public:
+    SteadyStateCircularTrajectory(float target_cumulative_ang_, float abs_ang_v, float v)
+    {
+        float x_ = 0.0;
+        float y_ = 0.0;
+        float ang_ = 0.0;
+        init(x_, y_, v, 0.0f, ang_, abs_ang_v, 0.0f);
+        motion_type = EMotionType::CURVE;
+        turn_type  = turn_type_e::CIRCULAR;
+        turn_dir = (turn_dir_e)SIGN(target_cumulative_ang_);
+        target_cumulative_ang = target_cumulative_ang_;
+    }
+
+    static std::unique_ptr<BaseTrajectory> create(float target_cumulative_ang_, float abs_ang_v, float v){
+        return std::unique_ptr<BaseTrajectory>(new SteadyStateCircularTrajectory(target_cumulative_ang_, abs_ang_v, v)  );
+    }
+
+    virtual float getEndX(){
+        return x_0;
+    }
+
+    virtual float getEndY(){
+        return y_0;
+    }
+
+    virtual float getEndAng(){
+        return fmod(ang_0 + target_cumulative_ang + 360.0f, 360.0f);        
+    }
+
+    virtual void update()
+    {
+        BaseTrajectory::update();
+    }
+
+    virtual bool isEnd()
+    {
+
+        if (ABS(cumulative_ang) >= ABS(target_cumulative_ang)){
+            x = getEndX();
+            y = getEndY();
+            ang = getEndAng();
+            return true;
+        }            
+        else
+            return false;
+    }
+
+private:
+    float target_cumulative_ang;
+    float abs_ang_a;
+    float abs_ang_v_max;
+    float ang_v_end;
+};
 
 
 
