@@ -153,7 +153,124 @@ void sendPeriodicMsg() {
 
 //迷路の壁情報を送る
 //32 x 32の迷路データを8つに分割
-void packDataMaze(uint8_t part_num, uint8_t *buf) {
+void packDataMaze8(uint8_t part_num, uint8_t *buf) {
+    buf[0] = part_num;
+    UMouse &mouse = UMouse::getInstance();
+    uint8_t ind = 1;
+
+    if (part_num == 0) {
+        for (int i = 0; i < 8; i++) {
+            buf[ind + 0 + i * 4] = ((mouse.maze.walls_vertical[i] & 0x000000ff)
+                    >> 0);
+            buf[ind + 1 + i * 4] = ((mouse.maze.walls_vertical[i] & 0x0000ff00)
+                    >> 8);
+            buf[ind + 2 + i * 4] = ((mouse.maze.walls_vertical[i] & 0x00ff0000)
+                    >> 16);
+            buf[ind + 3 + i * 4] = ((mouse.maze.walls_vertical[i] & 0xff000000)
+                    >> 24);
+        }
+    }
+
+    if (part_num == 1) {
+        for (int i = 8; i < 16; i++) {
+            buf[ind + 0 + (i-8) * 4] = ((mouse.maze.walls_vertical[i] & 0x000000ff)
+                    >> 0);
+            buf[ind + 1 + (i-8) * 4] = ((mouse.maze.walls_vertical[i] & 0x0000ff00)
+                    >> 8);
+            buf[ind + 2 + (i-8) * 4] = ((mouse.maze.walls_vertical[i] & 0x00ff0000)
+                    >> 16);
+            buf[ind + 3 + (i-8) * 4] = ((mouse.maze.walls_vertical[i] & 0xff000000)
+                    >> 24);
+        }
+    }
+
+
+    if (part_num == 2) {
+        for (int i = 0; i < 8; i++) {
+            buf[ind + 0 + i * 4] = ((mouse.maze.walls_vertical[i + 16]
+                    & 0x000000ff) >> 0);
+            buf[ind + 1 + i * 4] = ((mouse.maze.walls_vertical[i + 16]
+                    & 0x0000ff00) >> 8);
+            buf[ind + 2 + i * 4] = ((mouse.maze.walls_vertical[i + 16]
+                    & 0x00ff0000) >> 16);
+            buf[ind + 3 + i * 4] = ((mouse.maze.walls_vertical[i + 16]
+                    & 0xff000000) >> 24);
+        }
+    }
+
+    if (part_num == 3) {
+        for (int i = 8; i < 15; i++) {
+            buf[ind + 0 + (i-8) * 4] = ((mouse.maze.walls_vertical[i + 16]
+                    & 0x000000ff) >> 0);
+            buf[ind + 1 + (i-8) * 4] = ((mouse.maze.walls_vertical[i + 16]
+                    & 0x0000ff00) >> 8);
+            buf[ind + 2 + (i-8) * 4] = ((mouse.maze.walls_vertical[i + 16]
+                    & 0x00ff0000) >> 16);
+            buf[ind + 3 + (i-8) * 4] = ((mouse.maze.walls_vertical[i + 16]
+                    & 0xff000000) >> 24);
+        }
+    }
+
+
+    if (part_num == 4) {
+        for (int i = 0; i < 8; i++) {
+            buf[ind + 0 + i * 4] =
+                    ((mouse.maze.walls_horizontal[i] & 0x000000ff) >> 0);
+            buf[ind + 1 + i * 4] =
+                    ((mouse.maze.walls_horizontal[i] & 0x0000ff00) >> 8);
+            buf[ind + 2 + i * 4] =
+                    ((mouse.maze.walls_horizontal[i] & 0x00ff0000) >> 16);
+            buf[ind + 3 + i * 4] =
+                    ((mouse.maze.walls_horizontal[i] & 0xff000000) >> 24);
+        }
+    }
+
+    if (part_num == 5) {
+        for (int i = 8; i < 16; i++) {
+            buf[ind + 0 + (i-8) * 4] =
+                    ((mouse.maze.walls_horizontal[i] & 0x000000ff) >> 0);
+            buf[ind + 1 + (i-8) * 4] =
+                    ((mouse.maze.walls_horizontal[i] & 0x0000ff00) >> 8);
+            buf[ind + 2 + (i-8) * 4] =
+                    ((mouse.maze.walls_horizontal[i] & 0x00ff0000) >> 16);
+            buf[ind + 3 + (i-8) * 4] =
+                    ((mouse.maze.walls_horizontal[i] & 0xff000000) >> 24);
+        }
+    }
+
+
+    if (part_num == 6) {
+        for (int i = 0; i < 8; i++) {
+            buf[ind + 0 + i * 4] = ((mouse.maze.walls_horizontal[i + 16]
+                    & 0x000000ff) >> 0);
+            buf[ind + 1 + i * 4] = ((mouse.maze.walls_horizontal[i + 16]
+                    & 0x0000ff00) >> 8);
+            buf[ind + 2 + i * 4] = ((mouse.maze.walls_horizontal[i + 16]
+                    & 0x00ff0000) >> 16);
+            buf[ind + 3 + i * 4] = ((mouse.maze.walls_horizontal[i + 16]
+                    & 0xff000000) >> 24);
+        }
+    }
+
+
+    if (part_num == 7) {
+        for (int i = 8; i < 15; i++) {
+            buf[ind + 0 + (i-8) * 4] = ((mouse.maze.walls_horizontal[i + 16]
+                    & 0x000000ff) >> 0);
+            buf[ind + 1 + (i-8) * 4] = ((mouse.maze.walls_horizontal[i + 16]
+                    & 0x0000ff00) >> 8);
+            buf[ind + 2 + (i-8) * 4] = ((mouse.maze.walls_horizontal[i + 16]
+                    & 0x00ff0000) >> 16);
+            buf[ind + 3 + (i-8) * 4] = ((mouse.maze.walls_horizontal[i + 16]
+                    & 0xff000000) >> 24);
+        }
+    }
+
+
+}
+
+//32 x 32の迷路データを4つに分割
+void packDataMaze4(uint8_t part_num, uint8_t *buf) {
     buf[0] = part_num;
     UMouse &mouse = UMouse::getInstance();
     uint8_t ind = 1;
@@ -549,13 +666,13 @@ void packData(uint8_t *buf) {
 
     //迷路データ
     static uint8_t count = 0;
-    //packDataMaze(count, &buf[160]);
+    packDataMaze8(count, &buf[160]);
     count++;
     if (count == 8) count = 0;
 
     //パラメータマネージャのデータ
     static uint8_t count_paramMng = 0;
-    packDataParamMng(count_paramMng, &buf[192]);
+    packDataParamMng(count_paramMng, &buf[193]);
     count_paramMng++;
     if(count_paramMng == PARAM_MNG_PART_NUM) count_paramMng = 0;
 
