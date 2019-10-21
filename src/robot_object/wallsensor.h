@@ -121,7 +121,10 @@ namespace umouse {
             int16_t threshold_ar = pm.wall_threshold_ahead_r;
             int16_t threshold_al = pm.wall_threshold_ahead_l;
             if (ahead_r_q.at(0) > threshold_ar ||
-                    ahead_l_q.at(0) > threshold_al ) return true;
+                    ahead_l_q.at(0) > threshold_al ){
+                return true;
+            }
+            //else if( 0.09 < calcAheadWallDist() && calcAheadWallDist() < 0.135 ) return true;
             else return false;
         }
 
@@ -257,6 +260,22 @@ namespace umouse {
             return false;
         }
 
+    float calcAheadWallDist(){        
+        float dist = 0.0;
+        if(isAhead() && !isLeft()){
+            dist = hornerMethod(ahead_l(), WALL_LA_POLY6_CONSTANT, 7);
+        }
+        else if(isAhead() && !isRight()){
+            dist = hornerMethod(ahead_r(), WALL_RA_POLY6_CONSTANT, 7);
+        }
+        else{
+            dist = (hornerMethod(ahead_l(), WALL_LA_POLY6_CONSTANT, 7) +
+                    hornerMethod(ahead_r(), WALL_RA_POLY6_CONSTANT, 7)) * 0.5;
+        }
+        return constrainL(dist, 0.045);
+    }
+
+
     private:
         const uint8_t BUFF_SIZE = 30;
         const uint16_t LED_ON_USEC = 20;
@@ -370,6 +389,42 @@ namespace umouse {
         bool isCorner() {
             return (isCornerL() || isCornerR());
         }
+
+    //y = 2E-21x6 - 3E-17x5 + 2E-13x4 - 4E-10x3 + 5E-07x2 - 0.0003x + 0.1612                  
+    const float WALL_LA_POLY6_CONSTANT[7] =
+    {
+        0.000000000000000000002496979705f, 
+        -0.000000000000000031343123812308f, 
+        0.000000000000152350727274190000f,
+        -0.000000000364670883847464000000f, 
+        0.000000455240592245447000000000f, 
+        -0.000300062017225004000000000000f, 
+        0.161200042128944000000000000000f 
+    };
+
+
+    // ra
+    //y = 3E-21x6 - 4E-17x5 + 2E-13x4 - 4E-10x3 + 5E-07x2 - 0.0003x + 0.1679
+    const float WALL_RA_POLY6_CONSTANT[7] =
+    {
+        0.000000000000000000003120871021f,
+        -0.000000000000000037347282693124f,
+        0.000000000000173869092712112000f,
+        -0.000000000401311698062999000000f,
+        0.000000488601588712184000000000f,
+        -0.000320169565262498000000000000f,
+        0.167931370815903000000000000000f
+    };
+
+    float hornerMethod(float x, const float a[], int n){
+        float f = a[0];
+        for (int i = 1; i < n; i++)
+            f = f*x + a[i];
+        return f;
+    }
+
+
+
 
     };
 

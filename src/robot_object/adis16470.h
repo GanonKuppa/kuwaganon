@@ -74,7 +74,7 @@ public:
         omega_raw[2] = Z_GYRO_OUT;
         omega_raw_32bit[2] = ((Z_GYRO_OUT << 16) + Z_GYRO_LOW);
         omega_ref[2] = pm.gyro2_z_ref;
-        omega_c[2] = (omega_raw_32bit[2] - omega_ref[2]);
+        omega_c[2] = (omega_raw_32bit[2] - (int32_t)omega_ref[2]);
         
 
         float scaler = 0.0f;
@@ -135,7 +135,7 @@ public:
         ParameterManager &pm = ParameterManager::getInstance();
         pm.write<float>(192, (float)ref_z);
 
-        pm.gyro2_z_ref = ref_z;
+        pm.gyro2_z_ref = (float)ref_z;
     }
 
 
