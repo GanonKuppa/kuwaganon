@@ -55,6 +55,7 @@ extern "C" void __main() {
 #include "phaseCounting.h"
 #include "dataFlash.h"
 #include "da.h"
+#include "wdt.h"
 
 //robot_object
 
@@ -182,6 +183,7 @@ void timeInterrupt(void) {
     endTimeuCountIntCMT0();
 
     int_tick_count++;
+    resetWdt();
 }
 
 //-------------メイン関数---------------//
@@ -240,6 +242,9 @@ void periperalInit() {
     umouse::ParameterManager &pm = umouse::ParameterManager::getInstance();
     pm.init();
 
+    //ウォッチドックタイマー
+    initWdt();
+    startWdt();
 }
 
 
