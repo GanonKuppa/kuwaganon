@@ -174,19 +174,32 @@ public:
 
 
     Eigen::Vector2f transFFWithParamDuty(float v, float a){
+        if(- 0.01 < v && v < 0.01){
+            Eigen::Vector2f duty;            
+            duty(0) = 0.0;
+            duty(1) = 0.0;
+            return duty;
+        }
         Eigen::Vector2f duty_v;
         Eigen::Vector2f duty_a;
         float Vcc = getVoltage();
         ParameterManager &pm = ParameterManager::getInstance();
         duty_v(0) = SIGN(v) * (pm.ff_v_coef * ABS(v) + pm.ff_v_offset) / Vcc;
         duty_v(1) = SIGN(v) * (pm.ff_v_coef * ABS(v) + pm.ff_v_offset) / Vcc;
-        duty_a(0) = SIGN(a) * (pm.ff_a_coef * ABS(a) + pm.ff_a_offset) / Vcc;
-        duty_a(1) = SIGN(a) * (pm.ff_a_coef * ABS(a) + pm.ff_a_offset) / Vcc;
+        duty_a(0) =           (pm.ff_a_coef * a + pm.ff_a_offset) / Vcc;
+        duty_a(1) =           (pm.ff_a_coef * a + pm.ff_a_offset) / Vcc;
         return duty_v + duty_a;
     }
 
 
     Eigen::Vector2f rotFFWithParamDuty(float rot_v, float rot_a){
+        if(ABS(rot_v) < 45.0f){
+            Eigen::Vector2f duty;            
+            duty(0) = 0.0;
+            duty(1) = 0.0;
+            return duty;
+        }
+
         Eigen::Vector2f duty_rot_v;
         Eigen::Vector2f duty_rot_a;
         float Vcc = getVoltage();

@@ -517,7 +517,9 @@ public:
             ang_v = 0.0f;
         }
         else if (cumulative_dist < (alp_curve->pre_dist + alp_curve->arc_len)){
+            float ang_v_pre = ang_v;            
             ang_v = float(turn_dir) * alp_curve->getOmega(cumulative_dist, v);
+            ang_a = (ang_v - ang_v_pre) / DELTA_T;
         }
         else{
             ang_a = 0.0f;

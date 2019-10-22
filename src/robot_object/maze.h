@@ -132,6 +132,15 @@ public:
         return wall;
     };
 
+    bool existAWall(uint16_t x, uint16_t y, direction_e dir ){
+        Wall wall = readWall(x, y);    
+        if(dir == direction_e::E) return wall.E && wall.EF;
+        else if(dir == direction_e::N) return wall.N && wall.NF;
+        else if(dir == direction_e::W) return wall.W && wall.WF;
+        else if(dir == direction_e::S) return wall.S && wall.SF;
+        else return false;
+    }
+
     bool existRWall(uint16_t x, uint16_t y, direction_e dir){
         Wall wall = readWall(x, y);    
         if(dir == direction_e::E) return wall.S && wall.SF;

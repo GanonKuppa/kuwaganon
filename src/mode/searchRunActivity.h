@@ -257,13 +257,15 @@ namespace umouse {
                 ParameterManager &pm = ParameterManager::getInstance();
                 rot_times *= SIGN(m.posEsti.calcWallCenterOffset());
 
-                if (ws.isAhead() == true) {
+                if (ws.isAhead()) {
                     std::function< void(void) > update_func = [&m, &ws]() {
-                        if(m.posEsti.getV() > 0.05){
-                            PowerTransmission::getInstance().setDuty(0.35, 0.35);
-                        }
-                        else{
-                            PowerTransmission::getInstance().setDuty(0.45, 0.45);
+                        if(m.maze.existAWall(m.coor.x, m.coor.y, m.direction)){
+                            if(m.posEsti.getV() > 0.05){
+                                PowerTransmission::getInstance().setDuty(0.35, 0.35);
+                            }
+                            else{
+                                PowerTransmission::getInstance().setDuty(0.45, 0.45);
+                            }
                         }
                         m.posEsti.setX(m.trajCommander.x);
                         m.posEsti.setY(m.trajCommander.y);
@@ -272,9 +274,9 @@ namespace umouse {
                     };
 
                     std::function< void(void) > update_func2 = [&m, &ws]() {
-                        if(ws.isAhead() == true){
+                        if(m.maze.existAWall(m.coor.x, m.coor.y, m.direction)){
                             if(m.posEsti.getV() > 0.05){
-                                PowerTransmission::getInstance().setDuty(0.55, 0.55);
+                                PowerTransmission::getInstance().setDuty(0.35, 0.35);
                             }
                             else{
                                 PowerTransmission::getInstance().setDuty(0.45, 0.45);

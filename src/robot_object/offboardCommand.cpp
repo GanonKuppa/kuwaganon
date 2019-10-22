@@ -74,11 +74,11 @@ void id_102_exec(uint8_t* buf){
     m.trajCommander.push(std::move(traj));
 }
 
-// id:102 CurveTrajectory挿入
+// id:103 CurveTrajectory挿入
 void id_103_exec(uint8_t* buf){
     uint8_t sum = calcCheckSum(buf, 5, 15);
     if(sum != buf[4]) return;
-    turn_type_e turn_type = (turn_type_e)parseFloat(buf[5], buf[6], 1.0f);
+    turn_type_e turn_type = (turn_type_e)buf[5];
     turn_dir_e turn_dir;
     if( buf[6] == 1) turn_dir = turn_dir_e(1);
     else if(buf[6] == 128) turn_dir = (turn_dir_e)(-1);
@@ -94,7 +94,7 @@ void id_103_exec(uint8_t* buf){
     m.trajCommander.push(std::move(traj2));
 }
 
-// id:104 CurveTrajectory挿入
+// id:104 SteadyStateCircularTrajectory挿入
 void id_104_exec(uint8_t* buf){
     uint8_t sum = calcCheckSum(buf, 5, 15);
     if(sum != buf[4]) return;

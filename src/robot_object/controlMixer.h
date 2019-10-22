@@ -167,7 +167,7 @@ namespace umouse {
             // 斜め直進時の衝突回避
             if(traj.motion_type == EMotionType::DIAGONAL_CENTER){
                 if (WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold){
-                    target_rot_x -= pm.wall_diagonal_avoid_add_ang;
+                    target_rot_x -= pm.wall_diagonal_avoid_add_ang;                    
                 }
                 else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold){
                     target_rot_x += pm.wall_diagonal_avoid_add_ang;
@@ -201,7 +201,8 @@ namespace umouse {
 
 
             ang_pidf.update(target_rot_x, esti.getAng());
-            target_rot_v += ang_pidf.getControlVal(); 
+            target_rot_v += ang_pidf.getControlVal();
+            target_rot_v += (target_rot_x - traj.ang)/0.05; // 1度を50msecで回る角速度を足す
             
 
             if( (traj.motion_type != motion_type_pre &&
@@ -245,22 +246,32 @@ namespace umouse {
             duty_ang_v_FF += pt.rotBackEmfDuty(target_rot_v);
             duty_ang_v_FF += pt.rotFrictionCompensationDuty(target_rot_v);
 */
-            if(ABS(target_rot_v) < 45.0f){
-
-            }else{
-                duty_ang_v_FF += pt.rotFFWithParamDuty(target_rot_v, target_rot_a);
-            }
+            duty_ang_v_FF += pt.rotFFWithParamDuty(target_rot_v, target_rot_a);
             if(pm.rot_v_FF_enable == true) duty += duty_ang_v_FF;
 
             float voltage = BatVoltageMonitor::getInstance().bat_vol;
-            float duty_v_saturation = pm.trans_v_saturation_FF_multiplier * ABS(duty_v_FF(0)) + pm.trans_v_saturation_offset_duty * 4.2f / voltage;
-            float duty_ang_v_saturation = pm.rot_v_saturation_FF_multiplier * ABS(duty_ang_v_FF(0)) + pm.rot_v_saturation_offset_duty * 4.2f / voltage;
+            float duty_v_saturation = (pm.trans_v_saturation_FF_multiplier * ABS(duty_v_FF(0)) + pm.trans_v_saturation_offset_duty) * voltage / 4.2f;
+            float duty_ang_v_saturation = (pm.rot_v_saturation_FF_multiplier * ABS(duty_ang_v_FF(0)) + pm.rot_v_saturation_offset_duty) * voltage / 4.2f;
 
             if(pm.trans_v_PIDF_saturation_enable == true) v_pidf.setSaturation(duty_v_saturation);
             if(pm.rot_v_PIDF_saturation_enable == true ) ang_v_pidf.setSaturation(duty_ang_v_saturation);
 
             duty(0) += (v_pidf.getControlVal() - ang_v_pidf.getControlVal()) * 4.2f / voltage;
             duty(1) += (v_pidf.getControlVal() + ang_v_pidf.getControlVal()) * 4.2f / voltage;
+            // duty飽和時には回転系制御を優先
+            if(duty(0) > 1.0 || duty(1) > 1.0){
+                float duty_overflow = 0.0f;
+                if(duty(0) > duty(1) ){
+                    duty_overflow = duty(0) - 1.0f;
+                }
+                else{
+                    duty_overflow = duty(1) - 1.0f;
+                }
+                duty(0) -= duty_overflow;
+                duty(1) -= duty_overflow;
+
+            }
+            
             motion_type_pre = traj.motion_type;
         }
 
