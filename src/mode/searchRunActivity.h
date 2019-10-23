@@ -114,17 +114,45 @@ namespace umouse {
                 else fcled.turn(0,0,1);
 
                 if(m.trajCommander.empty()){
-                    auto traj = StopTrajectory::create(1.0f);
-                    SE_Im7();
-                    m.trajCommander.push(std::move(traj));
+                    SE_I7();
+                    waitmsec(200);
+                    // 前壁を見る
+                    m.maze.writeAheadWall(m.coor.x, m.coor.y, m.getDirection(), ws.isAhead()); 
+                    headBudWall(0.3);
+                    // 左壁を見る
+                    auto traj0 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    m.trajCommander.push(std::move(traj0));
+                    while(!m.trajCommander.empty()){waitmsec(1);}
                     m.maze.writeAheadWall(m.coor.x, m.coor.y, m.getDirection(), ws.isAhead());
+                    headBudWall(0.3);
+                    // 右壁を見る
+                    auto traj1 = SpinTurnTrajectory::create(180.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    m.trajCommander.push(std::move(traj1));
+                    while(!m.trajCommander.empty()){waitmsec(1);}
+                    m.maze.writeAheadWall(m.coor.x, m.coor.y, m.getDirection(), ws.isAhead());
+                    headBudWall(0.3);
+                    // 最初の向きに戻る
+                    auto traj2 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    m.trajCommander.push(std::move(traj2));
+                    while(!m.trajCommander.empty()){waitmsec(1);}
+
                     m.maze.makeSearchMap(desti_coor.x, desti_coor.y);
+                    bool able_goal = m.maze.isExistPath(m.coor.x, m.coor.y);
+                    if(!able_goal){
+                        for(int i=0;i<3;i++){
+                            SE_Im7();
+                            waitmsec(500);
+                        }
+                        return; //以降の処理を行わず次のループへ
+                    }
+
                     direction_e dest_dir_next = m.maze.getMinDirection(m.coor.x, m.coor.y, m.direction);
                     int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
-                    auto traj0 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj1 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
-                    m.trajCommander.push(std::move(traj0));
-                    m.trajCommander.push(std::move(traj1));
+                    auto traj3 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj4 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
+                    m.trajCommander.push(std::move(traj3));
+                    m.trajCommander.push(std::move(traj4));
+
                 }
 
 
@@ -142,6 +170,17 @@ namespace umouse {
 
                     m.maze.updateWall(x_next, y_next, m.direction, ws);
                     m.maze.makeSearchMap(desti_coor.x, desti_coor.y);
+                    bool able_goal = m.maze.isExistPath(x_next, y_next);
+                    if(!able_goal){
+                        auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.1, a, a);
+                        m.trajCommander.push(std::move(traj0));
+
+                        for(int i=0;i<3;i++){
+                            SE_Im7();
+                            waitmsec(500);
+                        }
+                        return; //以降の処理を行わず次のループへ
+                    }
                     direction_e dest_dir_next = m.maze.getSearchDirection(x_next, y_next, m.direction);
                     int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
 
@@ -250,6 +289,26 @@ namespace umouse {
                 }
 
             }
+            void headBudWall(float time){
+                UMouse &m = UMouse::getInstance();
+                WallSensor &ws = WallSensor::getInstance();
+                std::function< void(void) > update_func = [&m, &ws]() {
+                    if(m.maze.existAWall(m.coor.x, m.coor.y, m.direction)){
+                        if(m.posEsti.getV() > 0.05){
+                            PowerTransmission::getInstance().setDuty(0.35, 0.35);
+                        }
+                        else{
+                            PowerTransmission::getInstance().setDuty(0.45, 0.45);
+                        }
+                    }
+                    m.posEsti.setX(m.trajCommander.x);
+                    m.posEsti.setY(m.trajCommander.y);
+                    //m.posEsti.setAng(m.trajCommander.ang);
+                    m.ctrlMixer.reset();
+                };
+                auto traj = UpdateInjectionTrajectory::create(time, update_func);
+                m.trajCommander.push(std::move(traj));
+            }
 
             void spin180(int8_t rot_times){
                 UMouse &m = UMouse::getInstance();
@@ -284,7 +343,7 @@ namespace umouse {
                         }
                         m.posEsti.setX(m.trajCommander.x);
                         m.posEsti.setY(m.trajCommander.y);
-                        m.posEsti.setAng(m.trajCommander.ang);
+                        //m.posEsti.setAng(m.trajCommander.ang);
                         m.ctrlMixer.reset();
                     };
 

@@ -459,7 +459,8 @@ private:
         if( corner_l_cool_down_time == 0.0f &&
             ws.isCornerL() == true && 
             fabs(ang_v) < 50.0 &&
-            v > 0.1 
+            v > 0.1 &&
+            fabs(calcWallCenterOffset()) < 0.005
         ) {
             bool done = true;
             if(ang >= 350.0 || ang < 10.0) {
@@ -495,7 +496,9 @@ private:
         if(corner_r_cool_down_time == 0.0f &&
             ws.isCornerR() == true &&
             fabs(ang_v) < 50.0 && 
-            v > 0.1 ) {
+            v > 0.1 &&
+            fabs(calcWallCenterOffset()) < 0.005
+            ) {
             
             bool done = true;
 

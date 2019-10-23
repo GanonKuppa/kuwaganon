@@ -202,7 +202,7 @@ namespace umouse {
 
             ang_pidf.update(target_rot_x, esti.getAng());
             target_rot_v += ang_pidf.getControlVal();
-            target_rot_v += (target_rot_x - traj.ang)/0.05; // 1度を50msecで回る角速度を足す
+            //target_rot_v += (target_rot_x - traj.ang)/0.05; // 1度を50msecで回る角速度を足す
             
 
             if( (traj.motion_type != motion_type_pre &&

@@ -105,6 +105,7 @@ public:
         turn_type = turn_type_e::STOP;
         motion_type = EMotionType::STOP;
         hash = (uint16_t)xor32();
+        on_end_func = nullptr;
     }
 
     std::string getMotionTypeString(){
@@ -149,7 +150,17 @@ public:
         return false;
     }
 
-    virtual ~BaseTrajectory(){};
+    virtual ~BaseTrajectory(){
+        if(on_end_func)on_end_func();
+    }
+
+    void setOnEndFunc(std::function< void(void) > on_end_func_){
+        on_end_func = on_end_func_;
+    }
+
+private:
+    std::function< void(void) > on_end_func;
+
 };
 
 class StraightTrajectory : public BaseTrajectory

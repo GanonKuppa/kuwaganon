@@ -105,11 +105,13 @@ public:
     };
 
     void writeAheadWall(uint16_t x, uint16_t y, direction_e dir, bool ahead){
+        printfAsync("  Ahead: %d\n", ahead );
         Wall wall = readWall(x, y);
         if(dir == direction_e::E) wall.E = ahead;
         else if(dir == direction_e::N) wall.N = ahead;
         else if(dir == direction_e::W) wall.W = ahead;
         else if(dir == direction_e::S) wall.S = ahead;
+        writeWall(x, y, wall);
     }
 
     Wall readWall(uint16_t x, uint16_t y) {

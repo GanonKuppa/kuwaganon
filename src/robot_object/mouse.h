@@ -208,7 +208,7 @@ public:
                    (trajCommander.getMotionType() == EMotionType::STRAIGHT ||
                     trajCommander.getMotionType() == EMotionType::STRAIGHT_WALL_CENTER)
                    ){
-                    pt.setDuty(0.4, 0.4);
+                    pt.setDuty(0.35, 0.35);
                     ctrlMixer.reset();
                     //trajCommander.clear();
                 }else{
