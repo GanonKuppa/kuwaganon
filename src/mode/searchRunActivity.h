@@ -53,6 +53,7 @@ namespace umouse {
             adis.calibOmegaOffset(800);
 
             std::unique_ptr<BaseState> state = std::unique_ptr<BaseState>(new Start2GoalState(intent));
+            m.running_sec = 0.0f;
             stateMachine.push(std::move(state));
             delete intent;
 
@@ -71,6 +72,7 @@ namespace umouse {
             bool pre_in_read_wall_area;
             Coor2D<uint16_t> pre_read_wall_coor;
             Coor2D<uint16_t> desti_coor;
+            const float ANG_CALIB_TIME = 60.0f;
 
 
             Start2GoalState(Intent* intent_) : BaseState(intent_) {
@@ -109,6 +111,8 @@ namespace umouse {
                 FcLed &fcled = FcLed::getInstance();
                 bool in_read_wall_area = m.inReadWallArea();
                 ParameterManager &pm = ParameterManager::getInstance();
+
+                
 
                 if(in_read_wall_area) fcled.turn(0,1,0);
                 else fcled.turn(0,0,1);
@@ -328,22 +332,16 @@ namespace umouse {
                         }
                         m.posEsti.setX(m.trajCommander.x);
                         m.posEsti.setY(m.trajCommander.y);
-                        //m.posEsti.setAng(m.trajCommander.ang);
                         m.ctrlMixer.reset();
                     };
 
                     std::function< void(void) > update_func2 = [&m, &ws]() {
                         if(m.maze.existAWall(m.coor.x, m.coor.y, m.direction)){
-                            if(m.posEsti.getV() > 0.05){
-                                PowerTransmission::getInstance().setDuty(0.35, 0.35);
-                            }
-                            else{
-                                PowerTransmission::getInstance().setDuty(0.45, 0.45);
-                            }
+                            PowerTransmission::getInstance().setDuty(0.6, 0.6);
                         }
                         m.posEsti.setX(m.trajCommander.x);
                         m.posEsti.setY(m.trajCommander.y);
-                        //m.posEsti.setAng(m.trajCommander.ang);
+                        m.posEsti.setAng(m.trajCommander.ang);
                         m.ctrlMixer.reset();
                     };
 
@@ -351,9 +349,18 @@ namespace umouse {
                     auto traj0 = StraightTrajectory::create(0.035f, v, v, 0.1f, a, a);
                     auto traj1 = StraightTrajectory::create(0.01f, 0.1f, 0.1f, 0.1f, a, a);
                     auto traj2 = StopTrajectory::create(0.05f);
-                    auto traj3 = UpdateInjectionTrajectory::create(0.35f, update_func);
+                    std::unique_ptr<BaseTrajectory> traj3;
+                    if(m.running_sec < ANG_CALIB_TIME ){
+                         traj3 = UpdateInjectionTrajectory::create(0.35f, update_func);
+                         SEG();
+                    }
+                    else{
+                        traj3 = UpdateInjectionTrajectory::create(1.0f, update_func2);
+                        m.running_sec = 0.0f;
+                        SE_Im7();
+                    } 
                     auto traj4 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj5 = UpdateInjectionTrajectory::create(0.55f, update_func2);
+                    auto traj5 = UpdateInjectionTrajectory::create(0.35f, update_func);
                     auto traj6 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
                     auto traj7 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
                     m.trajCommander.push(std::move(traj0));
@@ -364,7 +371,7 @@ namespace umouse {
                     m.trajCommander.push(std::move(traj5));
                     m.trajCommander.push(std::move(traj6));
                     m.trajCommander.push(std::move(traj7));
-                    SEG();
+                    
                     m.maze.writeMazeData2Flash();
                 }
                 else {
