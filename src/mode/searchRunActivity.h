@@ -53,6 +53,7 @@ namespace umouse {
             adis.calibOmegaOffset(800);
 
             std::unique_ptr<BaseState> state = std::unique_ptr<BaseState>(new Start2GoalState(intent));
+            m.ang_no_calib_sec = 0.0f;
             m.running_sec = 0.0f;
             stateMachine.push(std::move(state));
             delete intent;
@@ -111,8 +112,9 @@ namespace umouse {
                 FcLed &fcled = FcLed::getInstance();
                 bool in_read_wall_area = m.inReadWallArea();
                 ParameterManager &pm = ParameterManager::getInstance();
-
-                
+                if(m.running_sec > 25.0) v = pm.v_search_run * 0.95;
+                else if(m.running_sec > 35.0) v = pm.v_search_run * 0.90;
+                else if(m.running_sec > 45.0) v = pm.v_search_run * 0.85;
 
                 if(in_read_wall_area) fcled.turn(0,1,0);
                 else fcled.turn(0,0,1);
@@ -129,15 +131,22 @@ namespace umouse {
                     while(!m.trajCommander.empty()){waitmsec(1);}
                     m.maze.writeAheadWall(m.coor.x, m.coor.y, m.getDirection(), ws.isAhead());
                     headBudWall(0.3);
-                    // 右壁を見る
-                    auto traj1 = SpinTurnTrajectory::create(180.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    // 後壁を見る
+                    auto traj1 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
                     m.trajCommander.push(std::move(traj1));
                     while(!m.trajCommander.empty()){waitmsec(1);}
                     m.maze.writeAheadWall(m.coor.x, m.coor.y, m.getDirection(), ws.isAhead());
                     headBudWall(0.3);
-                    // 最初の向きに戻る
+                    // 右壁を見る
                     auto traj2 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
                     m.trajCommander.push(std::move(traj2));
+                    while(!m.trajCommander.empty()){waitmsec(1);}
+                    m.maze.writeAheadWall(m.coor.x, m.coor.y, m.getDirection(), ws.isAhead());
+                    headBudWall(0.3);
+
+                    // 最初の向きに戻る
+                    auto traj3 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    m.trajCommander.push(std::move(traj3));
                     while(!m.trajCommander.empty()){waitmsec(1);}
 
                     m.maze.makeSearchMap(desti_coor.x, desti_coor.y);
@@ -152,10 +161,10 @@ namespace umouse {
 
                     direction_e dest_dir_next = m.maze.getMinDirection(m.coor.x, m.coor.y, m.direction);
                     int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
-                    auto traj3 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj4 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
-                    m.trajCommander.push(std::move(traj3));
+                    auto traj4 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj5 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
                     m.trajCommander.push(std::move(traj4));
+                    m.trajCommander.push(std::move(traj5));
 
                 }
 
@@ -204,8 +213,8 @@ namespace umouse {
                             spin180(rot_times);
                         }
 
-                        else if (ABS(m.posEsti.calcDiffAngle()) > 10.0f ||
-                                ABS(m.posEsti.calcWallCenterOffset()) > 0.1f ||
+                        else if (ABS(m.posEsti.calcDiffAngle()) > 7.5f ||
+                                ABS(m.posEsti.calcWallCenterOffset()) > 0.01f ||
                                 mode == ESearchMode::SPIN_TURN_SERCH ||
                                 mode == ESearchMode::SPIN_TURN_SERCH_BOTHWAYS
                         ) {
@@ -249,16 +258,15 @@ namespace umouse {
                 WallSensor &ws = WallSensor::getInstance();
                 ParameterManager &pm = ParameterManager::getInstance();
 
-                if (ws.isAhead() == true && false) {
+                if (ws.isAhead() == true) {
                     std::function< void(void) > update_func = [&m, &ws]() {
-                        if(ws.getContactWallTime() > 0.1f){
-                            PowerTransmission::getInstance().setDuty(0.25, 0.25);
-                        }
-                        else if(ws.getContactWallTime() > 0.2f){
-                            PowerTransmission::getInstance().setDuty(0.15, 0.15);
-                        }
-                        else{
-                            PowerTransmission::getInstance().setDuty(0.35, 0.35);
+                        if(m.maze.existAWall(m.coor.x, m.coor.y, m.direction)){
+                            if(m.posEsti.getV() > 0.05){
+                                PowerTransmission::getInstance().setDuty(0.35, 0.35);
+                            }
+                            else{
+                                PowerTransmission::getInstance().setDuty(0.45, 0.45);
+                            }
                         }
                         m.posEsti.setX(m.trajCommander.x);
                         m.posEsti.setY(m.trajCommander.y);
@@ -269,14 +277,18 @@ namespace umouse {
                     auto traj1 = StraightTrajectory::create(0.01f, 0.1f, 0.1f, 0.1f, a, a);
                     auto traj2 = StopTrajectory::create(0.1f);
                     auto traj3 = UpdateInjectionTrajectory::create(0.35f, update_func);
-                    auto traj4 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj5 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
+                    auto traj4 = SpinTurnTrajectory::create(- rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj5 = UpdateInjectionTrajectory::create(0.35f, update_func);
+                    auto traj6 = SpinTurnTrajectory::create(180.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj7 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
                     m.trajCommander.push(std::move(traj0));
                     m.trajCommander.push(std::move(traj1));
                     m.trajCommander.push(std::move(traj2));
                     m.trajCommander.push(std::move(traj3));
                     m.trajCommander.push(std::move(traj4));
                     m.trajCommander.push(std::move(traj5));
+                    m.trajCommander.push(std::move(traj6));
+                    m.trajCommander.push(std::move(traj7));
                     SEG();
                 }
                 else {
@@ -293,6 +305,7 @@ namespace umouse {
                 }
 
             }
+            
             void headBudWall(float time){
                 UMouse &m = UMouse::getInstance();
                 WallSensor &ws = WallSensor::getInstance();
@@ -350,13 +363,13 @@ namespace umouse {
                     auto traj1 = StraightTrajectory::create(0.01f, 0.1f, 0.1f, 0.1f, a, a);
                     auto traj2 = StopTrajectory::create(0.05f);
                     std::unique_ptr<BaseTrajectory> traj3;
-                    if(m.running_sec < ANG_CALIB_TIME ){
+                    if(m.ang_no_calib_sec < ANG_CALIB_TIME ){
                          traj3 = UpdateInjectionTrajectory::create(0.35f, update_func);
                          SEG();
                     }
                     else{
                         traj3 = UpdateInjectionTrajectory::create(1.0f, update_func2);
-                        m.running_sec = 0.0f;
+                        m.ang_no_calib_sec = 0.0f;
                         SE_Im7();
                     } 
                     auto traj4 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);

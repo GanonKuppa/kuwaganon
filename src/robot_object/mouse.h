@@ -142,6 +142,7 @@ public:
     TrajectoryCommander trajCommander;
     PositionEstimator posEsti;
     float running_sec;
+    float ang_no_calib_sec;
 
     void initBuff() {
         for (int i = 0; i < buff_size; i++) {
@@ -249,6 +250,7 @@ public:
 
         direction = getDirection();
         running_sec += DELTA_T;
+        ang_no_calib_sec += DELTA_T;
     }
 
 
@@ -385,6 +387,7 @@ private:
         initBuff();
         maze.readMazeDataFromFlash();
         running_sec = 0.0f;
+        ang_no_calib_sec = 0.0f;
     }
     ;
     ~UMouse() {
