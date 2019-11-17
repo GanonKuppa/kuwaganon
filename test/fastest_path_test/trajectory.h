@@ -7,7 +7,6 @@
 #include "arcLengthParameterizedCurve.h"
 #include "kappa.h"
 #include "myUtil.h"
-#include "wallsensor.h"
 
 namespace umouse
 {
@@ -21,7 +20,7 @@ enum class EMotionType{
     SPINTURN,
     CURVE,
     STOP,
-    DIRECT_DUTY_SET
+    STOP_DIRECT_DUTY_SET
 };
 
 
@@ -48,10 +47,8 @@ public:
     float cumulative_ang;
     float cumulative_t;
     EMotionType motion_type;
-    turn_dir_e turn_dir;
-    turn_type_e turn_type;
     uint16_t hash;
-    const float DELTA_T = 0.0005;
+    float DELTA_T = 0.0005;
 
     void setInitPos(float x_, float y_, float ang_){
         x = x_;
@@ -72,15 +69,6 @@ public:
 
     virtual float getEndAng(){
         return 0.0f;
-    }
-
-    float getNecessaryTime(){
-        float necessary_time = 0.0f;
-        while(!isEnd()){
-            update();
-            necessary_time += DELTA_T;
-        }
-        return necessary_time;
     }
 
     virtual void forceEnd(){
@@ -109,12 +97,8 @@ public:
         x_dd = 0.0f;
         y_d = 0.0f;
         y_dd = 0.0f;
-        
-        turn_dir = turn_dir_e::NO_TURN;
-        turn_type = turn_type_e::STOP;
-        motion_type = EMotionType::STOP;
+        motion_type =EMotionType::STOP;
         hash = (uint16_t)xor32();
-        on_end_func = nullptr;
     }
 
     std::string getMotionTypeString(){
@@ -126,7 +110,6 @@ public:
         else if(motion_type == EMotionType::SPINTURN) str = "SPINTURN";
         else if(motion_type == EMotionType::CURVE) str = "CURVE";
         else if(motion_type == EMotionType::STOP) str = "STOP";
-        else if(motion_type == EMotionType::DIRECT_DUTY_SET) str = "DIRECT_DUTY_SET";
         return str;
     }
 
@@ -154,22 +137,24 @@ public:
         y += DELTA_T * y_d;
     }
 
+    float getNecessaryTime(){
+        DELTA_T = 0.01;
+        float necessary_time = 0.0f;
+        while(!isEnd()){
+            update();
+            necessary_time += DELTA_T;
+        }
+        //printf("getNT:%f cum_dist: %f trg_dist: %f\n",necessary_time, cumulative_dist, target_dist);
+        return necessary_time;
+    }
+
+
     virtual bool isEnd()
     {
         return false;
     }
 
-    virtual ~BaseTrajectory(){
-        if(on_end_func)on_end_func();
-    }
-
-    void setOnEndFunc(std::function< void(void) > on_end_func_){
-        on_end_func = on_end_func_;
-    }
-
-private:
-    std::function< void(void) > on_end_func;
-
+    virtual ~BaseTrajectory(){};
 };
 
 class StraightTrajectory : public BaseTrajectory
@@ -189,8 +174,6 @@ public:
         wall_contact = false;
         init(x_, y_, v_0_, a_acc, ang_, 0.0f, 0.0f);
         motion_type = EMotionType::STRAIGHT;
-        turn_type = turn_type_e::STRAIGHT;
-        turn_dir = turn_dir_e::NO_TURN;
 
     }
 
@@ -208,9 +191,6 @@ public:
         wall_contact = false;
         init(x_, y_, v_0_, a_acc, ang_, 0.0f, 0.0f);
         motion_type = EMotionType::STRAIGHT;
-        turn_type = turn_type_e::STRAIGHT;
-        turn_dir = turn_dir_e::NO_TURN;
-
     }
 
     static std::unique_ptr<BaseTrajectory> create(float target_dist_, float v_0_){
@@ -236,41 +216,37 @@ public:
 
     static std::unique_ptr<BaseTrajectory> createAsWallCenter(float target_dist_, float v_0_){
         auto traj = new StraightTrajectory(target_dist_, v_0_);
-        traj->motion_type = EMotionType::STRAIGHT_WALL_CENTER;
+        traj->motion_type=EMotionType::STRAIGHT_WALL_CENTER;
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
     static std::unique_ptr<BaseTrajectory> createAsWallCenter(float target_dist_, float v_0_, float v_max_, float v_end_, float a_acc_, float a_dec_){
         auto traj = new StraightTrajectory(target_dist_, v_0_, v_max_, v_end_, a_acc_, a_dec_  );
-        traj->motion_type = EMotionType::STRAIGHT_WALL_CENTER;
+        traj->motion_type=EMotionType::STRAIGHT_WALL_CENTER;
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
     static std::unique_ptr<BaseTrajectory> createAsDiagonal(float target_dist_, float v_0_){
         auto traj = new StraightTrajectory(target_dist_, v_0_);
-        traj->motion_type = EMotionType::DIAGONAL;
-        traj->turn_type = turn_type_e::D_STRAIGHT;
+        traj->motion_type=EMotionType::DIAGONAL;
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
     static std::unique_ptr<BaseTrajectory> createAsDiagonal(float target_dist_, float v_0_, float v_max_, float v_end_, float a_acc_, float a_dec_){
         auto traj = new StraightTrajectory(target_dist_, v_0_, v_max_, v_end_, a_acc_, a_dec_  );
-        traj->motion_type = EMotionType::DIAGONAL;
-        traj->turn_type = turn_type_e::D_STRAIGHT;
+        traj->motion_type=EMotionType::DIAGONAL;
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
     static std::unique_ptr<BaseTrajectory> createAsDiagonalCenter(float target_dist_, float v_0_){
         auto traj = new StraightTrajectory(target_dist_, v_0_);
         traj->motion_type=EMotionType::DIAGONAL_CENTER;
-        traj->turn_type = turn_type_e::D_STRAIGHT;        
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
     static std::unique_ptr<BaseTrajectory> createAsDiagonalCenter(float target_dist_, float v_0_, float v_max_, float v_end_, float a_acc_, float a_dec_){
         auto traj = new StraightTrajectory(target_dist_, v_0_, v_max_, v_end_, a_acc_, a_dec_  );
         traj->motion_type=EMotionType::DIAGONAL_CENTER;
-        traj->turn_type = turn_type_e::D_STRAIGHT;
         return std::unique_ptr<BaseTrajectory>(traj);
     }
 
@@ -349,22 +325,21 @@ public:
                 return false;
         }
         else{
-            WallSensor &ws = WallSensor::getInstance();
+            //WallSensor &ws = WallSensor::getInstance();
 
             if (cumulative_dist >= target_dist){
                 x = getEndX();
                 y = getEndY();
                 ang = getEndAng();
             }
-
+/*
             if (ws.getContactWallTime()>0.3 && cumulative_dist >= target_dist)
                 return true;
             else
                 return false;
-
+*/
         }
     }
-
 
     virtual ~StraightTrajectory(){};
 
@@ -389,8 +364,6 @@ public:
         float ang_ = 0.0;
         init(x_, y_, 0.0f, 0.0f, ang_, 0.0f, SIGN(target_cumulative_ang_) * abs_ang_a_);
         motion_type = EMotionType::SPINTURN;
-        turn_type = turn_type_e::STOP;
-        turn_dir = (turn_dir_e)SIGN(target_cumulative_ang_);
         target_cumulative_ang = target_cumulative_ang_;
         abs_ang_v_max = abs_ang_v_max_;
         abs_ang_a = abs_ang_a_;
@@ -439,12 +412,8 @@ public:
     {
         if(target_cumulative_ang == 0.0f) return true;
 
-        if (ABS(cumulative_ang) >= ABS(target_cumulative_ang)){
-            x = getEndX();
-            y = getEndY();
-            ang = getEndAng();
+        if (ABS(cumulative_ang) >= ABS(target_cumulative_ang))
             return true;
-        }            
         else
             return false;
     }
@@ -469,8 +438,6 @@ public:
         alp_curve = CurveFactory::create(turn_type_);
         turn_dir = turn_dir_;
         motion_type = EMotionType::CURVE;
-        turn_type = turn_type_;
-        turn_dir = turn_dir_;
     }
 
 
@@ -538,9 +505,7 @@ public:
             ang_v = 0.0f;
         }
         else if (cumulative_dist < (alp_curve->pre_dist + alp_curve->arc_len)){
-            float ang_v_pre = ang_v;            
             ang_v = float(turn_dir) * alp_curve->getOmega(cumulative_dist, v);
-            ang_a = (ang_v - ang_v_pre) / DELTA_T;
         }
         else{
             ang_a = 0.0f;
@@ -575,6 +540,9 @@ public:
         else return false;
     }
     ArcLengthParameterizedCurve *alp_curve;
+private:
+
+    turn_dir_e turn_dir;
 };
 
 
@@ -587,14 +555,6 @@ public:
 
         init(x_, y_, 0.0f, 0.0f, ang_, 0.0f, 0.0f);
         motion_type = EMotionType::STOP;
-        turn_type = turn_type_e::STOP;
-        turn_dir = turn_dir_e::NO_TURN;
-        stop_time = stop_time_;
-    }
-
-    StopTrajectory(float stop_time_, float x_, float y_, float ang_){
-        init(x_, y_, 0.0f, 0.0f, ang_, 0.0f, 0.0f);
-        motion_type = EMotionType::STOP;
         stop_time = stop_time_;
     }
 
@@ -602,15 +562,17 @@ public:
         return std::unique_ptr<BaseTrajectory>(new StopTrajectory(stop_time_));
     }
 
-    static std::unique_ptr<BaseTrajectory> create(float stop_time_, float x_, float y_, float ang_){
-        return std::unique_ptr<BaseTrajectory>(new StopTrajectory(stop_time_, x_, y_, ang_));
-    }
+
 
     static std::unique_ptr<BaseTrajectory> createAsDirectDutySet(float stop_time_){
+
+
         auto traj = new StopTrajectory(stop_time_);
-        traj->motion_type=EMotionType::DIRECT_DUTY_SET;
+        traj->motion_type=EMotionType::STOP_DIRECT_DUTY_SET;
         return std::unique_ptr<BaseTrajectory>(traj);
+
     }
+
 
     virtual float getEndX(){
         return x_0;
@@ -636,123 +598,6 @@ public:
 
 private:
     float stop_time;
-};
-
-
-class UpdateInjectionTrajectory : public BaseTrajectory{
-public:
-    UpdateInjectionTrajectory(float stop_time_, std::function< void(void) > injection_func_){
-        float x_ = 0.0;
-        float y_ = 0.0;
-        float ang_ = 0.0;
-
-        init(x_, y_, 0.0f, 0.0f, ang_, 0.0f, 0.0f);
-        motion_type = EMotionType::DIRECT_DUTY_SET;
-        turn_type = turn_type_e::STOP;
-        turn_dir = turn_dir_e::NO_TURN;
-
-        stop_time = stop_time_;
-        injection_func = injection_func_;
-    }
-
-    UpdateInjectionTrajectory(float stop_time_, float x_, float y_, float ang_, std::function< void(void) > injection_func_){
-        init(x_, y_, 0.0f, 0.0f, ang_, 0.0f, 0.0f);
-        motion_type = EMotionType::DIRECT_DUTY_SET;
-        stop_time = stop_time_;
-        injection_func = injection_func_;
-    }
-
-    static std::unique_ptr<BaseTrajectory> create(float stop_time_, std::function< void(void) > injection_func_){
-        return std::unique_ptr<BaseTrajectory>(new UpdateInjectionTrajectory(stop_time_, injection_func_));
-    }
-
-    static std::unique_ptr<BaseTrajectory> create(float stop_time_, float x_, float y_, float ang_, std::function< void(void) > injection_func_){
-        return std::unique_ptr<BaseTrajectory>(new UpdateInjectionTrajectory(stop_time_, x_, y_, ang_, injection_func_));
-    }
-
-
-    virtual float getEndX(){
-        return x_0;
-    }
-
-    virtual float getEndY(){
-        return y_0;
-    }
-
-    virtual float getEndAng(){
-        return ang_0;
-    }
-
-    virtual void update(){
-        cumulative_t += DELTA_T;
-        injection_func();
-    }
-
-    virtual bool isEnd(){
-        if(stop_time < cumulative_t) return true;
-        else return false;
-    }
-
-private:
-    float stop_time;
-    std::function< void(void) > injection_func;
-
-};
-
-class SteadyStateCircularTrajectory : public BaseTrajectory
-{
-public:
-    SteadyStateCircularTrajectory(float target_cumulative_ang_, float abs_ang_v, float v)
-    {
-        float x_ = 0.0;
-        float y_ = 0.0;
-        float ang_ = 0.0;
-        init(x_, y_, v, 0.0f, ang_, abs_ang_v, 0.0f);
-        motion_type = EMotionType::CURVE;
-        turn_type  = turn_type_e::CIRCULAR;
-        turn_dir = (turn_dir_e)SIGN(target_cumulative_ang_);
-        target_cumulative_ang = target_cumulative_ang_;
-    }
-
-    static std::unique_ptr<BaseTrajectory> create(float target_cumulative_ang_, float abs_ang_v, float v){
-        return std::unique_ptr<BaseTrajectory>(new SteadyStateCircularTrajectory(target_cumulative_ang_, abs_ang_v, v)  );
-    }
-
-    virtual float getEndX(){
-        return x_0;
-    }
-
-    virtual float getEndY(){
-        return y_0;
-    }
-
-    virtual float getEndAng(){
-        return fmod(ang_0 + target_cumulative_ang + 360.0f, 360.0f);        
-    }
-
-    virtual void update()
-    {
-        BaseTrajectory::update();
-    }
-
-    virtual bool isEnd()
-    {
-
-        if (ABS(cumulative_ang) >= ABS(target_cumulative_ang)){
-            x = getEndX();
-            y = getEndY();
-            ang = getEndAng();
-            return true;
-        }            
-        else
-            return false;
-    }
-
-private:
-    float target_cumulative_ang;
-    float abs_ang_a;
-    float abs_ang_v_max;
-    float ang_v_end;
 };
 
 
