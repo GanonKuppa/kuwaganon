@@ -450,19 +450,19 @@ public:
             Wall wall = readWall((uint16_t)(que.front().first), (uint16_t)(que.front().second));
             que.pop();
             if( (wall.E == 0) && (wall.EF == 1) && (x != 31) && (p_map[x+1][y] == 0xffff) ) {
-                p_map[x+1][y] = p_map[x][y] + 1 + rand() % 10;
+                p_map[x+1][y] = p_map[x][y] + 1 + xor32() % 10;
                 que.push(std::make_pair(x+1,y));
             }
             if( (wall.N == 0 ) && (wall.NF == 1 ) && (y != 31) && (p_map[x][y+1] == 0xffff) ) {
-                p_map[x][y+1] = p_map[x][y] + 1 + rand() % 10;
+                p_map[x][y+1] = p_map[x][y] + 1 + xor32() % 10;
                 que.push(std::make_pair(x,y+1));
             }
             if( (wall.W == 0) && (wall.WF == 1) && (x != 0) && (p_map[x-1][y] == 0xffff) ) {
-                p_map[x-1][y] = p_map[x][y] + 1 + rand() % 10;
+                p_map[x-1][y] = p_map[x][y] + 1 + xor32() % 10;
                 que.push(std::make_pair(x-1,y));
             }
             if( (wall.S == 0) && (wall.SF == 1) && (y != 0) && (p_map[x][y-1] == 0xffff) ) {
-                p_map[x][y-1] = p_map[x][y] + 1 + rand() % 10;
+                p_map[x][y-1] = p_map[x][y] + 1 + xor32() % 10;
                 que.push(std::make_pair(x,y-1));
             }
         }
@@ -526,19 +526,19 @@ public:
             Wall wall = readWall((uint16_t)(que.front().first), (uint16_t)(que.front().second));
             que.pop();
             if( (wall.E == 0) && !isNoEntry(x+1,y) &&(wall.EF == 1) && (x != 31) && (p_map[x+1][y] == 0xffff) ) {
-                p_map[x+1][y] = p_map[x][y] + 1 + rand() % 10;
+                p_map[x+1][y] = p_map[x][y] + 1 + xor32() % 10;
                 que.push(std::make_pair(x+1,y));
             }
             if( (wall.N == 0 ) && !isNoEntry(x,y+1) && (wall.NF == 1 ) && (y != 31) && (p_map[x][y+1] == 0xffff) ) {
-                p_map[x][y+1] = p_map[x][y] + 1 + rand() % 10;
+                p_map[x][y+1] = p_map[x][y] + 1 + xor32() % 10;
                 que.push(std::make_pair(x,y+1));
             }
             if( (wall.W == 0) && !isNoEntry(x-1,y) && (wall.WF == 1) && (x != 0) && (p_map[x-1][y] == 0xffff) ) {
-                p_map[x-1][y] = p_map[x][y] + 1 + rand() % 10;
+                p_map[x-1][y] = p_map[x][y] + 1 + xor32() % 10;
                 que.push(std::make_pair(x-1,y));
             }
             if( (wall.S == 0) && !isNoEntry(x,y-1) && (wall.SF == 1) && (y != 0) && (p_map[x][y-1] == 0xffff) ) {
-                p_map[x][y-1] = p_map[x][y] + 1 + rand() % 10;
+                p_map[x][y-1] = p_map[x][y] + 1 + xor32() % 10;
                 que.push(std::make_pair(x,y-1));
             }
         }

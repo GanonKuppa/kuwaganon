@@ -29,6 +29,15 @@ public:
         this->turn_type = obj.turn_type;
     }
 
+    bool operator==(const Path & r) const{
+        return (turn_type == r.turn_type) && (block_num == r.block_num) && (turn_dir == r.turn_dir);
+    }
+
+    bool operator!=(const Path &r) const{
+        return !(*this == r);
+    }
+
+
     bool isStraightEnd(){
         if(turn_type == turn_type_e::STRAIGHT     ||
            turn_type == turn_type_e::TURN_180     ||

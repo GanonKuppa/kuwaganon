@@ -138,7 +138,7 @@ public:
     }
 
     float getNecessaryTime(){
-        DELTA_T = 0.01;
+        DELTA_T = 0.001;
         float necessary_time = 0.0f;
         while(!isEnd()){
             update();

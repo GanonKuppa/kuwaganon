@@ -4,6 +4,7 @@
 #include "maze.h"
 #include <map> // pair
 #include <vector>
+#include <algorithm>
 #include "communication.h"
 //#include "timer.h"
 //#include "sound.h"
@@ -96,8 +97,8 @@ void makeQuasiMinStepPath(uint16_t goal_x, uint16_t goal_y, Maze &maze, std::vec
     maze.writeNoEntryAllTrue();
         
     while(1){
-        tmp_goal_x= rand() % 32;    
-        tmp_goal_y= rand() % 32;
+        tmp_goal_x= xor32() % 32;    
+        tmp_goal_y= xor32() % 32;
         maze.makeRandomFastestMap(tmp_goal_x, tmp_goal_y);
         if(tmp_goal_x != goal_x && tmp_goal_y != goal_y && maze.p_map[0][0] != 65535) break;
     }    
@@ -148,22 +149,44 @@ void makeQuasiMinStepPath(uint16_t goal_x, uint16_t goal_y, Maze &maze, std::vec
     path_vec.push_back(Path(turn_type_e::STRAIGHT, 1, turn_dir_e::NO_TURN));
 }
 
+uint32_t calcPathVecHash(std::vector<Path> &path_vec){
+    uint32_t ret = 0;
+    int j = 0;
+    for (auto i : path_vec){
+        uint64_t val = uint8_t(i.block_num) + uint8_t(i.turn_type) + uint8_t(i.turn_dir); 
+        ret += (uint8_t(i.block_num) + uint8_t(i.turn_type)*(3<<j) + uint8_t(i.turn_dir)*(5<<j));        
+        if(j>16)j = 0;
+        j++;
+    }
+    return ret;
+}
+
 void makeFastestDiagonalPath(uint32_t trial_times, TurnParameter turn_p, uint16_t goal_x, uint16_t goal_y, Maze &maze, std::vector<Path> &path_vec){    
     float min_time = 1000.0f;
     std::vector<Path> min_vec;
+    std::vector<uint32_t> path_vec_hash_list;
     for(int i=0;i<trial_times;i++){
         path_vec.clear();
         makeQuasiMinStepPath(goal_x, goal_y, maze, path_vec);
-        translatePathDiagonal(path_vec);
-        float necessary_time = HF_calcPlayPathTime(turn_p, path_vec);
-        if(min_time > necessary_time){
-            min_time = necessary_time;
-            min_vec = path_vec;
+        uint32_t path_vec_hash = calcPathVecHash(path_vec);
+        //printf("hash num: %x\n", path_vec_hash);
+        if ( std::find(path_vec_hash_list.begin(), path_vec_hash_list.end(), path_vec_hash) != path_vec_hash_list.end() ){
+            // do nothing
+        }
+        else{
+            path_vec_hash_list.push_back(path_vec_hash);
+            translatePathDiagonal(path_vec);
+            float necessary_time = HF_calcPlayPathTime(turn_p, path_vec);
+            if(min_time > necessary_time){
+                min_time = necessary_time;
+                min_vec = path_vec;
+            }
         }
         //printf("necessary_time:%f\n", necessary_time);
     }
     path_vec = min_vec;
-    printf("★ min_time:%f\n", min_time);
+    printf("path_vec_hash_num:%d\n", path_vec_hash_list.size());
+    printf("min_time:%f\n", min_time);
 };
 
 
