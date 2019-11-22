@@ -1,5 +1,5 @@
 //======================
-const uint16_t wily0[][2]={ 
+const uint16_t wily0[][2]= {
     {nR,240},
     {61,198},
     {nR,42},
@@ -1444,7 +1444,7 @@ const uint16_t wily0[][2]={
     {76,207}
 };
 //======================
-const uint16_t wily1[][2]={ 
+const uint16_t wily1[][2]= {
     {nR,240},
     {37,201},
     {nR,39},
@@ -2885,7 +2885,7 @@ const uint16_t wily1[][2]={
     {73,203}
 };
 //======================
-const uint16_t wily2[][2]={ 
+const uint16_t wily2[][2]= {
     {nR,1440},
     {49,205},
     {nR,515},
@@ -3264,41 +3264,41 @@ const uint16_t wily2[][2]={
     {49,201}
 };
 
-void wily(void){
-	Note note;
+void wily(void) {
+    Note note;
 
-	BGMM.wave_form_data[0] = KUKEI12_5;
-	BGMM.wave_volume_data[0] = 16;    //各トラックのボリューム  volume_resolution段階
-	BGMM.wave_form_data[1] = KUKEI12_5;
-	BGMM.wave_volume_data[1] = 16;    //各トラックのボリューム  volume_resolution段階
-	BGMM.wave_form_data[2] = KUKEI12_5;
-	BGMM.wave_volume_data[2] = 16;    //各トラックのボリューム  volume_resolution段階
+    BGMM.wave_form_data[0] = KUKEI12_5;
+    BGMM.wave_volume_data[0] = 16;    //各トラックのボリューム  volume_resolution段階
+    BGMM.wave_form_data[1] = KUKEI12_5;
+    BGMM.wave_volume_data[1] = 16;    //各トラックのボリューム  volume_resolution段階
+    BGMM.wave_form_data[2] = KUKEI12_5;
+    BGMM.wave_volume_data[2] = 16;    //各トラックのボリューム  volume_resolution段階
 
 
-	//8,8,12,10
+    //8,8,12,10
 
-	BGMM.bpm = 200;
-	BGMM.enable=false;
+    BGMM.bpm = 200;
+    BGMM.enable=false;
 
-	uint16_t len0 = sizeof(wily0)/sizeof(wily0[0]);
-	for(int i=0;i<len0;i++){
-		note.pitch = wily0[i][0];
-		note.len = wily0[i][1];
-		BGMM.noteBuff[0].push(note);
-	}
+    uint16_t len0 = sizeof(wily0)/sizeof(wily0[0]);
+    for(int i=0; i<len0; i++) {
+        note.pitch = wily0[i][0];
+        note.len = wily0[i][1];
+        BGMM.noteBuff[0].push(note);
+    }
 
-	uint16_t len1 = sizeof(wily1)/sizeof(wily1[0]);
-	for(int i=0;i<len1;i++){
-		note.pitch = wily1[i][0] ;
-		note.len = wily1[i][1];
-		BGMM.noteBuff[1].push(note);
-	}
+    uint16_t len1 = sizeof(wily1)/sizeof(wily1[0]);
+    for(int i=0; i<len1; i++) {
+        note.pitch = wily1[i][0] ;
+        note.len = wily1[i][1];
+        BGMM.noteBuff[1].push(note);
+    }
 
-	uint16_t len2 = sizeof(wily2)/sizeof(wily2[0]);
-	for(int i=0;i<len2;i++){
-		note.pitch = wily2[i][0] ;
-		note.len = wily2[i][1];
-		BGMM.noteBuff[2].push(note);
-	}
-	BGMM.enable=true;
+    uint16_t len2 = sizeof(wily2)/sizeof(wily2[0]);
+    for(int i=0; i<len2; i++) {
+        note.pitch = wily2[i][0] ;
+        note.len = wily2[i][1];
+        BGMM.noteBuff[2].push(note);
+    }
+    BGMM.enable=true;
 }

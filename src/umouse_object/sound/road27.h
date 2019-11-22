@@ -1,5 +1,5 @@
 //======================
-const uint16_t road270[][2]={ 
+const uint16_t road270[][2]= {
     {nR,1920},
     {70,480},
     {nR,240},
@@ -188,7 +188,7 @@ const uint16_t road270[][2]={
     {75,480}
 };
 //======================
-const uint16_t road271[][2]={ 
+const uint16_t road271[][2]= {
     {nR,1920},
     {62,480},
     {nR,480},
@@ -482,7 +482,7 @@ const uint16_t road271[][2]={
     {71,480}
 };
 //======================
-const uint16_t road272[][2]={ 
+const uint16_t road272[][2]= {
     {nR,1920},
     {46,480},
     {nR,240},
@@ -822,7 +822,7 @@ const uint16_t road272[][2]={
 //};
 
 //======================
-const uint16_t road274[][2]={ 
+const uint16_t road274[][2]= {
     {nR,1920},
     {49,240},
     {nR,480},
@@ -1273,7 +1273,7 @@ const uint16_t road274[][2]={
     {38,80}
 };
 //======================
-const uint16_t road275[][2]={ 
+const uint16_t road275[][2]= {
     {nR,1920},
     {38,240},
     {nR,600},
@@ -1396,7 +1396,7 @@ const uint16_t road275[][2]={
     {38,1080}
 };
 //======================
-const uint16_t road276[][2]={ 
+const uint16_t road276[][2]= {
     {nR,2880},
     {38,240},
     {nR,720},
@@ -1453,7 +1453,7 @@ const uint16_t road276[][2]={
     {38,540}
 };
 //======================
-const uint16_t road277[][2]={ 
+const uint16_t road277[][2]= {
     {nR,4980},
     {38,1980},
     {nR,1380},
@@ -1493,7 +1493,7 @@ const uint16_t road277[][2]={
     {nR,1380},
     {38,540}
 };
-void road27(void){
+void road27(void) {
     Note note;
     BGMM.enable=false;
     BGMM.wave_form_data[0] = NOKOGIRI;
@@ -1516,56 +1516,56 @@ void road27(void){
 
     //-------------
     uint16_t len0 = sizeof(road270)/sizeof(road270[0]);
-    for(int i=0;i<len0;i++){
+    for(int i=0; i<len0; i++) {
         note.pitch = road270[i][0];
         note.len = road270[i][1];
         BGMM.noteBuff[0].push(note);
     }
     //-------------
     uint16_t len1 = sizeof(road271)/sizeof(road271[0]);
-    for(int i=0;i<len1;i++){
+    for(int i=0; i<len1; i++) {
         note.pitch = road271[i][0];
         note.len = road271[i][1];
         BGMM.noteBuff[1].push(note);
     }
     //-------------
     uint16_t len2 = sizeof(road272)/sizeof(road272[0]);
-    for(int i=0;i<len2;i++){
+    for(int i=0; i<len2; i++) {
         note.pitch = road272[i][0];
         note.len = road272[i][1];
         BGMM.noteBuff[2].push(note);
     }
     //-------------
- //   uint16_t len3 = sizeof(road273)/sizeof(road273[0]);
- //   for(int i=0;i<len3;i++){
- //       note.pitch = road273[i][0];
- //       note.len = road273[i][1];
- //       BGMM.noteBuff[3].push(note);
- //   }
+//   uint16_t len3 = sizeof(road273)/sizeof(road273[0]);
+//   for(int i=0;i<len3;i++){
+//       note.pitch = road273[i][0];
+//       note.len = road273[i][1];
+//       BGMM.noteBuff[3].push(note);
+//   }
     //-------------
     uint16_t len4 = sizeof(road274)/sizeof(road274[0]);
-    for(int i=0;i<len4;i++){
+    for(int i=0; i<len4; i++) {
         note.pitch = road274[i][0];
         note.len = road274[i][1];
         BGMM.noteBuff[4].push(note);
     }
     //-------------
     uint16_t len5 = sizeof(road275)/sizeof(road275[0]);
-    for(int i=0;i<len5;i++){
+    for(int i=0; i<len5; i++) {
         note.pitch = road275[i][0];
         note.len = road275[i][1];
         BGMM.noteBuff[5].push(note);
     }
     //-------------
     uint16_t len6 = sizeof(road276)/sizeof(road276[0]);
-    for(int i=0;i<len6;i++){
+    for(int i=0; i<len6; i++) {
         note.pitch = road276[i][0];
         note.len = road276[i][1];
         BGMM.noteBuff[6].push(note);
     }
     //-------------
     uint16_t len7 = sizeof(road277)/sizeof(road277[0]);
-    for(int i=0;i<len7;i++){
+    for(int i=0; i<len7; i++) {
         note.pitch = road277[i][0];
         note.len = road277[i][1];
         BGMM.noteBuff[7].push(note);

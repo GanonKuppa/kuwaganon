@@ -3,7 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-inline int printfAsync(const char *fmt, ...) {
+inline int printfAsync(const char* fmt, ...) {
     int len;
 
     va_list ap;

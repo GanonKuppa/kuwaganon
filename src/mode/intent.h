@@ -4,10 +4,10 @@
 #include <stdint.h>
 #include <string>
 
-class Intent{
-public:
-    Intent(){};
-    virtual ~Intent(){};
+class Intent {
+  public:
+    Intent() {};
+    virtual ~Intent() {};
 
     std::map<std::string, float> float_param;
     std::map<std::string, int8_t> int8_t_param;

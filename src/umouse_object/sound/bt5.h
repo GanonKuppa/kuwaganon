@@ -1,5 +1,5 @@
 //======================
-const uint16_t bt50[][2]={ 
+const uint16_t bt50[][2]= {
     {nR,1920},
     {50,10},
     {nR,110},
@@ -1298,7 +1298,7 @@ const uint16_t bt50[][2]={
     {36,10}
 };
 //======================
-const uint16_t bt51[][2]={ 
+const uint16_t bt51[][2]= {
     {nR,1920},
     {49,10},
     {nR,350},
@@ -2093,7 +2093,7 @@ const uint16_t bt51[][2]={
     {46,10}
 };
 //======================
-const uint16_t bt52[][2]={ 
+const uint16_t bt52[][2]= {
     {nR,35040},
     {54,10},
     {nR,1670},
@@ -2115,7 +2115,7 @@ const uint16_t bt52[][2]={
     {nR,230},
     {54,10}
 };
-void bt5(void){
+void bt5(void) {
     Note note;
     BGMM.enable=false;
     BGMM.wave_form_data[0] = KUKEI12_5;
@@ -2128,21 +2128,21 @@ void bt5(void){
     BGMM.time_resolution = 480;
     //-------------
     uint16_t len0 = sizeof(bt50)/sizeof(bt50[0]);
-    for(int i=0;i<len0;i++){
+    for(int i=0; i<len0; i++) {
         note.pitch = bt50[i][0];
         note.len = bt50[i][1];
         BGMM.noteBuff[0].push(note);
     }
     //-------------
     uint16_t len1 = sizeof(bt51)/sizeof(bt51[0]);
-    for(int i=0;i<len1;i++){
+    for(int i=0; i<len1; i++) {
         note.pitch = bt51[i][0];
         note.len = bt51[i][1];
         BGMM.noteBuff[1].push(note);
     }
     //-------------
     uint16_t len2 = sizeof(bt52)/sizeof(bt52[0]);
-    for(int i=0;i<len2;i++){
+    for(int i=0; i<len2; i++) {
         note.pitch = bt52[i][0];
         note.len = bt52[i][1];
         BGMM.noteBuff[2].push(note);

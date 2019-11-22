@@ -3,18 +3,18 @@
 #include "baseActivity.h"
 #include "communication.h"
 
-namespace umouse{
+namespace umouse {
 
-class CalibrateWallCenterActivity : public BaseActivity{
-protected:
-    ELoopStatus loop(){
+    class CalibrateWallCenterActivity : public BaseActivity {
+      protected:
+        ELoopStatus loop() {
 
-        return ELoopStatus::CONTINUE;
+            return ELoopStatus::CONTINUE;
+        };
+        void onStart() {
+            printfAsync("This is calibrate wall center activity.\n");
+        };
+        void onFinish() {};
     };
-    void onStart(){
-        printfAsync("This is calibrate wall center activity.\n");
-    };
-    void onFinish(){};
-};
 
 }

@@ -33,19 +33,19 @@
 #ifndef EIGEN_SELFADJOINT_MATRIX_VECTOR_BLAS_H
 #define EIGEN_SELFADJOINT_MATRIX_VECTOR_BLAS_H
 
-namespace Eigen { 
+namespace Eigen {
 
-namespace internal {
+    namespace internal {
 
-/**********************************************************************
-* This file implements selfadjoint matrix-vector multiplication using BLAS
-**********************************************************************/
+        /**********************************************************************
+        * This file implements selfadjoint matrix-vector multiplication using BLAS
+        **********************************************************************/
 
 // symv/hemv specialization
 
-template<typename Scalar, typename Index, int StorageOrder, int UpLo, bool ConjugateLhs, bool ConjugateRhs>
-struct selfadjoint_matrix_vector_product_symv :
-  selfadjoint_matrix_vector_product<Scalar,Index,StorageOrder,UpLo,ConjugateLhs,ConjugateRhs,BuiltIn> {};
+        template<typename Scalar, typename Index, int StorageOrder, int UpLo, bool ConjugateLhs, bool ConjugateRhs>
+        struct selfadjoint_matrix_vector_product_symv :
+            selfadjoint_matrix_vector_product<Scalar,Index,StorageOrder,UpLo,ConjugateLhs,ConjugateRhs,BuiltIn> {};
 
 #define EIGEN_BLAS_SYMV_SPECIALIZE(Scalar) \
 template<typename Index, int StorageOrder, int UpLo, bool ConjugateLhs, bool ConjugateRhs> \
@@ -66,10 +66,10 @@ static void run( \
   } \
 }; \
 
-EIGEN_BLAS_SYMV_SPECIALIZE(double)
-EIGEN_BLAS_SYMV_SPECIALIZE(float)
-EIGEN_BLAS_SYMV_SPECIALIZE(dcomplex)
-EIGEN_BLAS_SYMV_SPECIALIZE(scomplex)
+        EIGEN_BLAS_SYMV_SPECIALIZE(double)
+        EIGEN_BLAS_SYMV_SPECIALIZE(float)
+        EIGEN_BLAS_SYMV_SPECIALIZE(dcomplex)
+        EIGEN_BLAS_SYMV_SPECIALIZE(scomplex)
 
 #define EIGEN_BLAS_SYMV_SPECIALIZATION(EIGTYPE,BLASTYPE,BLASFUNC) \
 template<typename Index, int StorageOrder, int UpLo, bool ConjugateLhs, bool ConjugateRhs> \
@@ -100,18 +100,18 @@ const EIGTYPE* _rhs, EIGTYPE* res, EIGTYPE alpha) \
 };
 
 #ifdef EIGEN_USE_MKL
-EIGEN_BLAS_SYMV_SPECIALIZATION(double,   double, dsymv)
-EIGEN_BLAS_SYMV_SPECIALIZATION(float,    float,  ssymv)
-EIGEN_BLAS_SYMV_SPECIALIZATION(dcomplex, MKL_Complex16, zhemv)
-EIGEN_BLAS_SYMV_SPECIALIZATION(scomplex, MKL_Complex8,  chemv)
+        EIGEN_BLAS_SYMV_SPECIALIZATION(double,   double, dsymv)
+        EIGEN_BLAS_SYMV_SPECIALIZATION(float,    float,  ssymv)
+        EIGEN_BLAS_SYMV_SPECIALIZATION(dcomplex, MKL_Complex16, zhemv)
+        EIGEN_BLAS_SYMV_SPECIALIZATION(scomplex, MKL_Complex8,  chemv)
 #else
-EIGEN_BLAS_SYMV_SPECIALIZATION(double,   double, dsymv_)
-EIGEN_BLAS_SYMV_SPECIALIZATION(float,    float,  ssymv_)
-EIGEN_BLAS_SYMV_SPECIALIZATION(dcomplex, double, zhemv_)
-EIGEN_BLAS_SYMV_SPECIALIZATION(scomplex, float,  chemv_)
+        EIGEN_BLAS_SYMV_SPECIALIZATION(double,   double, dsymv_)
+        EIGEN_BLAS_SYMV_SPECIALIZATION(float,    float,  ssymv_)
+        EIGEN_BLAS_SYMV_SPECIALIZATION(dcomplex, double, zhemv_)
+        EIGEN_BLAS_SYMV_SPECIALIZATION(scomplex, float,  chemv_)
 #endif
 
-} // end namespace internal
+    } // end namespace internal
 
 } // end namespace Eigen
 

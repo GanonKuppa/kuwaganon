@@ -6,8 +6,7 @@ static struct sockaddr_in addr;
 static WSAData wsaData;
 
 
-void initUdpClient(std::string ip, int port)
-{
+void initUdpClient(std::string ip, int port) {
     WSAStartup(MAKEWORD(2, 0), &wsaData);
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     addr.sin_family = AF_INET;
@@ -16,11 +15,11 @@ void initUdpClient(std::string ip, int port)
 
 }
 
-void sendUdpString(std::string s){
-    sendto(sock, s.c_str(), s.length(), 0, (struct sockaddr *)&addr, sizeof(addr));
+void sendUdpString(std::string s) {
+    sendto(sock, s.c_str(), s.length(), 0, (struct sockaddr*)&addr, sizeof(addr));
 }
 
-void finalizeUdpClient(){
+void finalizeUdpClient() {
     closesocket(sock);
     WSACleanup();
 }

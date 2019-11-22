@@ -39,7 +39,7 @@ static const uint32_t F_FCLK = 48000000;
 
 enum class error
     : uint8_t {
-        NONE, //< エラー無し
+    NONE, //< エラー無し
     ADDRESS, //< アドレス・エラー
     TIMEOUT, //< タイム・アウト・エラー
     LOCK, //< ロック・エラー
@@ -47,7 +47,7 @@ enum class error
 
 enum class mode
     : uint8_t {
-        NONE, RD, PE
+    NONE, RD, PE
 };
 
 static error error_ = error::NONE;
@@ -99,8 +99,7 @@ static bool FACI_termination() {
 
     if (FLASH.FASTAT.BIT.CMDLK == 0) {
         return true;
-    }
-    else {
+    } else {
         //debug_format("FACI 'turn_break_' fail\n");
         return false;
     }
@@ -151,8 +150,7 @@ static bool initFCU() {
         while (FLASH.FENTRYR.WORD != 0) {
             if (wait > 0) {
                 --wait;
-            }
-            else {
+            } else {
                 //debug_format("FACI Tras FARM timeout\n");
                 return false;
             }
@@ -174,8 +172,7 @@ static bool initFCU() {
     if (f) {
         FACI_readMD();
         trans_farm_ = true;
-    }
-    else {
+    } else {
         FACI_termination();
         //debug_format("FACI Tras FARM lock\n");
     }
@@ -246,8 +243,7 @@ bool initDataFlash() {
     if (clk & 1) {
         clk >>= 1;
         ++clk;
-    }
-    else {
+    } else {
         clk >>= 1;
     }
     if (clk > 60) {
@@ -335,8 +331,7 @@ bool eraseCheckDataFlash(uint32_t org, uint32_t len) {
 
     if (FLASH.FASTAT.BIT.CMDLK == 0) {
         return (FLASH.FBCSTAT.BIT.BCST == 0);
-    }
-    else {
+    } else {
         error_ = error::LOCK;
         //debug_format("FACI 'erase_check' lock fail\n");
         return false;
@@ -382,8 +377,7 @@ bool eraseDataFlash(uint32_t org) {
 
         error_ = error::NONE;
         return true;
-    }
-    else {
+    } else {
         error_ = error::LOCK;
         //debug_format("FACI 'erase' lock fail\n");
         return false;
@@ -434,8 +428,7 @@ bool writeDataFlash(uint32_t org, const void* src, uint32_t len) {
             }
             org &= 0xFFFFFFFC;
             f = write32(tmp, org);
-        }
-        else {
+        } else {
             f = write32(p, org);
             p += 4;
             l -= 4;

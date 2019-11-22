@@ -1,5 +1,5 @@
 //======================
-const uint16_t meiji0[][2]={ 
+const uint16_t meiji0[][2]= {
     {68,24},
     {71,24},
     {75,24},
@@ -533,7 +533,7 @@ const uint16_t meiji0[][2]={
     {72,24}
 };
 //======================
-const uint16_t meiji1[][2]={ 
+const uint16_t meiji1[][2]= {
     {63,96},
     {nR,48},
     {64,96},
@@ -923,7 +923,7 @@ const uint16_t meiji1[][2]={
     {60,96}
 };
 //======================
-const uint16_t meiji2[][2]={ 
+const uint16_t meiji2[][2]= {
     {59,96},
     {nR,48},
     {59,96},
@@ -1261,7 +1261,7 @@ const uint16_t meiji2[][2]={
     {55,96}
 };
 //======================
-const uint16_t meiji3[][2]={ 
+const uint16_t meiji3[][2]= {
     {56,96},
     {nR,48},
     {56,96},
@@ -1476,19 +1476,19 @@ const uint16_t meiji3[][2]={
     {52,96}
 };
 //======================
-const uint16_t meiji4[][2]={ 
+const uint16_t meiji4[][2]= {
     {nR,18432},
     {48,384}
 };
 //======================
-const uint16_t meiji5[][2]={ 
+const uint16_t meiji5[][2]= {
     {nR,18432},
     {41,96},
     {41,96},
     {41,96},
     {41,96}
 };
-void meiji(void){
+void meiji(void) {
     Note note;
     BGMM.enable=false;
     BGMM.wave_form_data[0] = KUKEI12_5;
@@ -1507,42 +1507,42 @@ void meiji(void){
     BGMM.time_resolution = 96;
     //-------------
     uint16_t len0 = sizeof(meiji0)/sizeof(meiji0[0]);
-    for(int i=0;i<len0;i++){
+    for(int i=0; i<len0; i++) {
         note.pitch = meiji0[i][0];
         note.len = meiji0[i][1];
         BGMM.noteBuff[0].push(note);
     }
     //-------------
     uint16_t len1 = sizeof(meiji1)/sizeof(meiji1[0]);
-    for(int i=0;i<len1;i++){
+    for(int i=0; i<len1; i++) {
         note.pitch = meiji1[i][0];
         note.len = meiji1[i][1];
         BGMM.noteBuff[1].push(note);
     }
     //-------------
     uint16_t len2 = sizeof(meiji2)/sizeof(meiji2[0]);
-    for(int i=0;i<len2;i++){
+    for(int i=0; i<len2; i++) {
         note.pitch = meiji2[i][0];
         note.len = meiji2[i][1];
         BGMM.noteBuff[2].push(note);
     }
     //-------------
     uint16_t len3 = sizeof(meiji3)/sizeof(meiji3[0]);
-    for(int i=0;i<len3;i++){
+    for(int i=0; i<len3; i++) {
         note.pitch = meiji3[i][0];
         note.len = meiji3[i][1];
         BGMM.noteBuff[3].push(note);
     }
     //-------------
     uint16_t len4 = sizeof(meiji4)/sizeof(meiji4[0]);
-    for(int i=0;i<len4;i++){
+    for(int i=0; i<len4; i++) {
         note.pitch = meiji4[i][0];
         note.len = meiji4[i][1];
         BGMM.noteBuff[4].push(note);
     }
     //-------------
     uint16_t len5 = sizeof(meiji5)/sizeof(meiji5[0]);
-    for(int i=0;i<len5;i++){
+    for(int i=0; i<len5; i++) {
         note.pitch = meiji5[i][0];
         note.len = meiji5[i][1];
         BGMM.noteBuff[5].push(note);

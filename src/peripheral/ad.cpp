@@ -191,7 +191,7 @@ uint16_t startAD_AN000(void) {
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
     int dummy = 0;
     while (S12AD.ADCSR.BIT.ADST == 1) dummy ++;
-        
+
     return S12AD.ADDR0;
 }
 
@@ -205,7 +205,7 @@ uint16_t startAD_AN001(void) {
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
     volatile int dummy = 0;
     while (S12AD.ADCSR.BIT.ADST == 1) dummy ++;
-        
+
     return S12AD.ADDR1;
 }
 
@@ -219,7 +219,7 @@ uint16_t startAD_AN002(void) {
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
     volatile int dummy = 0;
     while (S12AD.ADCSR.BIT.ADST == 1) dummy ++;
-        
+
     return S12AD.ADDR2;
 }
 
@@ -247,7 +247,7 @@ uint16_t startAD_AN004(void) {
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
     int dummy = 0;
     while (S12AD.ADCSR.BIT.ADST == 1)dummy ++;
-        
+
     return S12AD.ADDR4;
 }
 
@@ -261,7 +261,7 @@ uint16_t startAD_AN005(void) {
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
     int dummy = 0;
     while (S12AD.ADCSR.BIT.ADST == 1) dummy ++;
-    
+
     return S12AD.ADDR5;
 }
 
@@ -289,7 +289,7 @@ uint16_t startAD_AN007(void) {
     //S12AD.ADSTRGR.BIT.ADSTRS = 0;
     int dummy = 0;
     while (S12AD.ADCSR.BIT.ADST == 1) dummy ++;
-    
+
     return S12AD.ADDR7;
 }
 

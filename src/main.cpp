@@ -25,7 +25,7 @@ extern "C" void __main() {
         typedef void (*pfunc)();
         extern pfunc __ctors[];
         extern pfunc __ctors_end[];
-        pfunc *p;
+        pfunc* p;
 
         initialized = 1;
         for (p = __ctors_end; p > __ctors;)
@@ -33,7 +33,7 @@ extern "C" void __main() {
     }
 }
 
-#endif 
+#endif
 
 //その他
 #include <stdint.h>
@@ -102,14 +102,14 @@ void timeInterrupt(void) {
     //--------------------------------------//
     umouse::ICM20602& icm = umouse::ICM20602::getInstance();
     umouse::adis16470& adis = umouse::adis16470::getInstance();
-    umouse::FcLed &fcled = umouse::FcLed::getInstance();
-    umouse::WallSensor &wallSen = umouse::WallSensor::getInstance();
-    umouse::Gamepad &gamepad = umouse::Gamepad::getInstance();
-    umouse::UMouse &mouse = umouse::UMouse::getInstance();
-    umouse::BatVoltageMonitor &batVolMan = umouse::BatVoltageMonitor::getInstance();
-    umouse::WheelOdometry &wheelOdometry = umouse::WheelOdometry::getInstance();
-    umouse::PseudoDialL &dialL = umouse::PseudoDialL::getInstance();
-    umouse::PseudoDialR &dialR = umouse::PseudoDialR::getInstance();
+    umouse::FcLed& fcled = umouse::FcLed::getInstance();
+    umouse::WallSensor& wallSen = umouse::WallSensor::getInstance();
+    umouse::Gamepad& gamepad = umouse::Gamepad::getInstance();
+    umouse::UMouse& mouse = umouse::UMouse::getInstance();
+    umouse::BatVoltageMonitor& batVolMan = umouse::BatVoltageMonitor::getInstance();
+    umouse::WheelOdometry& wheelOdometry = umouse::WheelOdometry::getInstance();
+    umouse::PseudoDialL& dialL = umouse::PseudoDialL::getInstance();
+    umouse::PseudoDialR& dialR = umouse::PseudoDialR::getInstance();
 
     //--------------------------------------//
 
@@ -130,36 +130,34 @@ void timeInterrupt(void) {
     }
     //スロット0
     if (int_tick_count % 4 == 0) {
-        if (getElapsedMsec() > 5000){
+        if (getElapsedMsec() > 5000) {
             std::function< void(void) > w1 = [&wallSen]() {wallSen.update();};
             std::function< void(void) > w2 = [&icm]() {icm.update();};
             std::function< void(void) > w3 = [&mouse]() {mouse.update();};
             std::function< void(void) > w4 = []() {waitusec_sub(20);};
             adis.update(w1, w2, w3, w4);
             sendDataSCIFA9();
-        }
-        else{
-            wallSen.update();            
+        } else {
+            wallSen.update();
         }
     }
     //スロット1
     if (int_tick_count % 4 == 0) {
         wheelOdometry.update();
         gamepad.update();
-        
+
     }
     //スロット2
     if (int_tick_count % 4 == 2) {
-        if (getElapsedMsec() > 5000){
+        if (getElapsedMsec() > 5000) {
             std::function< void(void) > w1 = [&wallSen]() {wallSen.update();};
             std::function< void(void) > w2 = [&icm]() {icm.update();};
             std::function< void(void) > w3 = [&mouse]() {mouse.update();};
             std::function< void(void) > w4 = []() {waitusec_sub(20);};
             adis.update(w1, w2, w3, w4);
             sendDataSCIFA9();
-        }
-        else{
-            wallSen.update();            
+        } else {
+            wallSen.update();
         }
     }
     //スロット3
@@ -167,7 +165,7 @@ void timeInterrupt(void) {
         wheelOdometry.update();
         dialL.update();
         dialR.update();
-        fcled.update();        
+        fcled.update();
     }
 
     /////毎回行う処理/////
@@ -178,8 +176,8 @@ void timeInterrupt(void) {
         SYSTEM.SWRR = 0xA501;
     }
 
-    batVolMan.update();    
-    soundUpdate();    
+    batVolMan.update();
+    soundUpdate();
     endTimeuCountIntCMT0();
 
     int_tick_count++;
@@ -239,7 +237,7 @@ void periperalInit() {
 
     //データフラッシュ
     initDataFlash();
-    umouse::ParameterManager &pm = umouse::ParameterManager::getInstance();
+    umouse::ParameterManager& pm = umouse::ParameterManager::getInstance();
     pm.init();
 
     //ウォッチドックタイマー

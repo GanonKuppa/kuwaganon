@@ -16,10 +16,10 @@
 namespace umouse {
 
     class ShortestRunActivity : public BaseActivity {
-    protected:
+      protected:
         ELoopStatus loop() {
             waitmsec(100);
-            UMouse &m = UMouse::getInstance();
+            UMouse& m = UMouse::getInstance();
             if(m.trajCommander.empty()== true) return ELoopStatus::FINISH;
             else return ELoopStatus::CONTINUE;
         }
@@ -30,7 +30,7 @@ namespace umouse {
             uint8_t run_mode = 0;
             uint8_t param_mode = 0;
             {
-                Intent *intent = new Intent();
+                Intent* intent = new Intent();
                 intent->uint8_t_param["SUB_MODE_NUM"] = 6;
                 auto activity = ActivityFactory::cteateSubModeSelect();
                 activity->start(intent);
@@ -41,7 +41,7 @@ namespace umouse {
             }
 
             {
-                Intent *intent = new Intent();
+                Intent* intent = new Intent();
                 intent->uint8_t_param["SUB_MODE_NUM"] = 8;
                 intent->uint16_t_param["LED_ON_MSEC"] = 125;
                 intent->uint16_t_param["LED_OFF_MSEC"] = 125;
@@ -55,12 +55,12 @@ namespace umouse {
             }
 
 
-            UMouse &m = UMouse::getInstance();
-            ParameterManager &pm = ParameterManager::getInstance();
+            UMouse& m = UMouse::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
 
             waitmsec(1000);
-            ICM20602 &icm = ICM20602::getInstance();
-            adis16470 &adis = adis16470::getInstance();
+            ICM20602& icm = ICM20602::getInstance();
+            adis16470& adis = adis16470::getInstance();
             icm.calibOmegaOffset(800);
             icm.calibAccOffset(800);
             adis.calibOmegaOffset(800);
@@ -82,16 +82,16 @@ namespace umouse {
             //                                  v   turn_v a
             else if(param_mode == 1) turn_p.set(1.0, 0.35, 4.0);
             else if(param_mode == 2) turn_p.set(1.5, 0.35, 4.0);
-            else{                
+            else {
                 if(param_mode == 3) setParamFromFlash(0, turn_p);
                 else if(param_mode == 4) setParamFromFlash(1, turn_p);
                 else if(param_mode == 5) setParamFromFlash(2, turn_p);
                 else if(param_mode == 6) setParamFromFlash(3, turn_p);
                 else if(param_mode == 7) setParamFromFlash(4, turn_p);
             }
-            
 
-            
+
+
             //else if(param_mode == 3) turn_p.set(1.0, 0.40, 0.40, 0.4 , 0.4 , 0.4 , 0.4 , 0.4 , 5.0, 3.0);
             //else if(param_mode == 4) turn_p.set(1.0, 0.45, 0.45, 0.45, 0.38, 0.45, 0.45, 0.45, 5.0, 3.0);
             //else if(param_mode == 5) turn_p.set(1.0, 0.50, 0.50, 0.47, 0.38, 0.47, 0.47, 0.47, 5.0, 3.0);
@@ -104,114 +104,104 @@ namespace umouse {
             printPath(path_vec);
 
 
-            if(run_mode == 0 ){
-                 return;
-            }
-            else if(run_mode == 1 ){
+            if(run_mode == 0 ) {
+                return;
+            } else if(run_mode == 1 ) {
                 translatePathSpin(path_vec);
                 HF_playPathSpin(turn_p, path_vec, m.trajCommander);
-            }
-            else if(run_mode == 2){
+            } else if(run_mode == 2) {
                 translatePathDiagonal(path_vec);
                 HF_playPathSpinDiagonal(turn_p, path_vec, m.trajCommander);
-            }
-            else if(run_mode == 3){
+            } else if(run_mode == 3) {
                 translatePath90Deg(path_vec);
                 HF_playPath(turn_p, path_vec, m.trajCommander);
-            }
-            else if(run_mode == 4){
+            } else if(run_mode == 4) {
                 translatePathLong(path_vec);
                 HF_playPath(turn_p, path_vec, m.trajCommander);
-            }
-            else if(run_mode == 5){
+            } else if(run_mode == 5) {
                 translatePathDiagonal(path_vec);
                 HF_playPath(turn_p, path_vec, m.trajCommander);
             }
             // ゴール区画に微妙に入り切れないことを防ぐための処理
             auto traj0 = StraightTrajectory::create(0.09f, 0.1f);
-            m.trajCommander.push(std::move(traj0));    
+            m.trajCommander.push(std::move(traj0));
 
         }
         void onFinish() { }
 
-    private:
-    void setParamFromFlash(uint8_t num, TurnParameter& turn_p){
-        ParameterManager &pm = ParameterManager::getInstance();
-        float v, v_d, v_90, v_l90, v_180, v_d90, v_45, v_135, a, a_diag;
-        if(num == 0){
-            v = pm.shortest_0_v;
-            v_d = pm.shortest_0_v_d;
-            v_90 = pm.shortest_0_v_90;
-            v_l90 = pm.shortest_0_v_l90;
-            v_180 = pm.shortest_0_v_180;
-            v_d90 = pm.shortest_0_v_d90;
-            v_45 = pm.shortest_0_v_45;
-            v_135 = pm.shortest_0_v_135;
-            a = pm.shortest_0_a;
-            a_diag = pm.shortest_0_a_diag;
+      private:
+        void setParamFromFlash(uint8_t num, TurnParameter& turn_p) {
+            ParameterManager& pm = ParameterManager::getInstance();
+            float v, v_d, v_90, v_l90, v_180, v_d90, v_45, v_135, a, a_diag;
+            if(num == 0) {
+                v = pm.shortest_0_v;
+                v_d = pm.shortest_0_v_d;
+                v_90 = pm.shortest_0_v_90;
+                v_l90 = pm.shortest_0_v_l90;
+                v_180 = pm.shortest_0_v_180;
+                v_d90 = pm.shortest_0_v_d90;
+                v_45 = pm.shortest_0_v_45;
+                v_135 = pm.shortest_0_v_135;
+                a = pm.shortest_0_a;
+                a_diag = pm.shortest_0_a_diag;
+            } else if(num == 1) {
+                v = pm.shortest_1_v;
+                v_d = pm.shortest_1_v_d;
+                v_90 = pm.shortest_1_v_90;
+                v_l90 = pm.shortest_1_v_l90;
+                v_180 = pm.shortest_1_v_180;
+                v_d90 = pm.shortest_1_v_d90;
+                v_45 = pm.shortest_1_v_45;
+                v_135 = pm.shortest_1_v_135;
+                a = pm.shortest_1_a;
+                a_diag = pm.shortest_1_a_diag;
+            } else if(num == 2) {
+                v = pm.shortest_2_v;
+                v_d = pm.shortest_2_v_d;
+                v_90 = pm.shortest_2_v_90;
+                v_l90 = pm.shortest_2_v_l90;
+                v_180 = pm.shortest_2_v_180;
+                v_d90 = pm.shortest_2_v_d90;
+                v_45 = pm.shortest_2_v_45;
+                v_135 = pm.shortest_2_v_135;
+                a = pm.shortest_2_a;
+                a_diag = pm.shortest_2_a_diag;
+            } else if(num == 3) {
+                v = pm.shortest_3_v;
+                v_d = pm.shortest_3_v_d;
+                v_90 = pm.shortest_3_v_90;
+                v_l90 = pm.shortest_3_v_l90;
+                v_180 = pm.shortest_3_v_180;
+                v_d90 = pm.shortest_3_v_d90;
+                v_45 = pm.shortest_3_v_45;
+                v_135 = pm.shortest_3_v_135;
+                a = pm.shortest_3_a;
+                a_diag = pm.shortest_3_a_diag;
+            } else if(num == 4) {
+                v = pm.shortest_4_v;
+                v_d = pm.shortest_4_v_d;
+                v_90 = pm.shortest_4_v_90;
+                v_l90 = pm.shortest_4_v_l90;
+                v_180 = pm.shortest_4_v_180;
+                v_d90 = pm.shortest_4_v_d90;
+                v_45 = pm.shortest_4_v_45;
+                v_135 = pm.shortest_4_v_135;
+                a = pm.shortest_4_a;
+                a_diag = pm.shortest_4_a_diag;
+            } else {
+                v = 0.35f;
+                v_d = 0.35f;
+                v_90 = 0.35f;
+                v_l90 = 0.35f;
+                v_180 = 0.35f;
+                v_d90 = 0.35f;
+                v_45 = 0.35f;
+                v_135 = 0.35f;
+                a = 1.0f;
+                a_diag = 1.0f;
+            }
+            turn_p.set(v, v_d, v_90, v_l90, v_180, v_d90, v_45, v_135, a, a_diag);
         }
-        else if(num == 1){
-            v = pm.shortest_1_v;
-            v_d = pm.shortest_1_v_d;
-            v_90 = pm.shortest_1_v_90;
-            v_l90 = pm.shortest_1_v_l90;
-            v_180 = pm.shortest_1_v_180;
-            v_d90 = pm.shortest_1_v_d90;
-            v_45 = pm.shortest_1_v_45;
-            v_135 = pm.shortest_1_v_135;
-            a = pm.shortest_1_a;
-            a_diag = pm.shortest_1_a_diag;
-        }
-        else if(num == 2){
-            v = pm.shortest_2_v;
-            v_d = pm.shortest_2_v_d;
-            v_90 = pm.shortest_2_v_90;
-            v_l90 = pm.shortest_2_v_l90;
-            v_180 = pm.shortest_2_v_180;
-            v_d90 = pm.shortest_2_v_d90;
-            v_45 = pm.shortest_2_v_45;
-            v_135 = pm.shortest_2_v_135;
-            a = pm.shortest_2_a;
-            a_diag = pm.shortest_2_a_diag;
-        }
-        else if(num == 3){
-            v = pm.shortest_3_v;
-            v_d = pm.shortest_3_v_d;
-            v_90 = pm.shortest_3_v_90;
-            v_l90 = pm.shortest_3_v_l90;
-            v_180 = pm.shortest_3_v_180;
-            v_d90 = pm.shortest_3_v_d90;
-            v_45 = pm.shortest_3_v_45;
-            v_135 = pm.shortest_3_v_135;
-            a = pm.shortest_3_a;
-            a_diag = pm.shortest_3_a_diag;
-        }
-        else if(num == 4){
-            v = pm.shortest_4_v;
-            v_d = pm.shortest_4_v_d;
-            v_90 = pm.shortest_4_v_90;
-            v_l90 = pm.shortest_4_v_l90;
-            v_180 = pm.shortest_4_v_180;
-            v_d90 = pm.shortest_4_v_d90;
-            v_45 = pm.shortest_4_v_45;
-            v_135 = pm.shortest_4_v_135;
-            a = pm.shortest_4_a;
-            a_diag = pm.shortest_4_a_diag;
-        }
-        else{
-            v = 0.35f;
-            v_d = 0.35f;
-            v_90 = 0.35f;
-            v_l90 = 0.35f;
-            v_180 = 0.35f;
-            v_d90 = 0.35f;
-            v_45 = 0.35f;
-            v_135 = 0.35f;
-            a = 1.0f;
-            a_diag = 1.0f;
-        }
-        turn_p.set(v, v_d, v_90, v_l90, v_180, v_d90, v_45, v_135, a, a_diag);
-    }
 
     };
 

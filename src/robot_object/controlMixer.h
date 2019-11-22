@@ -16,13 +16,13 @@
 namespace umouse {
 
     class ControlMixer {
-    public:
+      public:
         VelocityTypePidfController v_pidf;
         VelocityTypePidfController ang_v_pidf;
         VelocityTypePidfController pos_pidf;
         AngPidfController ang_pidf;
         WallPidfController wall_pidf;
-        
+
         const float DELTA_T = 0.0005;
 
         float target_trans_v;
@@ -57,7 +57,7 @@ namespace umouse {
             v_fric_FF = 0.0f;
             ang_v_back_emf_FF = 0.0f;
             ang_a_acc_FF = 0.0f;
-            ang_v_fric_FF = 0.0f; 
+            ang_v_fric_FF = 0.0f;
 
             pos_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
             v_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
@@ -87,7 +87,7 @@ namespace umouse {
             ang_v_back_emf_FF = 0.0f;
             ang_a_acc_FF = 0.0f;
             ang_v_fric_FF = 0.0f;
-            
+
             pos_pidf.reset();
             v_pidf.reset();
             ang_v_pidf.reset();
@@ -105,8 +105,8 @@ namespace umouse {
         }
 
         bool isOutOfControl() {
-            WheelOdometry &wodo = WheelOdometry::getInstance();
-            ICM20602 &icm = ICM20602::getInstance();
+            WheelOdometry& wodo = WheelOdometry::getInstance();
+            ICM20602& icm = ICM20602::getInstance();
             if( ABS(v_pidf.e_k0) > v_error_th ||
                     ABS(ang_v_pidf.e_k0) > ang_v_error_th ||
                     ABS(icm.omega_f[2] - wodo. getAng_v()) > ang_v_error_th ) error_sec += DELTA_T;
@@ -118,12 +118,12 @@ namespace umouse {
         }
 
         void update(BaseTrajectory& traj, PositionEstimator& esti, bool isRWall, bool isLWall) {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
 
             setPIDF(traj);
             target_trans_v = traj.v;
             target_trans_a = traj.a;
-            
+
             target_rot_x = traj.ang;
             target_rot_v = traj.ang_v;
             target_rot_a = traj.ang_a;
@@ -131,70 +131,65 @@ namespace umouse {
 
             if(traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER) {
                 wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall);
-            }
-            else {
+            } else {
                 wall_pidf.reset();
             }
 
             if( (isRWall || isLWall) &&
-                (WallSensor::getInstance().isRight_for_ctrl() ||
-                 WallSensor::getInstance().isLeft_for_ctrl()) &&
-                 traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER &&
-                 pm.wall_PIDF_enable == true 
-                 //fabs(esti.calcWallCenterOffset()) > 0.001
-                 ){
-                
-                wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall);                
+                    (WallSensor::getInstance().isRight_for_ctrl() ||
+                     WallSensor::getInstance().isLeft_for_ctrl()) &&
+                    traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER &&
+                    pm.wall_PIDF_enable == true
+                    //fabs(esti.calcWallCenterOffset()) > 0.001
+              ) {
+
+                wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall);
                 target_rot_x += wall_pidf.getControlVal();
                 pos_pidf.reset();
-            }
-            else if( (traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
-                      traj.motion_type == EMotionType::STRAIGHT &&
-                      pm.pos_PIDF_enable == true) &&
-                      fabs(esti.calcWallCenterOffset()) > pm.rot_x_wall_abs_center_offset
-            ){
+            } else if( (traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
+                        traj.motion_type == EMotionType::STRAIGHT &&
+                        pm.pos_PIDF_enable == true) &&
+                       fabs(esti.calcWallCenterOffset()) > pm.rot_x_wall_abs_center_offset
+                     ) {
                 pos_pidf.update(0.0, - esti.calcWallCenterOffset());
                 target_rot_x += pos_pidf.getControlVal();
                 wall_pidf.reset();
-            }
-            else if(traj.motion_type == EMotionType::DIAGONAL_CENTER &&
-                    pm.pos_PIDF_enable == true 
-            ){
+            } else if(traj.motion_type == EMotionType::DIAGONAL_CENTER &&
+                      pm.pos_PIDF_enable == true
+                     ) {
                 pos_pidf.update(0.0, - esti.calcDiagWallCenterOffset());
                 target_rot_x += pos_pidf.getControlVal();
             }
 
             // 斜め直進時の衝突回避
-            if(traj.motion_type == EMotionType::DIAGONAL_CENTER){
-                if (WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold){
-                    target_rot_x -= pm.wall_diagonal_avoid_add_ang;                    
-                }
-                else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold){
+            if(traj.motion_type == EMotionType::DIAGONAL_CENTER) {
+                if (WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold) {
+                    target_rot_x -= pm.wall_diagonal_avoid_add_ang;
+                } else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold) {
                     target_rot_x += pm.wall_diagonal_avoid_add_ang;
                 }
             }
             // 斜めターン時の衝突回避
             if(traj.motion_type == EMotionType::CURVE &&
-              (( esti.getAng() > 30.0f  && esti.getAng() < 60.0f  ) ||
-              ( esti.getAng() > 120.0f && esti.getAng() < 150.0f ) ||
-              ( esti.getAng() > 210.0f && esti.getAng() < 240.0f ) ||
-              ( esti.getAng() > 300.0f && esti.getAng() < 330.0f )) &&
-              
-              (traj.turn_type == turn_type_e::TURN_D_90 ||
-              traj.turn_type == turn_type_e::TURN_D2S_135 ||
-              traj.turn_type == turn_type_e::TURN_S2D_135 ||
-              traj.turn_type == turn_type_e::TURN_D2S_45 ||
-              traj.turn_type == turn_type_e::TURN_S2D_45)
+                    (( esti.getAng() > 30.0f  && esti.getAng() < 60.0f  ) ||
+                     ( esti.getAng() > 120.0f && esti.getAng() < 150.0f ) ||
+                     ( esti.getAng() > 210.0f && esti.getAng() < 240.0f ) ||
+                     ( esti.getAng() > 300.0f && esti.getAng() < 330.0f )) &&
+
+                    (traj.turn_type == turn_type_e::TURN_D_90 ||
+                     traj.turn_type == turn_type_e::TURN_D2S_135 ||
+                     traj.turn_type == turn_type_e::TURN_S2D_135 ||
+                     traj.turn_type == turn_type_e::TURN_D2S_45 ||
+                     traj.turn_type == turn_type_e::TURN_S2D_45)
 
 
-              ){
+              ) {
                 if (WallSensor::getInstance().ahead_l() > 150
-                   && WallSensor::getInstance().ahead_l() < pm.wall_diagonal_ahead_l_threshold){
+                        && WallSensor::getInstance().ahead_l() < pm.wall_diagonal_ahead_l_threshold) {
                     target_rot_x -= pm.wall_diagonal_avoid_add_ang;
-                }
-                else if (WallSensor::getInstance().ahead_r() > 150 &&
-                         WallSensor::getInstance().ahead_r() < pm.wall_diagonal_ahead_l_threshold
-                ){
+                } else if (WallSensor::getInstance().ahead_r() > 150 &&
+                           WallSensor::getInstance().ahead_r() < pm.wall_diagonal_ahead_l_threshold
+                          ) {
                     target_rot_x += pm.wall_diagonal_avoid_add_ang;
                 }
             }
@@ -203,24 +198,23 @@ namespace umouse {
             ang_pidf.update(target_rot_x, esti.getAng());
             target_rot_v += ang_pidf.getControlVal();
             //target_rot_v += (target_rot_x - traj.ang)/0.05; // 1度を50msecで回る角速度を足す
-            
+
 
             if( (traj.motion_type != motion_type_pre &&
-                motion_type_pre == EMotionType::STOP)
-                || traj.motion_type == EMotionType::DIRECT_DUTY_SET)
-            {
+                    motion_type_pre == EMotionType::STOP)
+                    || traj.motion_type == EMotionType::DIRECT_DUTY_SET) {
                 ang_v_pidf.reset();
                 ang_pidf.reset();
                 v_pidf.reset();
                 wall_pidf.reset();
                 pos_pidf.reset();
             }
-            
-            WheelOdometry &wodo = WheelOdometry::getInstance();
+
+            WheelOdometry& wodo = WheelOdometry::getInstance();
             v_pidf.update(target_trans_v, wodo.getV());
             ang_v_pidf.update(target_rot_v, esti.getAngV());
 
-            PowerTransmission &pt = PowerTransmission::getInstance();
+            PowerTransmission& pt = PowerTransmission::getInstance();
             duty(0) = 0.0f;
             duty(1) = 0.0f;
 
@@ -229,11 +223,11 @@ namespace umouse {
             v_back_emf_FF = pt.transBackEmfDuty(target_trans_v)(0);
             a_acc_FF = pt.transAccDuty(target_trans_a)(0);
             v_fric_FF = pt.transFrictionCompensationDuty(target_trans_v)(0);
-/*
-            duty_v_FF += pt.transAccDuty(target_trans_a);
-            duty_v_FF += pt.transBackEmfDuty(target_trans_v);
-            duty_v_FF += pt.transFrictionCompensationDuty(target_trans_v);
-*/
+            /*
+                        duty_v_FF += pt.transAccDuty(target_trans_a);
+                        duty_v_FF += pt.transBackEmfDuty(target_trans_v);
+                        duty_v_FF += pt.transFrictionCompensationDuty(target_trans_v);
+            */
             duty_v_FF += pt.transFFWithParamDuty(target_trans_v, target_trans_a);
             if(pm.trans_v_FF_enable == true) duty += duty_v_FF;
 
@@ -241,11 +235,11 @@ namespace umouse {
             ang_v_back_emf_FF = pt.rotBackEmfDuty(target_rot_v)(0);
             ang_a_acc_FF = pt.rotAccDuty(target_rot_a)(0);
             ang_v_fric_FF = pt.rotFrictionCompensationDuty(target_rot_v)(0);
-/*
-            duty_ang_v_FF += pt.rotAccDuty(target_rot_a);
-            duty_ang_v_FF += pt.rotBackEmfDuty(target_rot_v);
-            duty_ang_v_FF += pt.rotFrictionCompensationDuty(target_rot_v);
-*/
+            /*
+                        duty_ang_v_FF += pt.rotAccDuty(target_rot_a);
+                        duty_ang_v_FF += pt.rotBackEmfDuty(target_rot_v);
+                        duty_ang_v_FF += pt.rotFrictionCompensationDuty(target_rot_v);
+            */
             duty_ang_v_FF += pt.rotFFWithParamDuty(target_rot_v, target_rot_a);
             if(pm.rot_v_FF_enable == true) duty += duty_ang_v_FF;
 
@@ -259,23 +253,22 @@ namespace umouse {
             duty(0) += (v_pidf.getControlVal() - ang_v_pidf.getControlVal()) * 4.2f / voltage;
             duty(1) += (v_pidf.getControlVal() + ang_v_pidf.getControlVal()) * 4.2f / voltage;
             // duty飽和時には回転系制御を優先
-            if(duty(0) > 1.0 || duty(1) > 1.0){
+            if(duty(0) > 1.0 || duty(1) > 1.0) {
                 float duty_overflow = 0.0f;
-                if(duty(0) > duty(1) ){
+                if(duty(0) > duty(1) ) {
                     duty_overflow = duty(0) - 1.0f;
-                }
-                else{
+                } else {
                     duty_overflow = duty(1) - 1.0f;
                 }
                 duty(0) -= duty_overflow;
                 duty(1) -= duty_overflow;
 
             }
-            
+
             motion_type_pre = traj.motion_type;
         }
 
-    private:
+      private:
         float error_sec;
         float error_limit_sec;
         float ang_v_error_th;
@@ -283,43 +276,37 @@ namespace umouse {
         EMotionType motion_type_pre;
 
         void setPIDF(const BaseTrajectory& traj) {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
 
             // 速度PIDFゲイン設定
             if(traj.motion_type == EMotionType::STOP || traj.motion_type == EMotionType::SPINTURN) {
                 v_pidf.set(pm.trans_v_spin_P, pm.trans_v_spin_I, pm.trans_v_spin_D, pm.trans_v_spin_F);
-            }
-            else if(traj.motion_type == EMotionType::STRAIGHT || traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
-                    traj.motion_type == EMotionType::DIAGONAL || traj.motion_type == EMotionType::DIAGONAL_CENTER
-            ){
+            } else if(traj.motion_type == EMotionType::STRAIGHT || traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
+                      traj.motion_type == EMotionType::DIAGONAL || traj.motion_type == EMotionType::DIAGONAL_CENTER
+                     ) {
                 v_pidf.set(pm.trans_v_P, pm.trans_v_I, pm.trans_v_D, pm.trans_v_F);
-            }
-            else if(traj.motion_type == EMotionType::CURVE ){
+            } else if(traj.motion_type == EMotionType::CURVE ) {
                 v_pidf.set(pm.trans_v_slalom_P, pm.trans_v_slalom_I, pm.trans_v_slalom_D, pm.trans_v_slalom_F);
             }
 
             // 角速度PIDFゲイン設定
             if(traj.motion_type == EMotionType::STOP || traj.motion_type == EMotionType::SPINTURN) {
                 ang_v_pidf.set(pm.rot_v_spin_P, pm.rot_v_spin_I, pm.rot_v_spin_D, pm.rot_v_spin_F);
-            }
-            else if(traj.motion_type == EMotionType::STRAIGHT || traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
-                    traj.motion_type == EMotionType::DIAGONAL || traj.motion_type == EMotionType::DIAGONAL_CENTER
-            ){
+            } else if(traj.motion_type == EMotionType::STRAIGHT || traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
+                      traj.motion_type == EMotionType::DIAGONAL || traj.motion_type == EMotionType::DIAGONAL_CENTER
+                     ) {
                 ang_v_pidf.set(pm.rot_v_P, pm.rot_v_I, pm.rot_v_D, pm.rot_v_F);
-            }
-            else if(traj.motion_type == EMotionType::CURVE ){
+            } else if(traj.motion_type == EMotionType::CURVE ) {
                 ang_v_pidf.set(pm.rot_v_slalom_P, pm.rot_v_slalom_I, pm.rot_v_slalom_D, pm.rot_v_slalom_F);
             }
 
             // 角度PIDFゲイン設定
             if(traj.motion_type == EMotionType::STOP || traj.motion_type == EMotionType::SPINTURN) {
                 ang_pidf.set(pm.rot_x_spin_P, pm.rot_x_spin_I, pm.rot_x_spin_D, pm.rot_x_spin_F);
-            }
-            else if(traj.motion_type == EMotionType::STRAIGHT || traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
-                    traj.motion_type == EMotionType::DIAGONAL || traj.motion_type == EMotionType::DIAGONAL_CENTER){
+            } else if(traj.motion_type == EMotionType::STRAIGHT || traj.motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
+                      traj.motion_type == EMotionType::DIAGONAL || traj.motion_type == EMotionType::DIAGONAL_CENTER) {
                 ang_pidf.set(pm.rot_x_P, pm.rot_x_I, pm.rot_x_D, pm.rot_x_F);
-            }
-            else if(traj.motion_type == EMotionType::CURVE){
+            } else if(traj.motion_type == EMotionType::CURVE) {
                 ang_pidf.set(pm.rot_x_slalom_P, pm.rot_x_slalom_I, pm.rot_x_slalom_D, pm.rot_x_slalom_F);
             }
 
@@ -327,8 +314,7 @@ namespace umouse {
             if(traj.motion_type == EMotionType::STOP || traj.motion_type == EMotionType::SPINTURN) {
                 //v_pidf.setSaturationEnable(false);
                 v_pidf.setSaturationEnable(pm.trans_v_PIDF_saturation_enable);
-            }
-            else {
+            } else {
                 v_pidf.setSaturationEnable(pm.trans_v_PIDF_saturation_enable);
             }
 
@@ -340,8 +326,7 @@ namespace umouse {
             if(traj.motion_type == EMotionType::STOP || traj.motion_type == EMotionType::SPINTURN) {
                 //ang_v_pidf.setSaturationEnable(false);
                 ang_v_pidf.setSaturationEnable(pm.rot_v_PIDF_saturation_enable);
-            }
-            else {
+            } else {
                 ang_v_pidf.setSaturationEnable(pm.rot_v_PIDF_saturation_enable);
             }
 

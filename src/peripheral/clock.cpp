@@ -14,13 +14,13 @@ void initClock(void) {
 
     /* ---- Initialization of the clock ---- */
 
-    //	SYSTEM.PRCR.WORD = 0xA502;
-    //		MSTP(DTC)     = 1;
-    //		MSTP(EXDMAC0) = 1;
-    //		MSTP(STBYRAM) = 1;
-    //		MSTP(ECCRAM)  = 1;
-    //		MSTP(RAM0)    = 1;
-    //	SYSTEM.PRCR.WORD = 0xA500;
+    //  SYSTEM.PRCR.WORD = 0xA502;
+    //      MSTP(DTC)     = 1;
+    //      MSTP(EXDMAC0) = 1;
+    //      MSTP(STBYRAM) = 1;
+    //      MSTP(ECCRAM)  = 1;
+    //      MSTP(RAM0)    = 1;
+    //  SYSTEM.PRCR.WORD = 0xA500;
     //R_INIT_Clock();
     SYSTEM.PRCR.WORD = 0xA503;
     //-------HOCOの設定
@@ -93,13 +93,13 @@ void initClock(void) {
     SYSTEM.PRCR.WORD = 0xA500;
 
     //モジュールを再起動する.
-    //	SYSTEM.PRCR.WORD = 0xA502;
-    //		MSTP(DTC)     = 0;
-    //		MSTP(EXDMAC0) = 0;
-    //		MSTP(STBYRAM) = 0;
-    //		MSTP(ECCRAM)  = 0;
-    //		MSTP(RAM0)    = 0;
-    //	SYSTEM.PRCR.WORD = 0xA500;
+    //  SYSTEM.PRCR.WORD = 0xA502;
+    //      MSTP(DTC)     = 0;
+    //      MSTP(EXDMAC0) = 0;
+    //      MSTP(STBYRAM) = 0;
+    //      MSTP(ECCRAM)  = 0;
+    //      MSTP(RAM0)    = 0;
+    //  SYSTEM.PRCR.WORD = 0xA500;
 
 }
 

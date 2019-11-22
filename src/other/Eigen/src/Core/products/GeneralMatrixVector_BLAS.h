@@ -33,21 +33,21 @@
 #ifndef EIGEN_GENERAL_MATRIX_VECTOR_BLAS_H
 #define EIGEN_GENERAL_MATRIX_VECTOR_BLAS_H
 
-namespace Eigen { 
+namespace Eigen {
 
-namespace internal {
+    namespace internal {
 
-/**********************************************************************
-* This file implements general matrix-vector multiplication using BLAS
-* gemv function via partial specialization of
-* general_matrix_vector_product::run(..) method for float, double,
-* std::complex<float> and std::complex<double> types
-**********************************************************************/
+        /**********************************************************************
+        * This file implements general matrix-vector multiplication using BLAS
+        * gemv function via partial specialization of
+        * general_matrix_vector_product::run(..) method for float, double,
+        * std::complex<float> and std::complex<double> types
+        **********************************************************************/
 
 // gemv specialization
 
-template<typename Index, typename LhsScalar, int StorageOrder, bool ConjugateLhs, typename RhsScalar, bool ConjugateRhs>
-struct general_matrix_vector_product_gemv;
+        template<typename Index, typename LhsScalar, int StorageOrder, bool ConjugateLhs, typename RhsScalar, bool ConjugateRhs>
+        struct general_matrix_vector_product_gemv;
 
 #define EIGEN_BLAS_GEMV_SPECIALIZE(Scalar) \
 template<typename Index, bool ConjugateLhs, bool ConjugateRhs> \
@@ -80,10 +80,10 @@ static void run( \
 } \
 }; \
 
-EIGEN_BLAS_GEMV_SPECIALIZE(double)
-EIGEN_BLAS_GEMV_SPECIALIZE(float)
-EIGEN_BLAS_GEMV_SPECIALIZE(dcomplex)
-EIGEN_BLAS_GEMV_SPECIALIZE(scomplex)
+        EIGEN_BLAS_GEMV_SPECIALIZE(double)
+        EIGEN_BLAS_GEMV_SPECIALIZE(float)
+        EIGEN_BLAS_GEMV_SPECIALIZE(dcomplex)
+        EIGEN_BLAS_GEMV_SPECIALIZE(scomplex)
 
 #define EIGEN_BLAS_GEMV_SPECIALIZATION(EIGTYPE,BLASTYPE,BLASFUNC) \
 template<typename Index, int LhsStorageOrder, bool ConjugateLhs, bool ConjugateRhs> \
@@ -118,18 +118,18 @@ static void run( \
 };
 
 #ifdef EIGEN_USE_MKL
-EIGEN_BLAS_GEMV_SPECIALIZATION(double,   double, dgemv)
-EIGEN_BLAS_GEMV_SPECIALIZATION(float,    float,  sgemv)
-EIGEN_BLAS_GEMV_SPECIALIZATION(dcomplex, MKL_Complex16, zgemv)
-EIGEN_BLAS_GEMV_SPECIALIZATION(scomplex, MKL_Complex8 , cgemv)
+        EIGEN_BLAS_GEMV_SPECIALIZATION(double,   double, dgemv)
+        EIGEN_BLAS_GEMV_SPECIALIZATION(float,    float,  sgemv)
+        EIGEN_BLAS_GEMV_SPECIALIZATION(dcomplex, MKL_Complex16, zgemv)
+        EIGEN_BLAS_GEMV_SPECIALIZATION(scomplex, MKL_Complex8, cgemv)
 #else
-EIGEN_BLAS_GEMV_SPECIALIZATION(double,   double, dgemv_)
-EIGEN_BLAS_GEMV_SPECIALIZATION(float,    float,  sgemv_)
-EIGEN_BLAS_GEMV_SPECIALIZATION(dcomplex, double, zgemv_)
-EIGEN_BLAS_GEMV_SPECIALIZATION(scomplex, float,  cgemv_)
+        EIGEN_BLAS_GEMV_SPECIALIZATION(double,   double, dgemv_)
+        EIGEN_BLAS_GEMV_SPECIALIZATION(float,    float,  sgemv_)
+        EIGEN_BLAS_GEMV_SPECIALIZATION(dcomplex, double, zgemv_)
+        EIGEN_BLAS_GEMV_SPECIALIZATION(scomplex, float,  cgemv_)
 #endif
 
-} // end namespase internal
+    } // end namespase internal
 
 } // end namespace Eigen
 

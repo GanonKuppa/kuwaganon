@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-namespace umouse{
+namespace umouse {
     int printfSync(const char* fmt, ...);
     int printfAsync(const char* fmt, ...);
     void fetchCommand();

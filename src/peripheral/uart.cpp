@@ -53,7 +53,7 @@ void put1byteSCI1(char c) {
     SCI1.TDR = c;
 }
 /***********nbyte送信関数*******************/
-void putnbyteSCI1(char *buf, int len) {
+void putnbyteSCI1(char* buf, int len) {
     int c;
 
     for (c = 0; c < len; c++) {
@@ -105,7 +105,7 @@ uint16_t recieveBuffCount = 0;
 //deque<uint8_t> recieveBuff;//受信用データバッファ
 
 /***********nbyte送信関数*******************/
-void putnbyteSCIFA9(uint8_t *buf, uint16_t len) {
+void putnbyteSCIFA9(uint8_t* buf, uint16_t len) {
     int c;
 
     for (c = 0; c < len; c++) {

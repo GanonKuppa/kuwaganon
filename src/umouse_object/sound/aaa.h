@@ -1,5 +1,5 @@
 //======================
-const uint16_t aaa0[][2]={ 
+const uint16_t aaa0[][2]= {
     {nR,1920},
     {77,960},
     {76,960},
@@ -973,7 +973,7 @@ const uint16_t aaa0[][2]={
     {86,120}
 };
 //======================
-const uint16_t aaa1[][2]={ 
+const uint16_t aaa1[][2]= {
     {nR,1920},
     {74,960},
     {73,960},
@@ -1970,7 +1970,7 @@ const uint16_t aaa1[][2]={
     {74,120}
 };
 //======================
-const uint16_t aaa2[][2]={ 
+const uint16_t aaa2[][2]= {
     {nR,1920},
     {65,960},
     {64,960},
@@ -2076,7 +2076,7 @@ const uint16_t aaa2[][2]={
     {74,720}
 };
 //======================
-const uint16_t aaa3[][2]={ 
+const uint16_t aaa3[][2]= {
     {nR,97920},
     {50,960},
     {52,960},
@@ -2159,7 +2159,7 @@ const uint16_t aaa3[][2]={
     {55,240}
 };
 //======================
-const uint16_t aaa4[][2]={ 
+const uint16_t aaa4[][2]= {
     {nR,97920},
     {45,960},
     {56,960},
@@ -2178,12 +2178,12 @@ const uint16_t aaa4[][2]={
     {51,960}
 };
 //======================
-const uint16_t aaa5[][2]={ 
+const uint16_t aaa5[][2]= {
     {nR,101280},
     {54,480}
 };
 //======================
-const uint16_t aaa6[][2]={ 
+const uint16_t aaa6[][2]= {
     {nR,1920},
     {53,960},
     {52,960},
@@ -2789,7 +2789,7 @@ const uint16_t aaa6[][2]={
     {62,240}
 };
 //======================
-const uint16_t aaa7[][2]={ 
+const uint16_t aaa7[][2]= {
     {nR,1920},
     {65,960},
     {64,960},
@@ -3399,7 +3399,7 @@ const uint16_t aaa7[][2]={
     {57,240}
 };
 //======================
-const uint16_t aaa8[][2]={ 
+const uint16_t aaa8[][2]= {
     {nR,32400},
     {47,240},
     {55,480},
@@ -3476,7 +3476,7 @@ const uint16_t aaa8[][2]={
     {43,480}
 };
 //======================
-const uint16_t aaa9[][2]={ 
+const uint16_t aaa9[][2]= {
     {nR,32640},
     {50,480},
     {nR,14880},
@@ -3536,13 +3536,13 @@ const uint16_t aaa9[][2]={
     {50,480}
 };
 //======================
-const uint16_t aaa10[][2]={ 
+const uint16_t aaa10[][2]= {
     {nR,116640},
     {71,120},
     {66,360}
 };
 //======================
-const uint16_t aaa11[][2]={ 
+const uint16_t aaa11[][2]= {
     {nR,1920},
     {89,960},
     {88,960},
@@ -3742,7 +3742,7 @@ const uint16_t aaa11[][2]={
     {62,960}
 };
 //======================
-const uint16_t aaa12[][2]={ 
+const uint16_t aaa12[][2]= {
     {nR,27600},
     {69,120},
     {74,120},
@@ -3803,7 +3803,7 @@ const uint16_t aaa12[][2]={
     {69,480}
 };
 //======================
-const uint16_t aaa13[][2]={ 
+const uint16_t aaa13[][2]= {
     {nR,9600},
     {77,960},
     {76,960},
@@ -3956,7 +3956,7 @@ const uint16_t aaa13[][2]={
     {74,1920}
 };
 //======================
-const uint16_t aaa14[][2]={ 
+const uint16_t aaa14[][2]= {
     {nR,157440},
     {77,480},
     {78,480},
@@ -3964,7 +3964,7 @@ const uint16_t aaa14[][2]={
     {80,960}
 };
 //======================
-const uint16_t aaa15[][2]={ 
+const uint16_t aaa15[][2]= {
     {nR,1920},
     {41,960},
     {40,960},
@@ -5094,7 +5094,7 @@ const uint16_t aaa15[][2]={
     {38,120}
 };
 //======================
-const uint16_t aaa16[][2]={ 
+const uint16_t aaa16[][2]= {
     {nR,1920},
     {29,960},
     {28,960},
@@ -5682,7 +5682,7 @@ const uint16_t aaa16[][2]={
     {26,240}
 };
 //======================
-const uint16_t aaa17[][2]={ 
+const uint16_t aaa17[][2]= {
     {nR,96000},
     {74,120},
     {81,120},
@@ -5702,7 +5702,7 @@ const uint16_t aaa17[][2]={
     {86,120}
 };
 //======================
-const uint16_t aaa18[][2]={ 
+const uint16_t aaa18[][2]= {
     {nR,96000},
     {86,120},
     {69,120},
@@ -5722,7 +5722,7 @@ const uint16_t aaa18[][2]={
     {74,120}
 };
 //======================
-const uint16_t aaa19[][2]={ 
+const uint16_t aaa19[][2]= {
     {nR,1920},
     {43,10},
     {nR,950},
@@ -7393,7 +7393,7 @@ const uint16_t aaa19[][2]={
     {48,10}
 };
 //======================
-const uint16_t aaa20[][2]={ 
+const uint16_t aaa20[][2]= {
     {nR,1920},
     {57,10},
     {nR,950},
@@ -7550,7 +7550,7 @@ const uint16_t aaa20[][2]={
     {49,10}
 };
 //======================
-const uint16_t aaa21[][2]={ 
+const uint16_t aaa21[][2]= {
     {nR,1920},
     {41,10},
     {nR,950},
@@ -7560,15 +7560,15 @@ const uint16_t aaa21[][2]={
     {nR,950},
     {41,10},
     {nR,9311},
-	{nR,9311},
-	{nR,9311},
-	{nR,9311},
-	{nR,9311},
-	{nR,9311},
-	{nR,9311},
-	{nR,9311},
-	{nR,9311},
-	{nR,9311},
+    {nR,9311},
+    {nR,9311},
+    {nR,9311},
+    {nR,9311},
+    {nR,9311},
+    {nR,9311},
+    {nR,9311},
+    {nR,9311},
+    {nR,9311},
     {36,10},
     {nR,1910},
     {36,10},
@@ -7615,7 +7615,7 @@ const uint16_t aaa21[][2]={
     {nR,950},
     {49,10}
 };
-void aaa(void){
+void aaa(void) {
     Note note;
     BGMM.enable=false;
     BGMM.wave_form_data[0] = KUKEI12_5;
@@ -7638,56 +7638,56 @@ void aaa(void){
     BGMM.time_resolution = 480;
     //-------------
     uint16_t len0 = sizeof(aaa0)/sizeof(aaa0[0]);
-    for(int i=0;i<len0;i++){
+    for(int i=0; i<len0; i++) {
         note.pitch = aaa0[i][0];
         note.len = aaa0[i][1];
         BGMM.noteBuff[0].push(note);
     }
     //-------------
     uint16_t len1 = sizeof(aaa1)/sizeof(aaa1[0]);
-    for(int i=0;i<len1;i++){
+    for(int i=0; i<len1; i++) {
         note.pitch = aaa1[i][0];
         note.len = aaa1[i][1];
         BGMM.noteBuff[1].push(note);
     }
     //-------------
     uint16_t len2 = sizeof(aaa2)/sizeof(aaa2[0]);
-    for(int i=0;i<len2;i++){
+    for(int i=0; i<len2; i++) {
         note.pitch = aaa2[i][0];
         note.len = aaa2[i][1];
         BGMM.noteBuff[2].push(note);
     }
     //-------------
     uint16_t len3 = sizeof(aaa3)/sizeof(aaa3[0]);
-    for(int i=0;i<len3;i++){
+    for(int i=0; i<len3; i++) {
         note.pitch = aaa3[i][0];
         note.len = aaa3[i][1];
         BGMM.noteBuff[3].push(note);
     }
     //-------------
     uint16_t len4 = sizeof(aaa4)/sizeof(aaa4[0]);
-    for(int i=0;i<len4;i++){
+    for(int i=0; i<len4; i++) {
         note.pitch = aaa4[i][0];
         note.len = aaa4[i][1];
         BGMM.noteBuff[4].push(note);
     }
     //-------------
     uint16_t len5 = sizeof(aaa5)/sizeof(aaa5[0]);
-    for(int i=0;i<len5;i++){
+    for(int i=0; i<len5; i++) {
         note.pitch = aaa5[i][0];
         note.len = aaa5[i][1];
         BGMM.noteBuff[5].push(note);
     }
     //-------------
     uint16_t len6 = sizeof(aaa6)/sizeof(aaa6[0]);
-    for(int i=0;i<len6;i++){
+    for(int i=0; i<len6; i++) {
         note.pitch = aaa6[i][0];
         note.len = aaa6[i][1];
         BGMM.noteBuff[6].push(note);
     }
     //-------------
     uint16_t len7 = sizeof(aaa7)/sizeof(aaa7[0]);
-    for(int i=0;i<len7;i++){
+    for(int i=0; i<len7; i++) {
         note.pitch = aaa7[i][0];
         note.len = aaa7[i][1];
         BGMM.noteBuff[7].push(note);

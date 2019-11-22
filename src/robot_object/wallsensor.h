@@ -18,7 +18,7 @@ namespace umouse {
 
     class WallSensor {
 
-    public:
+      public:
 
         int16_t ahead_l_on;
         int16_t ahead_r_on;
@@ -50,7 +50,7 @@ namespace umouse {
         void setEnable(bool en) {
             enable = en;
             if (enable == false)
-            turnOffAllLed();
+                turnOffAllLed();
         }
 
         void update() {
@@ -78,8 +78,7 @@ namespace umouse {
                 modulateVal();
                 if(isContactWall() == true) contact_wall_time += DELTA_T;
                 else contact_wall_time = 0.0f;
-            }
-            else {
+            } else {
                 turnOffAllLed();
             }
 
@@ -103,25 +102,25 @@ namespace umouse {
         }
 
         bool isRight() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             int16_t threshold = pm.wall_threshold_right;
             if (right_q.at(0) > threshold) return true;
             else return false;
         }
 
         bool isLeft() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             int16_t threshold = pm.wall_threshold_left;
             if (left_q.at(0) > threshold) return true;
             else return false;
         }
 
         bool isAhead() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             int16_t threshold_ar = pm.wall_threshold_ahead_r;
             int16_t threshold_al = pm.wall_threshold_ahead_l;
             if (ahead_r_q.at(0) > threshold_ar ||
-                    ahead_l_q.at(0) > threshold_al ){
+                    ahead_l_q.at(0) > threshold_al ) {
                 return true;
             }
             //else if( 0.09 < calcAheadWallDist() && calcAheadWallDist() < 0.135 ) return true;
@@ -129,7 +128,7 @@ namespace umouse {
         }
 
         bool isAhead_l() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             int16_t threshold_al = pm.wall_threshold_ahead_l;
             if (ahead_l_q.at(0) > threshold_al ) return true;
             else return false;
@@ -137,7 +136,7 @@ namespace umouse {
         }
 
         bool isAhead_r() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             int16_t threshold_ar = pm.wall_threshold_ahead_r;
             if (ahead_r_q.at(0) > threshold_ar ) return true;
             else return false;
@@ -147,7 +146,7 @@ namespace umouse {
         bool isAheadCloseWall() {return 0;}
 
         bool isRight_for_ctrl() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             int16_t d_RS = right_q.at(0) - right_q.at(2);
             int16_t threshold = pm.wall_ctrl_threshold_right;
             int16_t threshold_delta = pm.wall_ctrl_threshold_delta_right;
@@ -160,7 +159,7 @@ namespace umouse {
 
         }
         bool isLeft_for_ctrl() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             int16_t d_LS = left_q.at(0) - left_q.at(2);
             int16_t threshold = pm.wall_ctrl_threshold_left;
             int16_t threshold_delta = pm.wall_ctrl_threshold_delta_left;
@@ -179,16 +178,16 @@ namespace umouse {
         int16_t ahead_r() {return ahead_r_q.at(0);}
 
         int16_t center_r() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             return pm.wall_center_r;
         }
         int16_t center_l() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             return pm.wall_center_l;
         }
 
         bool isContactWall() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             float r_th = pm.wall_contact_threshold_right;
             float l_th = pm.wall_contact_threshold_left;
             float r_a_th = pm.wall_contact_threshold_ahead_r;
@@ -202,24 +201,23 @@ namespace umouse {
             return contact_wall_time;
         }
 
-        float getAheadOnTime(){
+        float getAheadOnTime() {
             return ahead_on_time;
         }
 
         bool isOnWallCenter() {
             if(in_wall_center_time > 0.1) {
                 return true;
-            }
-            else return false;
+            } else return false;
 
         }
 
-        float getOnWallCenterTime(){
+        float getOnWallCenterTime() {
             return in_wall_center_time;
         }
 
         void setWallCenterVal() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             pm.wall_center_r = right();
             pm.wall_center_l = left();
             pm.write<uint16_t>(120, pm.wall_center_r);
@@ -230,12 +228,12 @@ namespace umouse {
         };
 
         bool isCornerL() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             int16_t th_on = pm.wall_corner_threshold_on_l;
             int16_t th_off = pm.wall_corner_threshold_off_l;
 
             if(left_q.at(0) < th_off) {
-                for(int i=1;i<BUFF_SIZE;i++) {
+                for(int i=1; i<BUFF_SIZE; i++) {
                     if(left_q.at(i)> th_on) {
                         return true;
                     }
@@ -246,12 +244,12 @@ namespace umouse {
         }
 
         bool isCornerR() {
-            ParameterManager &pm = ParameterManager::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             int16_t th_on = pm.wall_corner_threshold_on_r;
             int16_t th_off = pm.wall_corner_threshold_off_r;
 
             if(right_q.at(0) < th_off) {
-                for(int i=1;i<BUFF_SIZE;i++) {
+                for(int i=1; i<BUFF_SIZE; i++) {
                     if(right_q.at(i)> th_on) {
                         return true;
                     }
@@ -260,23 +258,21 @@ namespace umouse {
             return false;
         }
 
-    float calcAheadWallDist(){        
-        float dist = 0.0;
-        if(isAhead() && !isLeft()){
-            dist = hornerMethod(ahead_l(), WALL_LA_POLY6_CONSTANT, 7);
+        float calcAheadWallDist() {
+            float dist = 0.0;
+            if(isAhead() && !isLeft()) {
+                dist = hornerMethod(ahead_l(), WALL_LA_POLY6_CONSTANT, 7);
+            } else if(isAhead() && !isRight()) {
+                dist = hornerMethod(ahead_r(), WALL_RA_POLY6_CONSTANT, 7);
+            } else {
+                dist = (hornerMethod(ahead_l(), WALL_LA_POLY6_CONSTANT, 7) +
+                        hornerMethod(ahead_r(), WALL_RA_POLY6_CONSTANT, 7)) * 0.5;
+            }
+            return constrainL(dist, 0.045);
         }
-        else if(isAhead() && !isRight()){
-            dist = hornerMethod(ahead_r(), WALL_RA_POLY6_CONSTANT, 7);
-        }
-        else{
-            dist = (hornerMethod(ahead_l(), WALL_LA_POLY6_CONSTANT, 7) +
-                    hornerMethod(ahead_r(), WALL_RA_POLY6_CONSTANT, 7)) * 0.5;
-        }
-        return constrainL(dist, 0.045);
-    }
 
 
-    private:
+      private:
         const uint8_t BUFF_SIZE = 30;
         const uint16_t LED_ON_USEC = 20;
         bool enable;
@@ -340,19 +336,19 @@ namespace umouse {
         }
 
         void updateOnVal(bool sled1, bool sled2, bool sled3, bool sled4) {
-            if(sled1 == true){
+            if(sled1 == true) {
                 ahead_l_on = startAD_AN101(); //AD_SLED1
                 ahead_l_on = startAD_AN101(); //AD_SLED1
             }
-            if(sled2 == true){
+            if(sled2 == true) {
                 right_on = startAD_AN100();//AD_SLED2
                 right_on = startAD_AN100();//AD_SLED2
             }
-            if(sled3 == true){
+            if(sled3 == true) {
                 left_on = startAD_AN001();//AD_SLED3
                 left_on = startAD_AN001();//AD_SLED3
-            } 
-            if(sled4 == true){
+            }
+            if(sled4 == true) {
                 ahead_r_on = startAD_AN002();//AD_SLED4
                 ahead_r_on = startAD_AN002();//AD_SLED4
             }
@@ -390,38 +386,36 @@ namespace umouse {
             return (isCornerL() || isCornerR());
         }
 
-    //y = 2E-21x6 - 3E-17x5 + 2E-13x4 - 4E-10x3 + 5E-07x2 - 0.0003x + 0.1612                  
-    const float WALL_LA_POLY6_CONSTANT[7] =
-    {
-        0.000000000000000000002496979705f, 
-        -0.000000000000000031343123812308f, 
-        0.000000000000152350727274190000f,
-        -0.000000000364670883847464000000f, 
-        0.000000455240592245447000000000f, 
-        -0.000300062017225004000000000000f, 
-        0.161200042128944000000000000000f 
-    };
+        //y = 2E-21x6 - 3E-17x5 + 2E-13x4 - 4E-10x3 + 5E-07x2 - 0.0003x + 0.1612
+        const float WALL_LA_POLY6_CONSTANT[7] = {
+            0.000000000000000000002496979705f,
+            -0.000000000000000031343123812308f,
+            0.000000000000152350727274190000f,
+            -0.000000000364670883847464000000f,
+            0.000000455240592245447000000000f,
+            -0.000300062017225004000000000000f,
+            0.161200042128944000000000000000f
+        };
 
 
-    // ra
-    //y = 3E-21x6 - 4E-17x5 + 2E-13x4 - 4E-10x3 + 5E-07x2 - 0.0003x + 0.1679
-    const float WALL_RA_POLY6_CONSTANT[7] =
-    {
-        0.000000000000000000003120871021f,
-        -0.000000000000000037347282693124f,
-        0.000000000000173869092712112000f,
-        -0.000000000401311698062999000000f,
-        0.000000488601588712184000000000f,
-        -0.000320169565262498000000000000f,
-        0.167931370815903000000000000000f
-    };
+        // ra
+        //y = 3E-21x6 - 4E-17x5 + 2E-13x4 - 4E-10x3 + 5E-07x2 - 0.0003x + 0.1679
+        const float WALL_RA_POLY6_CONSTANT[7] = {
+            0.000000000000000000003120871021f,
+            -0.000000000000000037347282693124f,
+            0.000000000000173869092712112000f,
+            -0.000000000401311698062999000000f,
+            0.000000488601588712184000000000f,
+            -0.000320169565262498000000000000f,
+            0.167931370815903000000000000000f
+        };
 
-    float hornerMethod(float x, const float a[], int n){
-        float f = a[0];
-        for (int i = 1; i < n; i++)
-            f = f*x + a[i];
-        return f;
-    }
+        float hornerMethod(float x, const float a[], int n) {
+            float f = a[0];
+            for (int i = 1; i < n; i++)
+                f = f*x + a[i];
+            return f;
+        }
 
 
 

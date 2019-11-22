@@ -13,7 +13,7 @@
 
 
 
-void sendRobotPos(float x, float y, float ang){
+void sendRobotPos(float x, float y, float ang) {
     picojson::object obj;
 
     // データの追加
@@ -24,11 +24,11 @@ void sendRobotPos(float x, float y, float ang){
     // 文字列にするためにvalueを使用
     picojson::value val(obj);
     // return std::string
-    val.serialize();    
+    val.serialize();
     sendUdpString( val.serialize());
 }
 
-void sendTargetPos(float x, float y, float ang){
+void sendTargetPos(float x, float y, float ang) {
     picojson::object obj;
 
     // データの追加
@@ -39,13 +39,12 @@ void sendTargetPos(float x, float y, float ang){
     // 文字列にするためにvalueを使用
     picojson::value val(obj);
     // return std::string
-    val.serialize();    
+    val.serialize();
     sendUdpString( val.serialize());
 }
 
 
-int main(int argc, const char *argv[])
-{
+int main(int argc, const char* argv[]) {
     std::cout << "test" << std::endl;
     initUdpClient("127.0.0.1", 2020);
     sendRobotPos(1.0,1.0, 0.0);

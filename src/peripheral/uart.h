@@ -15,10 +15,10 @@
 
 void initSCI1();
 void put1byteSCI1(char c);
-void putnbyteSCI1(char *buf, int len);
+void putnbyteSCI1(char* buf, int len);
 
 void initSCIFA9();
-void putnbyteSCIFA9(uint8_t *buf, uint16_t len);
+void putnbyteSCIFA9(uint8_t* buf, uint16_t len);
 void recieveDataSCIFA9();
 void sendDataSCIFA9();
 

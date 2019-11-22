@@ -1,5 +1,5 @@
 //======================
-const uint16_t togetoge0[][2]={ 
+const uint16_t togetoge0[][2]= {
     {nR,2160},
     {71,80},
     {nR,160},
@@ -1298,7 +1298,7 @@ const uint16_t togetoge0[][2]={
     {67,80}
 };
 //======================
-const uint16_t togetoge1[][2]={ 
+const uint16_t togetoge1[][2]= {
     {nR,1920},
     {76,3840},
     {79,3840},
@@ -1391,7 +1391,7 @@ const uint16_t togetoge1[][2]={
     {74,3840}
 };
 //======================
-const uint16_t togetoge2[][2]={ 
+const uint16_t togetoge2[][2]= {
     {nR,1920},
     {72,3840},
     {76,3840},
@@ -1488,7 +1488,7 @@ const uint16_t togetoge2[][2]={
     {71,2880}
 };
 //======================
-const uint16_t togetoge3[][2]={ 
+const uint16_t togetoge3[][2]= {
     {nR,29280},
     {79,1440},
     {nR,6480},
@@ -1499,7 +1499,7 @@ const uint16_t togetoge3[][2]={
     {79,1200}
 };
 //======================
-const uint16_t togetoge4[][2]={ 
+const uint16_t togetoge4[][2]= {
     {nR,1920},
     {91,3840},
     {95,3840},
@@ -1592,7 +1592,7 @@ const uint16_t togetoge4[][2]={
     {95,3840}
 };
 //======================
-const uint16_t togetoge5[][2]={ 
+const uint16_t togetoge5[][2]= {
     {nR,34560},
     {98,3840},
     {nR,3840},
@@ -1607,7 +1607,7 @@ const uint16_t togetoge5[][2]={
     {95,3840}
 };
 //======================
-const uint16_t togetoge6[][2]={ 
+const uint16_t togetoge6[][2]= {
     {nR,18480},
     {71,96},
     {nR,144},
@@ -1888,7 +1888,7 @@ const uint16_t togetoge6[][2]={
     {91,96}
 };
 //======================
-const uint16_t togetoge7[][2]={ 
+const uint16_t togetoge7[][2]= {
     {nR,1920},
     {69,3840},
     {72,3840},
@@ -1943,7 +1943,7 @@ const uint16_t togetoge7[][2]={
     {71,1920}
 };
 //======================
-const uint16_t togetoge8[][2]={ 
+const uint16_t togetoge8[][2]= {
     {nR,34320},
     {76,240},
     {74,1344},
@@ -2080,7 +2080,7 @@ const uint16_t togetoge8[][2]={
     {81,1056}
 };
 //======================
-const uint16_t togetoge9[][2]={ 
+const uint16_t togetoge9[][2]= {
     {nR,38400},
     {74,672},
     {nR,648},
@@ -2115,7 +2115,7 @@ const uint16_t togetoge9[][2]={
     {76,230}
 };
 //======================
-const uint16_t togetoge10[][2]={ 
+const uint16_t togetoge10[][2]= {
     {nR,17280},
     {41,120},
     {41,120},
@@ -3497,7 +3497,7 @@ const uint16_t togetoge10[][2]={
     {47,120}
 };
 //======================
-const uint16_t togetoge11[][2]={ 
+const uint16_t togetoge11[][2]= {
     {nR,42540},
     {81,480},
     {nR,120},
@@ -3650,7 +3650,7 @@ const uint16_t togetoge11[][2]={
     {74,432}
 };
 //======================
-const uint16_t togetoge12[][2]={ 
+const uint16_t togetoge12[][2]= {
     {nR,42900},
     {76,230},
     {nR,10030},
@@ -3669,7 +3669,7 @@ const uint16_t togetoge12[][2]={
     {71,336}
 };
 //======================
-const uint16_t togetoge13[][2]={ 
+const uint16_t togetoge13[][2]= {
     {nR,18720},
     {71,96},
     {nR,144},
@@ -3944,7 +3944,7 @@ const uint16_t togetoge13[][2]={
     {91,96}
 };
 //======================
-const uint16_t togetoge14[][2]={ 
+const uint16_t togetoge14[][2]= {
     {nR,73080},
     {74,216},
     {nR,744},
@@ -3963,7 +3963,7 @@ const uint16_t togetoge14[][2]={
     {74,216}
 };
 //======================
-const uint16_t togetoge15[][2]={ 
+const uint16_t togetoge15[][2]= {
     {nR,55680},
     {35,10},
     {nR,110},
@@ -5246,7 +5246,7 @@ const uint16_t togetoge15[][2]={
     {46,10}
 };
 //======================
-const uint16_t togetoge16[][2]={ 
+const uint16_t togetoge16[][2]= {
     {nR,2400},
     {95,80},
     {nR,160},
@@ -6545,7 +6545,7 @@ const uint16_t togetoge16[][2]={
     {91,80}
 };
 //======================
-const uint16_t togetoge17[][2]={ 
+const uint16_t togetoge17[][2]= {
     {nR,9720},
     {72,108},
     {nR,12},
@@ -6948,7 +6948,7 @@ const uint16_t togetoge17[][2]={
     {76,108}
 };
 //======================
-const uint16_t togetoge18[][2]={ 
+const uint16_t togetoge18[][2]= {
     {nR,9720},
     {69,108},
     {nR,12},
@@ -7351,7 +7351,7 @@ const uint16_t togetoge18[][2]={
     {72,108}
 };
 //======================
-const uint16_t togetoge19[][2]={ 
+const uint16_t togetoge19[][2]= {
     {nR,9960},
     {72,108},
     {nR,12},
@@ -7649,7 +7649,7 @@ const uint16_t togetoge19[][2]={
     {76,108}
 };
 //======================
-const uint16_t togetoge20[][2]={ 
+const uint16_t togetoge20[][2]= {
     {nR,9960},
     {69,108},
     {nR,12},
@@ -7898,7 +7898,7 @@ const uint16_t togetoge20[][2]={
     {72,108}
 };
 //======================
-const uint16_t togetoge21[][2]={ 
+const uint16_t togetoge21[][2]= {
     {nR,2880},
     {64,14400},
     {nR,85440},
@@ -7907,7 +7907,7 @@ const uint16_t togetoge21[][2]={
     {64,14400}
 };
 //======================
-const uint16_t togetoge22[][2]={ 
+const uint16_t togetoge22[][2]= {
     {nR,34680},
     {76,240},
     {74,1344},
@@ -8032,7 +8032,7 @@ const uint16_t togetoge22[][2]={
     {76,360}
 };
 //======================
-const uint16_t togetoge23[][2]={ 
+const uint16_t togetoge23[][2]= {
     {nR,39600},
     {74,187},
     {nR,293},
@@ -8073,7 +8073,7 @@ const uint16_t togetoge23[][2]={
     {81,1200}
 };
 //======================
-const uint16_t togetoge24[][2]={ 
+const uint16_t togetoge24[][2]= {
     {nR,23040},
     {96,50},
     {nR,10},
@@ -8542,7 +8542,7 @@ const uint16_t togetoge24[][2]={
     {28,50}
 };
 //======================
-const uint16_t togetoge25[][2]={ 
+const uint16_t togetoge25[][2]= {
     {nR,23220},
     {94,50},
     {nR,10},
@@ -8754,7 +8754,7 @@ const uint16_t togetoge25[][2]={
     {nR,10},
     {48,50}
 };
-void togetoge(void){
+void togetoge(void) {
     Note note;
     BGMM.wave_form_data[0] = KUKEI12_5;
     BGMM.wave_volume_data[0] = 8;
@@ -8776,56 +8776,56 @@ void togetoge(void){
     BGMM.enable=false;
     //-------------
     uint16_t len0 = sizeof(togetoge0)/sizeof(togetoge0[0]);
-    for(int i=0;i<len0;i++){
+    for(int i=0; i<len0; i++) {
         note.pitch = togetoge0[i][0];
         note.len = togetoge0[i][1];
         BGMM.noteBuff[0].push(note);
     }
     //-------------
     uint16_t len1 = sizeof(togetoge1)/sizeof(togetoge1[0]);
-    for(int i=0;i<len1;i++){
+    for(int i=0; i<len1; i++) {
         note.pitch = togetoge1[i][0];
         note.len = togetoge1[i][1];
         BGMM.noteBuff[1].push(note);
     }
     //-------------
     uint16_t len2 = sizeof(togetoge2)/sizeof(togetoge2[0]);
-    for(int i=0;i<len2;i++){
+    for(int i=0; i<len2; i++) {
         note.pitch = togetoge2[i][0];
         note.len = togetoge2[i][1];
         BGMM.noteBuff[2].push(note);
     }
     //-------------
-/*    uint16_t len3 = sizeof(togetoge3)/sizeof(togetoge3[0]);
-    for(int i=0;i<len3;i++){
-        note.pitch = togetoge3[i][0];
-        note.len = togetoge3[i][1];
-        BGMM.noteBuff[3].push(note);
-    }*/
+    /*    uint16_t len3 = sizeof(togetoge3)/sizeof(togetoge3[0]);
+        for(int i=0;i<len3;i++){
+            note.pitch = togetoge3[i][0];
+            note.len = togetoge3[i][1];
+            BGMM.noteBuff[3].push(note);
+        }*/
     //-------------
     uint16_t len4 = sizeof(togetoge4)/sizeof(togetoge4[0]);
-    for(int i=0;i<len4;i++){
+    for(int i=0; i<len4; i++) {
         note.pitch = togetoge4[i][0];
         note.len = togetoge4[i][1];
         BGMM.noteBuff[4].push(note);
     }
     //-------------
-/*    uint16_t len5 = sizeof(togetoge5)/sizeof(togetoge5[0]);
-    for(int i=0;i<len5;i++){
-        note.pitch = togetoge5[i][0];
-        note.len = togetoge5[i][1];
-        BGMM.noteBuff[5].push(note);
-    }*/
+    /*    uint16_t len5 = sizeof(togetoge5)/sizeof(togetoge5[0]);
+        for(int i=0;i<len5;i++){
+            note.pitch = togetoge5[i][0];
+            note.len = togetoge5[i][1];
+            BGMM.noteBuff[5].push(note);
+        }*/
     //-------------
-/*    uint16_t len6 = sizeof(togetoge6)/sizeof(togetoge6[0]);
-    for(int i=0;i<len6;i++){
-        note.pitch = togetoge6[i][0];
-        note.len = togetoge6[i][1];
-        BGMM.noteBuff[6].push(note);
-    }*/
+    /*    uint16_t len6 = sizeof(togetoge6)/sizeof(togetoge6[0]);
+        for(int i=0;i<len6;i++){
+            note.pitch = togetoge6[i][0];
+            note.len = togetoge6[i][1];
+            BGMM.noteBuff[6].push(note);
+        }*/
     //-------------
     uint16_t len7 = sizeof(togetoge7)/sizeof(togetoge7[0]);
-    for(int i=0;i<len7;i++){
+    for(int i=0; i<len7; i++) {
         note.pitch = togetoge7[i][0];
         note.len = togetoge7[i][1];
         BGMM.noteBuff[7].push(note);

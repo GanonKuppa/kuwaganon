@@ -1,5 +1,5 @@
 //======================
-const uint16_t saigetu0[][2]={ 
+const uint16_t saigetu0[][2]= {
     {nR,5760},
     {67,480},
     {70,480},
@@ -772,17 +772,17 @@ const uint16_t saigetu0[][2]={
     {84,240}
 };
 //======================
-const uint16_t saigetu1[][2]={ 
+const uint16_t saigetu1[][2]= {
     {nR,19008},
-	{nR,19008},
-	{nR,19008},
-	{nR,19008},
-	{nR,19008},
-	{nR,19008},
-	{nR,19008},
-	{nR,19008},
-	{nR,19008},
-	{nR,19008},
+    {nR,19008},
+    {nR,19008},
+    {nR,19008},
+    {nR,19008},
+    {nR,19008},
+    {nR,19008},
+    {nR,19008},
+    {nR,19008},
+    {nR,19008},
     {67,240},
     {66,240},
     {63,240},
@@ -958,17 +958,17 @@ const uint16_t saigetu1[][2]={
     {79,2880}
 };
 //======================
-const uint16_t saigetu2[][2]={ 
-	{nR,19200},
-	{nR,19200},
-	{nR,19200},
-	{nR,19200},
-	{nR,19200},
-	{nR,19200},
-	{nR,19200},
-	{nR,19200},
-	{nR,19200},
-	{nR,19200},
+const uint16_t saigetu2[][2]= {
+    {nR,19200},
+    {nR,19200},
+    {nR,19200},
+    {nR,19200},
+    {nR,19200},
+    {nR,19200},
+    {nR,19200},
+    {nR,19200},
+    {nR,19200},
+    {nR,19200},
     {60,6720},
     {nR,960},
     {72,2880},
@@ -991,13 +991,13 @@ const uint16_t saigetu2[][2]={
     {68,1920},
     {70,1920},
     {nR,32960},
-	{nR,40000},
+    {nR,40000},
     {60,6720},
     {nR,960},
     {72,2880}
 };
 //======================
-const uint16_t saigetu3[][2]={ 
+const uint16_t saigetu3[][2]= {
     {nR,7680},
     {44,720},
     {44,240},
@@ -2046,12 +2046,12 @@ const uint16_t saigetu3[][2]={
     {51,240}
 };
 //======================
-const uint16_t saigetu4[][2]={ 
+const uint16_t saigetu4[][2]= {
     {nR,65535},
-	{nR,65535},
-	{nR,65535},
-	{nR,3075},
-	{48,480},
+    {nR,65535},
+    {nR,65535},
+    {nR,3075},
+    {48,480},
     {nR,240},
     {48,720},
     {46,480},
@@ -2064,9 +2064,9 @@ const uint16_t saigetu4[][2]={
     {48,720},
     {46,480},
     {48,240},
-	{nR,65535},
-	{nR,65535},
-	{nR,62610},
+    {nR,65535},
+    {nR,65535},
+    {nR,62610},
     {48,480},
     {nR,240},
     {48,720},
@@ -2081,7 +2081,7 @@ const uint16_t saigetu4[][2]={
     {46,480},
     {48,240}
 };
-void saigetu(void){
+void saigetu(void) {
     Note note;
     BGMM.enable=false;
     BGMM.wave_form_data[0] = KUKEI12_5;
@@ -2098,35 +2098,35 @@ void saigetu(void){
     BGMM.time_resolution = 960;
     //-------------
     uint16_t len0 = sizeof(saigetu0)/sizeof(saigetu0[0]);
-    for(int i=0;i<len0;i++){
+    for(int i=0; i<len0; i++) {
         note.pitch = saigetu0[i][0];
         note.len = saigetu0[i][1];
         BGMM.noteBuff[0].push(note);
     }
     //-------------
     uint16_t len1 = sizeof(saigetu1)/sizeof(saigetu1[0]);
-    for(int i=0;i<len1;i++){
+    for(int i=0; i<len1; i++) {
         note.pitch = saigetu1[i][0];
         note.len = saigetu1[i][1];
         BGMM.noteBuff[1].push(note);
     }
     //-------------
     uint16_t len2 = sizeof(saigetu2)/sizeof(saigetu2[0]);
-    for(int i=0;i<len2;i++){
+    for(int i=0; i<len2; i++) {
         note.pitch = saigetu2[i][0];
         note.len = saigetu2[i][1];
         BGMM.noteBuff[2].push(note);
     }
     //-------------
     uint16_t len3 = sizeof(saigetu3)/sizeof(saigetu3[0]);
-    for(int i=0;i<len3;i++){
+    for(int i=0; i<len3; i++) {
         note.pitch = saigetu3[i][0];
         note.len = saigetu3[i][1];
         BGMM.noteBuff[3].push(note);
     }
     //-------------
     uint16_t len4 = sizeof(saigetu4)/sizeof(saigetu4[0]);
-    for(int i=0;i<len4;i++){
+    for(int i=0; i<len4; i++) {
         note.pitch = saigetu4[i][0];
         note.len = saigetu4[i][1];
         BGMM.noteBuff[4].push(note);

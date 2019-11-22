@@ -1,5 +1,5 @@
 //======================
-const uint16_t otenba0[][2]={ 
+const uint16_t otenba0[][2]= {
     {67,884},
     {nR,76},
     {87,221},
@@ -1101,7 +1101,7 @@ const uint16_t otenba0[][2]={
     {87,6183}
 };
 //======================
-const uint16_t otenba1[][2]={ 
+const uint16_t otenba1[][2]= {
     {63,884},
     {nR,76},
     {48,442},
@@ -1787,7 +1787,7 @@ const uint16_t otenba1[][2]={
     {82,6183}
 };
 //======================
-const uint16_t otenba2[][2]={ 
+const uint16_t otenba2[][2]= {
     {nR,960},
     {72,663},
     {nR,57},
@@ -2210,7 +2210,7 @@ const uint16_t otenba2[][2]={
     {27,6183}
 };
 //======================
-const uint16_t otenba3[][2]={ 
+const uint16_t otenba3[][2]= {
     {nR,960},
     {63,663},
     {nR,57},
@@ -2527,7 +2527,7 @@ const uint16_t otenba3[][2]={
     {39,6183}
 };
 //======================
-const uint16_t otenba4[][2]={ 
+const uint16_t otenba4[][2]= {
     {nR,66240},
     {46,1767},
     {nR,24273},
@@ -2588,18 +2588,18 @@ const uint16_t otenba4[][2]={
     {27,3533}
 };
 //======================
-const uint16_t otenba5[][2]={ 
+const uint16_t otenba5[][2]= {
     {nR,153720},
     {89,773},
     {nR,29947},
     {89,773}
 };
 //======================
-const uint16_t otenba6[][2]={ 
+const uint16_t otenba6[][2]= {
     {nR,184440},
     {97,773}
 };
-void otenba(void){
+void otenba(void) {
     Note note;
     BGMM.enable=false;
     BGMM.wave_form_data[0] = KUKEI12_5;
@@ -2620,55 +2620,55 @@ void otenba(void){
     //myprintf3("bpm:%d\n",BGMM.bpm);
     //-------------
     uint16_t len0 = sizeof(otenba0)/sizeof(otenba0[0]);
-    for(int i=0;i<len0;i++){
+    for(int i=0; i<len0; i++) {
         note.pitch = otenba0[i][0];
         note.len = otenba0[i][1];
         BGMM.noteBuff[0].push(note);
     }
     //-------------
     uint16_t len1 = sizeof(otenba1)/sizeof(otenba1[0]);
-    for(int i=0;i<len1;i++){
+    for(int i=0; i<len1; i++) {
         note.pitch = otenba1[i][0];
         note.len = otenba1[i][1];
         BGMM.noteBuff[1].push(note);
     }
     //-------------
     uint16_t len2 = sizeof(otenba2)/sizeof(otenba2[0]);
-    for(int i=0;i<len2;i++){
+    for(int i=0; i<len2; i++) {
         note.pitch = otenba2[i][0];
         note.len = otenba2[i][1];
         BGMM.noteBuff[2].push(note);
     }
     //-------------
     uint16_t len3 = sizeof(otenba3)/sizeof(otenba3[0]);
-    for(int i=0;i<len3;i++){
+    for(int i=0; i<len3; i++) {
         note.pitch = otenba3[i][0];
         note.len = otenba3[i][1];
         BGMM.noteBuff[3].push(note);
     }
     //-------------
-/*
-    uint16_t len4 = sizeof(otenba4)/sizeof(otenba4[0]);
-    for(int i=0;i<len4;i++){
-        note.pitch = otenba4[i][0];
-        note.len = otenba4[i][1];
-        BGMM.noteBuff[4].push(note);
-    }
-    //-------------
+    /*
+        uint16_t len4 = sizeof(otenba4)/sizeof(otenba4[0]);
+        for(int i=0;i<len4;i++){
+            note.pitch = otenba4[i][0];
+            note.len = otenba4[i][1];
+            BGMM.noteBuff[4].push(note);
+        }
+        //-------------
 
-    uint16_t len5 = sizeof(otenba5)/sizeof(otenba5[0]);
-    for(int i=0;i<len5;i++){
-        note.pitch = otenba5[i][0];
-        note.len = otenba5[i][1];
-        BGMM.noteBuff[5].push(note);
-    }
-    //-------------
-    uint16_t len6 = sizeof(otenba6)/sizeof(otenba6[0]);
-    for(int i=0;i<len6;i++){
-        note.pitch = otenba6[i][0];
-        note.len = otenba6[i][1];
-        BGMM.noteBuff[6].push(note);
-    }
-*/
+        uint16_t len5 = sizeof(otenba5)/sizeof(otenba5[0]);
+        for(int i=0;i<len5;i++){
+            note.pitch = otenba5[i][0];
+            note.len = otenba5[i][1];
+            BGMM.noteBuff[5].push(note);
+        }
+        //-------------
+        uint16_t len6 = sizeof(otenba6)/sizeof(otenba6[0]);
+        for(int i=0;i<len6;i++){
+            note.pitch = otenba6[i][0];
+            note.len = otenba6[i][1];
+            BGMM.noteBuff[6].push(note);
+        }
+    */
     BGMM.enable=true;
 }

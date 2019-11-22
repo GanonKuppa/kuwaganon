@@ -1,5 +1,5 @@
 //======================
-const uint16_t owen0[][2]={ 
+const uint16_t owen0[][2]= {
     {nR,21120},
     {46,240},
     {53,240},
@@ -538,7 +538,7 @@ const uint16_t owen0[][2]={
     {34,1920}
 };
 //======================
-const uint16_t owen1[][2]={ 
+const uint16_t owen1[][2]= {
     {nR,36480},
     {42,960},
     {44,960},
@@ -657,7 +657,7 @@ const uint16_t owen1[][2]={
     {46,1920}
 };
 //======================
-const uint16_t owen2[][2]={ 
+const uint16_t owen2[][2]= {
     {nR,1920},
     {73,120},
     {70,120},
@@ -1597,7 +1597,7 @@ const uint16_t owen2[][2]={
     {94,1920}
 };
 //======================
-const uint16_t owen3[][2]={ 
+const uint16_t owen3[][2]= {
     {nR,1920},
     {85,120},
     {82,120},
@@ -2537,7 +2537,7 @@ const uint16_t owen3[][2]={
     {82,1920}
 };
 //======================
-const uint16_t owen4[][2]={ 
+const uint16_t owen4[][2]= {
     {nR,3360},
     {84,120},
     {nR,200},
@@ -3152,7 +3152,7 @@ const uint16_t owen4[][2]={
     {89,1920}
 };
 //======================
-const uint16_t owen5[][2]={ 
+const uint16_t owen5[][2]= {
     {nR,3360},
     {75,120},
     {nR,200},
@@ -3751,7 +3751,7 @@ const uint16_t owen5[][2]={
     {77,1920}
 };
 //======================
-const uint16_t owen6[][2]={ 
+const uint16_t owen6[][2]= {
     {nR,1920},
     {46,1440},
     {48,960},
@@ -3770,16 +3770,16 @@ const uint16_t owen6[][2]={
     {46,1440},
     {51,960},
     {nR,13152},
-	{nR,13152},
-	{nR,13152},
-	{nR,13152},
-	{nR,13152},
-	{nR,13152},
-	{nR,13152},
-	{nR,13152},
-	{nR,13152},
-	{nR,13152},
-	{46,1440},
+    {nR,13152},
+    {nR,13152},
+    {nR,13152},
+    {nR,13152},
+    {nR,13152},
+    {nR,13152},
+    {nR,13152},
+    {nR,13152},
+    {nR,13152},
+    {46,1440},
     {48,960},
     {46,1440},
     {51,960},
@@ -3797,7 +3797,7 @@ const uint16_t owen6[][2]={
     {51,960}
 };
 //======================
-const uint16_t owen7[][2]={ 
+const uint16_t owen7[][2]= {
     {nR,2640},
     {53,480},
     {58,240},
@@ -3834,7 +3834,7 @@ const uint16_t owen7[][2]={
     {nR,13320},
 
 
-	{53,480},
+    {53,480},
     {58,240},
     {nR,1680},
     {53,480},
@@ -3859,7 +3859,7 @@ const uint16_t owen7[][2]={
     {58,240}
 };
 //======================
-const uint16_t owen8[][2]={ 
+const uint16_t owen8[][2]= {
     {nR,1920},
     {65,1440},
     {63,960},
@@ -4075,7 +4075,7 @@ const uint16_t owen8[][2]={
     {53,1920}
 };
 //======================
-const uint16_t owen9[][2]={ 
+const uint16_t owen9[][2]= {
     {nR,21120},
     {65,960},
     {64,960},
@@ -4226,7 +4226,7 @@ const uint16_t owen9[][2]={
     {58,1920}
 };
 //======================
-const uint16_t owen10[][2]={ 
+const uint16_t owen10[][2]= {
     {nR,36480},
     {49,960},
     {51,960},
@@ -4345,7 +4345,7 @@ const uint16_t owen10[][2]={
     {65,1920}
 };
 //======================
-const uint16_t owen11[][2]={ 
+const uint16_t owen11[][2]= {
     {nR,36480},
     {46,960},
     {48,960},
@@ -4460,7 +4460,7 @@ const uint16_t owen11[][2]={
     {63,960}
 };
 //======================
-const uint16_t owen12[][2]={ 
+const uint16_t owen12[][2]= {
     {nR,21120},
     {85,840},
     {nR,120},
@@ -4815,7 +4815,7 @@ const uint16_t owen12[][2]={
     {87,120}
 };
 //======================
-const uint16_t owen13[][2]={ 
+const uint16_t owen13[][2]= {
     {nR,25200},
     {77,120},
     {nR,360},
@@ -5138,7 +5138,7 @@ const uint16_t owen13[][2]={
     {78,120}
 };
 //======================
-const uint16_t owen14[][2]={ 
+const uint16_t owen14[][2]= {
     {nR,21120},
     {65,240},
     {nR,240},
@@ -5467,7 +5467,7 @@ const uint16_t owen14[][2]={
     {69,160}
 };
 //======================
-const uint16_t owen15[][2]={ 
+const uint16_t owen15[][2]= {
     {nR,89280},
     {61,160},
     {nR,200},
@@ -5482,7 +5482,7 @@ const uint16_t owen15[][2]={
     {65,160}
 };
 //======================
-const uint16_t owen16[][2]={ 
+const uint16_t owen16[][2]= {
     {nR,89280},
     {65,160},
     {nR,200},
@@ -5497,7 +5497,7 @@ const uint16_t owen16[][2]={
     {61,160}
 };
 //======================
-const uint16_t owen17[][2]={ 
+const uint16_t owen17[][2]= {
     {nR,21120},
     {65,120},
     {nR,360},
@@ -5740,7 +5740,7 @@ const uint16_t owen17[][2]={
     {63,120}
 };
 //======================
-const uint16_t owen18[][2]={ 
+const uint16_t owen18[][2]= {
     {nR,67200},
     {53,1920},
     {53,1920},
@@ -6011,7 +6011,7 @@ const uint16_t owen18[][2]={
     {69,160}
 };
 //======================
-const uint16_t owen19[][2]={ 
+const uint16_t owen19[][2]= {
     {nR,67200},
     {46,1920},
     {46,1920},
@@ -6036,7 +6036,7 @@ const uint16_t owen19[][2]={
     {65,160}
 };
 //======================
-const uint16_t owen20[][2]={ 
+const uint16_t owen20[][2]= {
     {nR,89280},
     {61,160},
     {nR,200},
@@ -6051,7 +6051,7 @@ const uint16_t owen20[][2]={
     {61,160}
 };
 //======================
-const uint16_t owen21[][2]={ 
+const uint16_t owen21[][2]= {
     {nR,90240},
     {61,840},
     {nR,120},
@@ -6182,7 +6182,7 @@ const uint16_t owen21[][2]={
     {63,840}
 };
 //======================
-const uint16_t owen22[][2]={ 
+const uint16_t owen22[][2]= {
     {nR,90240},
     {58,840},
     {nR,120},
@@ -6313,7 +6313,7 @@ const uint16_t owen22[][2]={
     {59,840}
 };
 //======================
-const uint16_t owen23[][2]={ 
+const uint16_t owen23[][2]= {
     {nR,1920},
     {35,1},
     {nR,479},
@@ -9360,7 +9360,7 @@ const uint16_t owen23[][2]={
     {38,1}
 };
 //======================
-const uint16_t owen24[][2]={ 
+const uint16_t owen24[][2]= {
     {nR,18960},
     {35,1},
     {nR,119},
@@ -10539,7 +10539,7 @@ const uint16_t owen24[][2]={
     {46,1}
 };
 //======================
-const uint16_t owen25[][2]={ 
+const uint16_t owen25[][2]= {
     {nR,20160},
     {57,1},
     {nR,959},
@@ -10806,7 +10806,7 @@ const uint16_t owen25[][2]={
     {42,1}
 };
 //======================
-const uint16_t owen26[][2]={ 
+const uint16_t owen26[][2]= {
     {nR,21120},
     {57,1},
     {nR,84479},
@@ -10816,7 +10816,7 @@ const uint16_t owen26[][2]={
     {nR,84479},
     {42,1}
 };
-void owen(void){
+void owen(void) {
     Note note;
     BGMM.wave_form_data[0] = KUKEI12_5;
     BGMM.wave_volume_data[0] = 16;
@@ -10838,56 +10838,56 @@ void owen(void){
     BGMM.enable=false;
     //-------------
     uint16_t len0 = sizeof(owen0)/sizeof(owen0[0]);
-    for(int i=0;i<len0;i++){
+    for(int i=0; i<len0; i++) {
         note.pitch = owen0[i][0];
         note.len = owen0[i][1];
         BGMM.noteBuff[0].push(note);
     }
     //-------------
     uint16_t len1 = sizeof(owen1)/sizeof(owen1[0]);
-    for(int i=0;i<len1;i++){
+    for(int i=0; i<len1; i++) {
         note.pitch = owen1[i][0];
         note.len = owen1[i][1];
         BGMM.noteBuff[1].push(note);
     }
     //-------------
     uint16_t len2 = sizeof(owen2)/sizeof(owen2[0]);
-    for(int i=0;i<len2;i++){
+    for(int i=0; i<len2; i++) {
         note.pitch = owen2[i][0];
         note.len = owen2[i][1];
         BGMM.noteBuff[2].push(note);
     }
     //-------------
     uint16_t len3 = sizeof(owen3)/sizeof(owen3[0]);
-    for(int i=0;i<len3;i++){
+    for(int i=0; i<len3; i++) {
         note.pitch = owen3[i][0];
         note.len = owen3[i][1];
         BGMM.noteBuff[3].push(note);
     }
     //-------------
     uint16_t len4 = sizeof(owen4)/sizeof(owen4[0]);
-    for(int i=0;i<len4;i++){
+    for(int i=0; i<len4; i++) {
         note.pitch = owen4[i][0];
         note.len = owen4[i][1];
         BGMM.noteBuff[4].push(note);
     }
     //-------------
     uint16_t len5 = sizeof(owen5)/sizeof(owen5[0]);
-    for(int i=0;i<len5;i++){
+    for(int i=0; i<len5; i++) {
         note.pitch = owen5[i][0];
         note.len = owen5[i][1];
         BGMM.noteBuff[5].push(note);
     }
     //-------------
     uint16_t len6 = sizeof(owen6)/sizeof(owen6[0]);
-    for(int i=0;i<len6;i++){
+    for(int i=0; i<len6; i++) {
         note.pitch = owen6[i][0];
         note.len = owen6[i][1];
         BGMM.noteBuff[6].push(note);
     }
     //-------------
     uint16_t len7 = sizeof(owen7)/sizeof(owen7[0]);
-    for(int i=0;i<len7;i++){
+    for(int i=0; i<len7; i++) {
         note.pitch = owen7[i][0];
         note.len = owen7[i][1];
         BGMM.noteBuff[7].push(note);

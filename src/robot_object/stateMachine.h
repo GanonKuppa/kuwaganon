@@ -4,24 +4,24 @@
 #include <memory>
 #include "intent.h"
 
-class BaseState{
-public:
+class BaseState {
+  public:
     Intent* intent;
-    BaseState(Intent* intent_){
+    BaseState(Intent* intent_) {
         nextState = nullptr;
         intent = intent_;
     }
 
-    BaseState(){
+    BaseState() {
         BaseState(nullptr);
         nextState = nullptr;
     }
 
-    virtual void onStart(){}
+    virtual void onStart() {}
 
-    virtual void update(){};
+    virtual void update() {};
 
-    virtual bool isEnd(){return true;};
+    virtual bool isEnd() {return true;};
 
 
     std::unique_ptr<BaseState> nextState;
@@ -30,39 +30,38 @@ public:
 };
 
 
-class StateMachine{
-public:
+class StateMachine {
+  public:
 
-    void update(){
-        if(empty() == false){
+    void update() {
+        if(empty() == false) {
             stateQueue.front()->update();
-            if(stateQueue.front()->isEnd() == true){
-                if(stateQueue.front()-> nextState != nullptr){
+            if(stateQueue.front()->isEnd() == true) {
+                if(stateQueue.front()-> nextState != nullptr) {
                     stateQueue.front()->nextState->onStart();
                     push(std::move(stateQueue.front()-> nextState));
                 }
                 stateQueue.pop();
             }
-        }
-        else
+        } else
             return;
 
     }
 
-    void push(std::unique_ptr<BaseState> &&state){
+    void push(std::unique_ptr<BaseState>&& state) {
         if(empty()==true) state->onStart();
         stateQueue.push(std::move(state));
 
     }
 
-    bool empty(){
+    bool empty() {
         return stateQueue.empty();
     }
 
-    void clear(){
+    void clear() {
         while(!stateQueue.empty()) stateQueue.pop();
     }
-private:
+  private:
     std::queue< std::unique_ptr<BaseState> > stateQueue;
 
 };

@@ -6,9 +6,8 @@
 template<typename OtherDerived>
 EIGEN_DEVICE_FUNC
 EIGEN_STRONG_INLINE const EIGEN_CWISE_BINARY_RETURN_TYPE(Derived,OtherDerived,product)
-operator*(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
-{
-  return EIGEN_CWISE_BINARY_RETURN_TYPE(Derived,OtherDerived,product)(derived(), other.derived());
+operator*(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived>& other) const {
+    return EIGEN_CWISE_BINARY_RETURN_TYPE(Derived,OtherDerived,product)(derived(), other.derived());
 }
 
 /** \returns an expression of the coefficient wise quotient of \c *this and \a other
@@ -18,9 +17,8 @@ operator*(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
 template<typename OtherDerived>
 EIGEN_DEVICE_FUNC
 EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_quotient_op<Scalar,typename OtherDerived::Scalar>, const Derived, const OtherDerived>
-operator/(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
-{
-  return CwiseBinaryOp<internal::scalar_quotient_op<Scalar,typename OtherDerived::Scalar>, const Derived, const OtherDerived>(derived(), other.derived());
+operator/(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived>& other) const {
+    return CwiseBinaryOp<internal::scalar_quotient_op<Scalar,typename OtherDerived::Scalar>, const Derived, const OtherDerived>(derived(), other.derived());
 }
 
 /** \returns an expression of the coefficient-wise min of \c *this and \a other
@@ -38,15 +36,14 @@ EIGEN_MAKE_CWISE_BINARY_OP(min,min)
   */
 EIGEN_DEVICE_FUNC
 EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_min_op<Scalar,Scalar>, const Derived,
-                                        const CwiseNullaryOp<internal::scalar_constant_op<Scalar>, PlainObject> >
+                    const CwiseNullaryOp<internal::scalar_constant_op<Scalar>, PlainObject> >
 #ifdef EIGEN_PARSED_BY_DOXYGEN
-min
+                    min
 #else
-(min)
+                    (min)
 #endif
-(const Scalar &other) const
-{
-  return (min)(Derived::PlainObject::Constant(rows(), cols(), other));
+(const Scalar& other) const {
+    return (min)(Derived::PlainObject::Constant(rows(), cols(), other));
 }
 
 /** \returns an expression of the coefficient-wise max of \c *this and \a other
@@ -64,15 +61,14 @@ EIGEN_MAKE_CWISE_BINARY_OP(max,max)
   */
 EIGEN_DEVICE_FUNC
 EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_max_op<Scalar,Scalar>, const Derived,
-                                        const CwiseNullaryOp<internal::scalar_constant_op<Scalar>, PlainObject> >
+const CwiseNullaryOp<internal::scalar_constant_op<Scalar>, PlainObject> >
 #ifdef EIGEN_PARSED_BY_DOXYGEN
 max
 #else
 (max)
 #endif
-(const Scalar &other) const
-{
-  return (max)(Derived::PlainObject::Constant(rows(), cols(), other));
+(const Scalar& other) const {
+    return (max)(Derived::PlainObject::Constant(rows(), cols(), other));
 }
 
 /** \returns an expression of the coefficient-wise power of \c *this to the given array of \a exponents.
@@ -257,16 +253,16 @@ const CwiseBinaryOp<internal::scalar_difference_op<T,Scalar>,Constant<T>,Derived
 
 
 #ifndef EIGEN_PARSED_BY_DOXYGEN
-  EIGEN_MAKE_SCALAR_BINARY_OP_ONTHELEFT(operator/,quotient)
+EIGEN_MAKE_SCALAR_BINARY_OP_ONTHELEFT(operator/,quotient)
 #else
-  /**
-    * \brief Component-wise division of the scalar \a s by array elements of \a a.
-    *
-    * \tparam Scalar is the scalar type of \a x. It must be compatible with the scalar type of the given array expression (\c Derived::Scalar).
-    */
-  template<typename T> friend
-  inline const CwiseBinaryOp<internal::scalar_quotient_op<T,Scalar>,Constant<T>,Derived>
-  operator/(const T& s,const StorageBaseType& a);
+/**
+  * \brief Component-wise division of the scalar \a s by array elements of \a a.
+  *
+  * \tparam Scalar is the scalar type of \a x. It must be compatible with the scalar type of the given array expression (\c Derived::Scalar).
+  */
+template<typename T> friend
+inline const CwiseBinaryOp<internal::scalar_quotient_op<T,Scalar>,Constant<T>,Derived>
+operator/(const T& s,const StorageBaseType& a);
 #endif
 
 /** \returns an expression of the coefficient-wise ^ operator of *this and \a other
@@ -281,11 +277,10 @@ const CwiseBinaryOp<internal::scalar_difference_op<T,Scalar>,Constant<T>,Derived
 template<typename OtherDerived>
 EIGEN_DEVICE_FUNC
 inline const CwiseBinaryOp<internal::scalar_boolean_xor_op, const Derived, const OtherDerived>
-operator^(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
-{
-  EIGEN_STATIC_ASSERT((internal::is_same<bool,Scalar>::value && internal::is_same<bool,typename OtherDerived::Scalar>::value),
-                      THIS_METHOD_IS_ONLY_FOR_EXPRESSIONS_OF_BOOL);
-  return CwiseBinaryOp<internal::scalar_boolean_xor_op, const Derived, const OtherDerived>(derived(),other.derived());
+operator^(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived>& other) const {
+    EIGEN_STATIC_ASSERT((internal::is_same<bool,Scalar>::value && internal::is_same<bool,typename OtherDerived::Scalar>::value),
+                        THIS_METHOD_IS_ONLY_FOR_EXPRESSIONS_OF_BOOL);
+    return CwiseBinaryOp<internal::scalar_boolean_xor_op, const Derived, const OtherDerived>(derived(),other.derived());
 }
 
 // NOTE disabled until we agree on argument order
@@ -302,9 +297,8 @@ operator^(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
   */
 template<typename DerivedN>
 inline const CwiseBinaryOp<internal::scalar_polygamma_op<Scalar>, const DerivedN, const Derived>
-polygamma(const EIGEN_CURRENT_STORAGE_BASE_CLASS<DerivedN> &n) const
-{
-  return CwiseBinaryOp<internal::scalar_polygamma_op<Scalar>, const DerivedN, const Derived>(n.derived(), this->derived());
+polygamma(const EIGEN_CURRENT_STORAGE_BASE_CLASS<DerivedN>& n) const {
+    return CwiseBinaryOp<internal::scalar_polygamma_op<Scalar>, const DerivedN, const Derived>(n.derived(), this->derived());
 }
 #endif
 
@@ -326,7 +320,6 @@ polygamma(const EIGEN_CURRENT_STORAGE_BASE_CLASS<DerivedN> &n) const
   */
 template<typename DerivedQ>
 inline const CwiseBinaryOp<internal::scalar_zeta_op<Scalar>, const Derived, const DerivedQ>
-zeta(const EIGEN_CURRENT_STORAGE_BASE_CLASS<DerivedQ> &q) const
-{
-  return CwiseBinaryOp<internal::scalar_zeta_op<Scalar>, const Derived, const DerivedQ>(this->derived(), q.derived());
+zeta(const EIGEN_CURRENT_STORAGE_BASE_CLASS<DerivedQ>& q) const {
+    return CwiseBinaryOp<internal::scalar_zeta_op<Scalar>, const Derived, const DerivedQ>(this->derived(), q.derived());
 }

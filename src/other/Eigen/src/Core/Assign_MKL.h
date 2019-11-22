@@ -1,7 +1,7 @@
 /*
  Copyright (c) 2011, Intel Corporation. All rights reserved.
  Copyright (C) 2015 Gael Guennebaud <gael.guennebaud@inria.fr>
- 
+
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
 
@@ -34,37 +34,36 @@
 #ifndef EIGEN_ASSIGN_VML_H
 #define EIGEN_ASSIGN_VML_H
 
-namespace Eigen { 
+namespace Eigen {
 
-namespace internal {
+    namespace internal {
 
-template<typename Dst, typename Src>
-class vml_assign_traits
-{
-  private:
-    enum {
-      DstHasDirectAccess = Dst::Flags & DirectAccessBit,
-      SrcHasDirectAccess = Src::Flags & DirectAccessBit,
-      StorageOrdersAgree = (int(Dst::IsRowMajor) == int(Src::IsRowMajor)),
-      InnerSize = int(Dst::IsVectorAtCompileTime) ? int(Dst::SizeAtCompileTime)
-                : int(Dst::Flags)&RowMajorBit ? int(Dst::ColsAtCompileTime)
-                : int(Dst::RowsAtCompileTime),
-      InnerMaxSize  = int(Dst::IsVectorAtCompileTime) ? int(Dst::MaxSizeAtCompileTime)
-                    : int(Dst::Flags)&RowMajorBit ? int(Dst::MaxColsAtCompileTime)
-                    : int(Dst::MaxRowsAtCompileTime),
-      MaxSizeAtCompileTime = Dst::SizeAtCompileTime,
+        template<typename Dst, typename Src>
+        class vml_assign_traits {
+          private:
+            enum {
+                DstHasDirectAccess = Dst::Flags & DirectAccessBit,
+                SrcHasDirectAccess = Src::Flags & DirectAccessBit,
+                StorageOrdersAgree = (int(Dst::IsRowMajor) == int(Src::IsRowMajor)),
+                InnerSize = int(Dst::IsVectorAtCompileTime) ? int(Dst::SizeAtCompileTime)
+                            : int(Dst::Flags)& RowMajorBit ? int(Dst::ColsAtCompileTime)
+                            : int(Dst::RowsAtCompileTime),
+                InnerMaxSize  = int(Dst::IsVectorAtCompileTime) ? int(Dst::MaxSizeAtCompileTime)
+                                : int(Dst::Flags)& RowMajorBit ? int(Dst::MaxColsAtCompileTime)
+                                : int(Dst::MaxRowsAtCompileTime),
+                MaxSizeAtCompileTime = Dst::SizeAtCompileTime,
 
-      MightEnableVml = StorageOrdersAgree && DstHasDirectAccess && SrcHasDirectAccess && Src::InnerStrideAtCompileTime==1 && Dst::InnerStrideAtCompileTime==1,
-      MightLinearize = MightEnableVml && (int(Dst::Flags) & int(Src::Flags) & LinearAccessBit),
-      VmlSize = MightLinearize ? MaxSizeAtCompileTime : InnerMaxSize,
-      LargeEnough = VmlSize==Dynamic || VmlSize>=EIGEN_MKL_VML_THRESHOLD
-    };
-  public:
-    enum {
-      EnableVml = MightEnableVml && LargeEnough,
-      Traversal = MightLinearize ? LinearTraversal : DefaultTraversal
-    };
-};
+                MightEnableVml = StorageOrdersAgree && DstHasDirectAccess && SrcHasDirectAccess && Src::InnerStrideAtCompileTime==1 && Dst::InnerStrideAtCompileTime==1,
+                MightLinearize = MightEnableVml && (int(Dst::Flags) & int(Src::Flags) & LinearAccessBit),
+                VmlSize = MightLinearize ? MaxSizeAtCompileTime : InnerMaxSize,
+                LargeEnough = VmlSize==Dynamic || VmlSize>=EIGEN_MKL_VML_THRESHOLD
+            };
+          public:
+            enum {
+                EnableVml = MightEnableVml && LargeEnough,
+                Traversal = MightLinearize ? LinearTraversal : DefaultTraversal
+            };
+        };
 
 #define EIGEN_PP_EXPAND(ARG) ARG
 #if !defined (EIGEN_FAST_MATH) || (EIGEN_FAST_MATH != 1)
@@ -73,7 +72,7 @@ class vml_assign_traits
 #define EIGEN_VMLMODE_EXPAND_LA , VML_LA
 #endif
 
-#define EIGEN_VMLMODE_EXPAND__ 
+#define EIGEN_VMLMODE_EXPAND__
 
 #define EIGEN_VMLMODE_PREFIX_LA vm
 #define EIGEN_VMLMODE_PREFIX__  v
@@ -111,32 +110,32 @@ class vml_assign_traits
 #define EIGEN_MKL_VML_DECLARE_UNARY_CALLS_CPLX(EIGENOP, VMLOP, VMLMODE)                                                         \
   EIGEN_MKL_VML_DECLARE_UNARY_CALL(EIGENOP, EIGEN_CAT(EIGEN_VMLMODE_PREFIX(VMLMODE),c##VMLOP), scomplex, MKL_Complex8, VMLMODE) \
   EIGEN_MKL_VML_DECLARE_UNARY_CALL(EIGENOP, EIGEN_CAT(EIGEN_VMLMODE_PREFIX(VMLMODE),z##VMLOP), dcomplex, MKL_Complex16, VMLMODE)
-  
+
 #define EIGEN_MKL_VML_DECLARE_UNARY_CALLS(EIGENOP, VMLOP, VMLMODE)                                                              \
   EIGEN_MKL_VML_DECLARE_UNARY_CALLS_REAL(EIGENOP, VMLOP, VMLMODE)                                                               \
   EIGEN_MKL_VML_DECLARE_UNARY_CALLS_CPLX(EIGENOP, VMLOP, VMLMODE)
 
-  
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(sin,   Sin,   LA)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(asin,  Asin,  LA)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(sinh,  Sinh,  LA)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(cos,   Cos,   LA)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(acos,  Acos,  LA)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(cosh,  Cosh,  LA)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(tan,   Tan,   LA)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(atan,  Atan,  LA)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(tanh,  Tanh,  LA)
-// EIGEN_MKL_VML_DECLARE_UNARY_CALLS(abs,   Abs,    _)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(exp,   Exp,   LA)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(log,   Ln,    LA)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(log10, Log10, LA)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS(sqrt,  Sqrt,  _)
 
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS_REAL(square, Sqr,   _)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS_CPLX(arg, Arg,      _)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS_REAL(round, Round,  _)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS_REAL(floor, Floor,  _)
-EIGEN_MKL_VML_DECLARE_UNARY_CALLS_REAL(ceil,  Ceil,   _)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(sin,   Sin,   LA)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(asin,  Asin,  LA)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(sinh,  Sinh,  LA)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(cos,   Cos,   LA)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(acos,  Acos,  LA)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(cosh,  Cosh,  LA)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(tan,   Tan,   LA)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(atan,  Atan,  LA)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(tanh,  Tanh,  LA)
+// EIGEN_MKL_VML_DECLARE_UNARY_CALLS(abs,   Abs,    _)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(exp,   Exp,   LA)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(log,   Ln,    LA)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(log10, Log10, LA)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS(sqrt,  Sqrt,  _)
+
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS_REAL(square, Sqr,   _)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS_CPLX(arg, Arg,      _)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS_REAL(round, Round,  _)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS_REAL(floor, Floor,  _)
+        EIGEN_MKL_VML_DECLARE_UNARY_CALLS_REAL(ceil,  Ceil,   _)
 
 #define EIGEN_MKL_VML_DECLARE_POW_CALL(EIGENOP, VMLOP, EIGENTYPE, VMLTYPE, VMLMODE)                                           \
   template< typename DstXprType, typename SrcXprNested, typename Plain>                                                       \
@@ -165,13 +164,13 @@ EIGEN_MKL_VML_DECLARE_UNARY_CALLS_REAL(ceil,  Ceil,   _)
       }                                                                                                                       \
     }                                                                                                                         \
   };
-  
-EIGEN_MKL_VML_DECLARE_POW_CALL(pow, vmsPowx, float,    float,         LA)
-EIGEN_MKL_VML_DECLARE_POW_CALL(pow, vmdPowx, double,   double,        LA)
-EIGEN_MKL_VML_DECLARE_POW_CALL(pow, vmcPowx, scomplex, MKL_Complex8,  LA)
-EIGEN_MKL_VML_DECLARE_POW_CALL(pow, vmzPowx, dcomplex, MKL_Complex16, LA)
 
-} // end namespace internal
+        EIGEN_MKL_VML_DECLARE_POW_CALL(pow, vmsPowx, float,    float,         LA)
+        EIGEN_MKL_VML_DECLARE_POW_CALL(pow, vmdPowx, double,   double,        LA)
+        EIGEN_MKL_VML_DECLARE_POW_CALL(pow, vmcPowx, scomplex, MKL_Complex8,  LA)
+        EIGEN_MKL_VML_DECLARE_POW_CALL(pow, vmzPowx, dcomplex, MKL_Complex16, LA)
+
+    } // end namespace internal
 
 } // end namespace Eigen
 

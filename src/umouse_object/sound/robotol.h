@@ -1,5 +1,5 @@
 //======================
-const uint16_t robotol0[][2]={ 
+const uint16_t robotol0[][2]= {
     {nR,384},
     {57,48},
     {56,144},
@@ -299,7 +299,7 @@ const uint16_t robotol0[][2]={
     //{55,432}
 };
 //======================
-const uint16_t robotol1[][2]={ 
+const uint16_t robotol1[][2]= {
     {nR,384},
     {57,48},
     {56,144},
@@ -549,7 +549,7 @@ const uint16_t robotol1[][2]={
     //{38,432}
 };
 //======================
-const uint16_t robotol2[][2]={ 
+const uint16_t robotol2[][2]= {
     {nR,384},
     {52,48},
     {52,144},
@@ -1009,7 +1009,7 @@ const uint16_t robotol2[][2]={
     //{42,432}
 };
 //======================
-const uint16_t robotol3[][2]={ 
+const uint16_t robotol3[][2]= {
     {nR,384},
     {45,48},
     {44,144},
@@ -1489,7 +1489,7 @@ const uint16_t robotol3[][2]={
     //{44,192}
 };
 //======================
-const uint16_t robotol4[][2]={ 
+const uint16_t robotol4[][2]= {
     {nR,384},
     {55,48},
     {55,144},
@@ -1916,7 +1916,7 @@ const uint16_t robotol4[][2]={
     {38,48}
 };
 //======================
-const uint16_t robotol5[][2]={ 
+const uint16_t robotol5[][2]= {
     {nR,384},
     {38,48},
     {38,144},
@@ -2265,7 +2265,7 @@ const uint16_t robotol5[][2]={
     {55,48}
 };
 //======================
-const uint16_t robotol6[][2]={ 
+const uint16_t robotol6[][2]= {
     {nR,384},
     {55,48},
     {55,144},
@@ -2688,7 +2688,7 @@ const uint16_t robotol6[][2]={
     {42,48}
 };
 //======================
-const uint16_t robotol7[][2]={ 
+const uint16_t robotol7[][2]= {
     {nR,384},
     {38,48},
     {38,144},
@@ -2938,89 +2938,89 @@ const uint16_t robotol7[][2]={
     {42,48}
 };
 
-void robotol(void){
-	Note note;
+void robotol(void) {
+    Note note;
 
-	BGMM.enable=false;
-	BGMM.wave_form_data[0] = KUKEI12_5;
-	BGMM.wave_volume_data[0] = 12;    //各トラックのボリューム  volume_resolution段階
-	BGMM.wave_form_data[1] = KUKEI12_5;
-	BGMM.wave_volume_data[1] = 6;    //各トラックのボリューム  volume_resolution段階
-	BGMM.wave_form_data[2] = KUKEI12_5;
-	BGMM.wave_volume_data[2] = 6;    //各トラックのボリューム  volume_resolution段階
-	BGMM.wave_form_data[3] = KUKEI12_5;
-	BGMM.wave_volume_data[3] = 6;    //各トラックのボリューム  volume_resolution段階
-	BGMM.wave_form_data[4] = KUKEI12_5;
-	BGMM.wave_volume_data[4] = 6;    //各トラックのボリューム  volume_resolution段階
-	BGMM.wave_form_data[5] = KUKEI12_5;
-	BGMM.wave_volume_data[5] = 6;    //各トラックのボリューム  volume_resolution段階
-	BGMM.wave_form_data[6] = KUKEI12_5;
-	BGMM.wave_volume_data[6] = 6;    //各トラックのボリューム  volume_resolution段階
-	BGMM.wave_form_data[7] = KUKEI12_5;
-	BGMM.wave_volume_data[7] = 6;    //各トラックのボリューム  volume_resolution段階
-
-
-	//8,8,12,10
-
-	BGMM.bpm = 40;
-	//myprintf3("bpm:%d\n",BGMM.bpm);
+    BGMM.enable=false;
+    BGMM.wave_form_data[0] = KUKEI12_5;
+    BGMM.wave_volume_data[0] = 12;    //各トラックのボリューム  volume_resolution段階
+    BGMM.wave_form_data[1] = KUKEI12_5;
+    BGMM.wave_volume_data[1] = 6;    //各トラックのボリューム  volume_resolution段階
+    BGMM.wave_form_data[2] = KUKEI12_5;
+    BGMM.wave_volume_data[2] = 6;    //各トラックのボリューム  volume_resolution段階
+    BGMM.wave_form_data[3] = KUKEI12_5;
+    BGMM.wave_volume_data[3] = 6;    //各トラックのボリューム  volume_resolution段階
+    BGMM.wave_form_data[4] = KUKEI12_5;
+    BGMM.wave_volume_data[4] = 6;    //各トラックのボリューム  volume_resolution段階
+    BGMM.wave_form_data[5] = KUKEI12_5;
+    BGMM.wave_volume_data[5] = 6;    //各トラックのボリューム  volume_resolution段階
+    BGMM.wave_form_data[6] = KUKEI12_5;
+    BGMM.wave_volume_data[6] = 6;    //各トラックのボリューム  volume_resolution段階
+    BGMM.wave_form_data[7] = KUKEI12_5;
+    BGMM.wave_volume_data[7] = 6;    //各トラックのボリューム  volume_resolution段階
 
 
-	uint16_t len0 = sizeof(robotol0)/sizeof(robotol0[0]);
-	for(int i=0;i<len0;i++){
-		note.pitch = robotol0[i][0];
-		note.len = robotol0[i][1];
-		BGMM.noteBuff[0].push(note);
-	}
+    //8,8,12,10
 
-	uint16_t len1 = sizeof(robotol1)/sizeof(robotol1[0]);
-	for(int i=0;i<len1;i++){
-		note.pitch = robotol1[i][0] ;
-		note.len = robotol1[i][1];
-		BGMM.noteBuff[1].push(note);
-	}
+    BGMM.bpm = 40;
+    //myprintf3("bpm:%d\n",BGMM.bpm);
 
-	uint16_t len2 = sizeof(robotol2)/sizeof(robotol2[0]);
-	for(int i=0;i<len2;i++){
-		note.pitch = robotol2[i][0] ;
-		note.len = robotol2[i][1];
-		BGMM.noteBuff[2].push(note);
-	}
 
-	uint16_t len3 = sizeof(robotol3)/sizeof(robotol3[0]);
-	for(int i=0;i<len3;i++){
-		note.pitch = robotol3[i][0];
-		note.len = robotol3[i][1];
-		BGMM.noteBuff[3].push(note);
-	}
+    uint16_t len0 = sizeof(robotol0)/sizeof(robotol0[0]);
+    for(int i=0; i<len0; i++) {
+        note.pitch = robotol0[i][0];
+        note.len = robotol0[i][1];
+        BGMM.noteBuff[0].push(note);
+    }
 
-	uint16_t len4 = sizeof(robotol4)/sizeof(robotol4[0]);
-	for(int i=0;i<len4;i++){
-		note.pitch = robotol4[i][0]  ;
-		note.len = robotol4[i][1];
-		BGMM.noteBuff[4].push(note);
-	}
+    uint16_t len1 = sizeof(robotol1)/sizeof(robotol1[0]);
+    for(int i=0; i<len1; i++) {
+        note.pitch = robotol1[i][0] ;
+        note.len = robotol1[i][1];
+        BGMM.noteBuff[1].push(note);
+    }
 
-	uint16_t len5 = sizeof(robotol5)/sizeof(robotol5[0]);
-	for(int i=0;i<len5;i++){
-		note.pitch = robotol5[i][0]  ;
-		note.len = robotol5[i][1];
-		BGMM.noteBuff[5].push(note);
-	}
-	uint16_t len6 = sizeof(robotol6)/sizeof(robotol6[0]);
-		for(int i=0;i<len6;i++){
-			note.pitch = robotol6[i][0]  ;
-			note.len = robotol6[i][1];
-			BGMM.noteBuff[6].push(note);
-	}
+    uint16_t len2 = sizeof(robotol2)/sizeof(robotol2[0]);
+    for(int i=0; i<len2; i++) {
+        note.pitch = robotol2[i][0] ;
+        note.len = robotol2[i][1];
+        BGMM.noteBuff[2].push(note);
+    }
 
-	uint16_t len7 = sizeof(robotol7)/sizeof(robotol7[0]);
-	for(int i=0;i<len7;i++){
-		note.pitch = robotol7[i][0]  ;
-		note.len = robotol7[i][1];
-		BGMM.noteBuff[7].push(note);
-	}
+    uint16_t len3 = sizeof(robotol3)/sizeof(robotol3[0]);
+    for(int i=0; i<len3; i++) {
+        note.pitch = robotol3[i][0];
+        note.len = robotol3[i][1];
+        BGMM.noteBuff[3].push(note);
+    }
 
-	BGMM.enable=true;
+    uint16_t len4 = sizeof(robotol4)/sizeof(robotol4[0]);
+    for(int i=0; i<len4; i++) {
+        note.pitch = robotol4[i][0]  ;
+        note.len = robotol4[i][1];
+        BGMM.noteBuff[4].push(note);
+    }
+
+    uint16_t len5 = sizeof(robotol5)/sizeof(robotol5[0]);
+    for(int i=0; i<len5; i++) {
+        note.pitch = robotol5[i][0]  ;
+        note.len = robotol5[i][1];
+        BGMM.noteBuff[5].push(note);
+    }
+    uint16_t len6 = sizeof(robotol6)/sizeof(robotol6[0]);
+    for(int i=0; i<len6; i++) {
+        note.pitch = robotol6[i][0]  ;
+        note.len = robotol6[i][1];
+        BGMM.noteBuff[6].push(note);
+    }
+
+    uint16_t len7 = sizeof(robotol7)/sizeof(robotol7[0]);
+    for(int i=0; i<len7; i++) {
+        note.pitch = robotol7[i][0]  ;
+        note.len = robotol7[i][1];
+        BGMM.noteBuff[7].push(note);
+    }
+
+    BGMM.enable=true;
 }
 

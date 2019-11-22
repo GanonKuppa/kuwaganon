@@ -33,19 +33,19 @@
 #ifndef EIGEN_TRIANGULAR_MATRIX_VECTOR_BLAS_H
 #define EIGEN_TRIANGULAR_MATRIX_VECTOR_BLAS_H
 
-namespace Eigen { 
+namespace Eigen {
 
-namespace internal {
+    namespace internal {
 
-/**********************************************************************
-* This file implements triangular matrix-vector multiplication using BLAS
-**********************************************************************/
+        /**********************************************************************
+        * This file implements triangular matrix-vector multiplication using BLAS
+        **********************************************************************/
 
 // trmv/hemv specialization
 
-template<typename Index, int Mode, typename LhsScalar, bool ConjLhs, typename RhsScalar, bool ConjRhs, int StorageOrder>
-struct triangular_matrix_vector_product_trmv :
-  triangular_matrix_vector_product<Index,Mode,LhsScalar,ConjLhs,RhsScalar,ConjRhs,StorageOrder,BuiltIn> {};
+        template<typename Index, int Mode, typename LhsScalar, bool ConjLhs, typename RhsScalar, bool ConjRhs, int StorageOrder>
+        struct triangular_matrix_vector_product_trmv :
+            triangular_matrix_vector_product<Index,Mode,LhsScalar,ConjLhs,RhsScalar,ConjRhs,StorageOrder,BuiltIn> {};
 
 #define EIGEN_BLAS_TRMV_SPECIALIZE(Scalar) \
 template<typename Index, int Mode, bool ConjLhs, bool ConjRhs> \
@@ -65,10 +65,10 @@ struct triangular_matrix_vector_product<Index,Mode,Scalar,ConjLhs,Scalar,ConjRhs
   } \
 };
 
-EIGEN_BLAS_TRMV_SPECIALIZE(double)
-EIGEN_BLAS_TRMV_SPECIALIZE(float)
-EIGEN_BLAS_TRMV_SPECIALIZE(dcomplex)
-EIGEN_BLAS_TRMV_SPECIALIZE(scomplex)
+        EIGEN_BLAS_TRMV_SPECIALIZE(double)
+        EIGEN_BLAS_TRMV_SPECIALIZE(float)
+        EIGEN_BLAS_TRMV_SPECIALIZE(dcomplex)
+        EIGEN_BLAS_TRMV_SPECIALIZE(scomplex)
 
 // implements col-major: res += alpha * op(triangular) * vector
 #define EIGEN_BLAS_TRMV_CM(EIGTYPE, BLASTYPE, EIGPREFIX, BLASPREFIX, BLASPOSTFIX) \
@@ -148,15 +148,15 @@ struct triangular_matrix_vector_product_trmv<Index,Mode,EIGTYPE,ConjLhs,EIGTYPE,
 };
 
 #ifdef EIGEN_USE_MKL
-EIGEN_BLAS_TRMV_CM(double,   double, d,  d,)
-EIGEN_BLAS_TRMV_CM(dcomplex, MKL_Complex16, cd, z,)
-EIGEN_BLAS_TRMV_CM(float,    float,  f,  s,)
-EIGEN_BLAS_TRMV_CM(scomplex, MKL_Complex8,  cf, c,)
+        EIGEN_BLAS_TRMV_CM(double,   double, d,  d,)
+        EIGEN_BLAS_TRMV_CM(dcomplex, MKL_Complex16, cd, z,)
+        EIGEN_BLAS_TRMV_CM(float,    float,  f,  s,)
+        EIGEN_BLAS_TRMV_CM(scomplex, MKL_Complex8,  cf, c,)
 #else
-EIGEN_BLAS_TRMV_CM(double,   double, d,  d, _)
-EIGEN_BLAS_TRMV_CM(dcomplex, double, cd, z, _)
-EIGEN_BLAS_TRMV_CM(float,    float,  f,  s, _)
-EIGEN_BLAS_TRMV_CM(scomplex, float,  cf, c, _)
+        EIGEN_BLAS_TRMV_CM(double,   double, d,  d, _)
+        EIGEN_BLAS_TRMV_CM(dcomplex, double, cd, z, _)
+        EIGEN_BLAS_TRMV_CM(float,    float,  f,  s, _)
+        EIGEN_BLAS_TRMV_CM(scomplex, float,  cf, c, _)
 #endif
 
 // implements row-major: res += alpha * op(triangular) * vector
@@ -237,18 +237,18 @@ struct triangular_matrix_vector_product_trmv<Index,Mode,EIGTYPE,ConjLhs,EIGTYPE,
 };
 
 #ifdef EIGEN_USE_MKL
-EIGEN_BLAS_TRMV_RM(double,   double, d,  d,)
-EIGEN_BLAS_TRMV_RM(dcomplex, MKL_Complex16, cd, z,)
-EIGEN_BLAS_TRMV_RM(float,    float,  f,  s,)
-EIGEN_BLAS_TRMV_RM(scomplex, MKL_Complex8,  cf, c,)
+        EIGEN_BLAS_TRMV_RM(double,   double, d,  d,)
+        EIGEN_BLAS_TRMV_RM(dcomplex, MKL_Complex16, cd, z,)
+        EIGEN_BLAS_TRMV_RM(float,    float,  f,  s,)
+        EIGEN_BLAS_TRMV_RM(scomplex, MKL_Complex8,  cf, c,)
 #else
-EIGEN_BLAS_TRMV_RM(double,   double, d,  d,_)
-EIGEN_BLAS_TRMV_RM(dcomplex, double, cd, z,_)
-EIGEN_BLAS_TRMV_RM(float,    float,  f,  s,_)
-EIGEN_BLAS_TRMV_RM(scomplex, float,  cf, c,_)
+        EIGEN_BLAS_TRMV_RM(double,   double, d,  d,_)
+        EIGEN_BLAS_TRMV_RM(dcomplex, double, cd, z,_)
+        EIGEN_BLAS_TRMV_RM(float,    float,  f,  s,_)
+        EIGEN_BLAS_TRMV_RM(scomplex, float,  cf, c,_)
 #endif
 
-} // end namespase internal
+    } // end namespase internal
 
 } // end namespace Eigen
 

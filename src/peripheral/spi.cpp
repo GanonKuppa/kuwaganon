@@ -74,14 +74,14 @@ void initRSPI0() {
     initTMR0();
 }
 
-void useSSLA0RSPI0(){
+void useSSLA0RSPI0() {
     setEnableRSPI0(0);
     RSPI0.SPBR = 5; //8MHz
     RSPI0.SPCMD0.BIT.SSLA = 0; //0:SSL0 1:SSL1
     RSPI0.SPCMD0.BIT.SPB = 0b0111;
 }
 
-void useSSLA1RSPI0(){
+void useSSLA1RSPI0() {
     setEnableRSPI0(0);
     RSPI0.SPCMD0.BIT.SSLA = 1; //0:SSL0 1:SSL1
     RSPI0.SPBR = 20; //2MHz
@@ -93,7 +93,7 @@ void useSSLA1RSPI0(){
 uint8_t communicate8bitRSPI0(uint8_t transmit) {
     unsigned int receive;
     RSPI0.SPDR.LONG = (uint8_t) transmit;
-    while(RSPI0.SPSR.BIT.SPTEF != 1){
+    while(RSPI0.SPSR.BIT.SPTEF != 1) {
     };
     while (RSPI0.SPSR.BIT.SPRF == 0) {
     }
@@ -101,13 +101,13 @@ uint8_t communicate8bitRSPI0(uint8_t transmit) {
     return (uint8_t) (receive & 0xff);
 }
 
-uint16_t communicate16bitRSPI0(uint16_t transmit){
+uint16_t communicate16bitRSPI0(uint16_t transmit) {
     setEnableRSPI0(0);
     setEnableRSPI0(1);
     uint32_t receive;
     RSPI0.SPDR.LONG = (uint16_t) transmit;
-    while(RSPI0.SPSR.BIT.SPTEF == 0){} //送信完了待ち
-    while(RSPI0.SPSR.BIT.SPRF == 0){} //データ受信待ち
+    while(RSPI0.SPSR.BIT.SPTEF == 0) {} //送信完了待ち
+    while(RSPI0.SPSR.BIT.SPRF == 0) {} //データ受信待ち
 
     receive = RSPI0.SPDR.LONG;
 
@@ -117,17 +117,17 @@ uint16_t communicate16bitRSPI0(uint16_t transmit){
 uint8_t communicate8bitRSPI1(uint8_t transmit) {
     unsigned int receive;
     RSPI1.SPDR.LONG = transmit;
-    //	myprintf3("---------%x\n",transmit);
+    //  myprintf3("---------%x\n",transmit);
     //while(RSPI1.SPSR.BIT.SPTEF != 1);
     while (RSPI1.SPSR.BIT.SPRF == 0) {
-        //		myprintf3("SPRF 0\n");
+        //      myprintf3("SPRF 0\n");
     };
     receive = RSPI1.SPDR.LONG;
     //while(RSPI1.SPSR.BIT.SPRF == 1){
-    //	myprintf3("SPRF 1\n");
+    //  myprintf3("SPRF 1\n");
 
     //};
-    //	myprintf3("rec %d\n",RSPI1.SPDR.LONG);
+    //  myprintf3("rec %d\n",RSPI1.SPDR.LONG);
     return (uint8_t) (receive & 0xff);
 }
 

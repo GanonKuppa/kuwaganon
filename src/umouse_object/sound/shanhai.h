@@ -1,5 +1,5 @@
 //======================
-const uint16_t shanhai0[][2]={ 
+const uint16_t shanhai0[][2]= {
     {nR,1920},
     {66,720},
     {78,240},
@@ -326,7 +326,7 @@ const uint16_t shanhai0[][2]={
     {95,1080}
 };
 //======================
-const uint16_t shanhai1[][2]={ 
+const uint16_t shanhai1[][2]= {
     {nR,19200},
     {66,720},
     {78,240},
@@ -574,7 +574,7 @@ const uint16_t shanhai1[][2]={
     {83,1080}
 };
 //======================
-const uint16_t shanhai2[][2]={ 
+const uint16_t shanhai2[][2]= {
     {nR,19200},
     {54,720},
     {66,240},
@@ -790,7 +790,7 @@ const uint16_t shanhai2[][2]={
     {73,120},
     {71,1080}
 };
-void shanhai(void){
+void shanhai(void) {
     Note note;
     BGMM.enable=false;
     BGMM.wave_form_data[0] = KUKEI12_5;
@@ -803,21 +803,21 @@ void shanhai(void){
     BGMM.time_resolution = 480;
     //-------------
     uint16_t len0 = sizeof(shanhai0)/sizeof(shanhai0[0]);
-    for(int i=0;i<len0;i++){
+    for(int i=0; i<len0; i++) {
         note.pitch = shanhai0[i][0];
         note.len = shanhai0[i][1];
         BGMM.noteBuff[0].push(note);
     }
     //-------------
     uint16_t len1 = sizeof(shanhai1)/sizeof(shanhai1[0]);
-    for(int i=0;i<len1;i++){
+    for(int i=0; i<len1; i++) {
         note.pitch = shanhai1[i][0];
         note.len = shanhai1[i][1];
         BGMM.noteBuff[1].push(note);
     }
     //-------------
     uint16_t len2 = sizeof(shanhai2)/sizeof(shanhai2[0]);
-    for(int i=0;i<len2;i++){
+    for(int i=0; i<len2; i++) {
         note.pitch = shanhai2[i][0];
         note.len = shanhai2[i][1];
         BGMM.noteBuff[2].push(note);

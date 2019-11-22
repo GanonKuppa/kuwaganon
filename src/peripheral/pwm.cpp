@@ -38,7 +38,7 @@ void initMTU3() {
     MTU3.TGRC = 750;
     MTU3.TGRD = 1;
     MTU3.TMDR1.BIT.MD = 2; //PWM1
-    //MTU3.TMDR1.BIT.BFA = 1;	//バッファーモードに設定
+    //MTU3.TMDR1.BIT.BFA = 1;   //バッファーモードに設定
     MTU3.TMDR1.BIT.BFB = 1;
 }
 
@@ -66,7 +66,7 @@ void initMTU4() {
     MTU4.TGRC = 750;
     MTU4.TGRD = 1;
     MTU4.TMDR1.BIT.MD = 2; //PWM1
-    //MTU4.TMDR1.BIT.BFA = 1;	//バッファーモードに設定
+    //MTU4.TMDR1.BIT.BFA = 1;   //バッファーモードに設定
     MTU4.TMDR1.BIT.BFB = 1; //バッファーモードに設定
 }
 
@@ -75,8 +75,7 @@ void setDutyMTU3(float duty) {
     dutyMTU3 = duty;
     if (duty == 0.0) {
         MTU3.TGRD = MTU3.TGRC - 1;
-    }
-    else {
+    } else {
         MTU3.TGRD = (uint16_t) (MTU3.TGRC * (1.0 - duty));
     }
     MTU.TSTRA.BIT.CST3 = 1;
@@ -88,8 +87,7 @@ void setDutyMTU4(float duty) {
     dutyMTU4 = duty;
     if (duty == 0.0) {
         MTU4.TGRD = MTU4.TGRC - 1;
-    }
-    else {
+    } else {
         MTU4.TGRD = (uint16_t) (MTU4.TGRC * (1.0 - duty));
     }
     MTU.TSTRA.BIT.CST4 = 1;

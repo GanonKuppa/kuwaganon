@@ -13,23 +13,22 @@
 
 using namespace umouse;
 
-int main(int argc, const char *argv[])
-{
+int main(int argc, const char* argv[]) {
     std::cout << "test" << std::endl;
     initWebAppConnection();
 
     Maze maze;
     TrajectoryCommander trajCommander;
-    
+
     //----------- 迷路に壁をセット
     maze_archive::Hokushinetsu2019_HF md;
-    
-    for(int i=0;i<31;i++){
-        maze.walls_vertical[i] = md.walls_vertical[i];        
+
+    for(int i=0; i<31; i++) {
+        maze.walls_vertical[i] = md.walls_vertical[i];
         maze.walls_horizontal[i] = md.walls_horizontal[i];
     }
 
-    for(int i=0;i<32;i++) maze.reached[i]=0xFFFFFFFF;
+    for(int i=0; i<32; i++) maze.reached[i]=0xFFFFFFFF;
 
     sendMazeWall(maze.walls_vertical, maze.walls_horizontal);
     //----------- パスを計算
@@ -48,29 +47,29 @@ int main(int argc, const char *argv[])
     HF_playPath(turn_p, path_vec, trajCommander);
     //HF_playPathSpin(turn_p, path_vec, trajCommander);
     //HF_playPathSpinDiagonal(turn_p, path_vec, trajCommander);
-    
+
     long tick_count = 0;
     double real_time = 0.0;
     return;
-    while(trajCommander.empty() == false){
+    while(trajCommander.empty() == false) {
         std::chrono::system_clock::time_point  start, end; // 型は auto で可
         start = std::chrono::system_clock::now(); // 計測開始時間
         trajCommander.update();
         real_time += 0.0005;
-        if(tick_count % 30 == 0){
+        if(tick_count % 30 == 0) {
             sendRobotPos(trajCommander.x, trajCommander.y, trajCommander.ang, trajCommander.v);
-            //sendTargetPos(trajCommander.x, trajCommander.y, trajCommander.ang);                
+            //sendTargetPos(trajCommander.x, trajCommander.y, trajCommander.ang);
         }
-        
+
 
         tick_count++;
-        
-        while(1){
+
+        while(1) {
             end = std::chrono::system_clock::now();  // 計測終了時間
             double elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count(); //処理に要した時間をミリ秒に変換
             if(elapsed > 1.0) break;
         }
-        
+
     }
     printf("real time:%f\n", real_time);
     finalizeWebAppConnection();

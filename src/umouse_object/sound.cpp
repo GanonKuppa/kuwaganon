@@ -30,7 +30,7 @@ struct Note {
 };
 
 class SoundManager {
-public:
+  public:
     uint16_t max_volume;
     uint16_t note_off_count;
     uint16_t bpm;
@@ -145,8 +145,8 @@ void SoundManager::setWave(uint8_t track, uint8_t pitch, uint8_t waveform, uint8
 }
 
 void SoundManager::update() {
-    umouse::ParameterManager &pm = umouse::ParameterManager::getInstance();
-    if (enable == false || pm.silent_flag == 1){
+    umouse::ParameterManager& pm = umouse::ParameterManager::getInstance();
+    if (enable == false || pm.silent_flag == 1) {
         for(int i=0; i<track_num; i++) while(!noteBuff[i].empty()) noteBuff[i].pop() ;
         return;
     }
@@ -191,10 +191,10 @@ uint16_t SoundManager::calcWaveVal(uint32_t num_count) {
         if (wave_period[i] != 0) {
             static uint16_t wave_val_ch = 0;
             if (wave_form_data[i] == NOISE1 && wave_period[i] != 1 && wave[i][0] != 0) wave_val_ch = (2 * xor32())
-                    % (wave_master_volume[i] * wave_volume_data[i] / volume_resolution);
+                        % (wave_master_volume[i] * wave_volume_data[i] / volume_resolution);
             else if (wave_form_data[i] == NOISE2 && wave_period[i] != 1 && wave[i][0] != 0) {
                 if (xor32() % 5 == 0) wave_val_ch = xor32()
-                        % (wave_master_volume[i] * wave_volume_data[i] / volume_resolution);
+                                                        % (wave_master_volume[i] * wave_volume_data[i] / volume_resolution);
             } else wave_val_ch = wave[i][num_count % wave_period[i]];
             wave_val += wave_val_ch;
         }

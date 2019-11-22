@@ -21,12 +21,12 @@ namespace umouse {
 
     class ModeSelectActivity : public BaseActivity {
 
-    public:
+      public:
         void onStart() {
             printfAsync("This is mode select activity.\n");
             RAMEN();
             //LEDをチカチカ
-            FcLed &fcled = FcLed::getInstance();
+            FcLed& fcled = FcLed::getInstance();
             fcled.turn(1, 0, 0);
             waitmsec(200);
             fcled.turn(0, 1, 0);
@@ -35,8 +35,8 @@ namespace umouse {
             waitmsec(200);
             fcled.turn(0, 0, 0);
 
-            PseudoDialL &dial_L = PseudoDialL::getInstance();
-            PseudoDialR &dial_R = PseudoDialR::getInstance();
+            PseudoDialL& dial_L = PseudoDialL::getInstance();
+            PseudoDialR& dial_R = PseudoDialR::getInstance();
             dial_L.reset();
             dial_R.reset();
             dial_L.setEnable(1);
@@ -53,15 +53,15 @@ namespace umouse {
         }
 
         ELoopStatus loop() {
-            Gamepad &gamepad = Gamepad::getInstance();
-            ICM20602 &icm = ICM20602::getInstance();
-            adis16470 &adis = adis16470::getInstance();
-            PseudoDialL &dial_L = PseudoDialL::getInstance();
-            PseudoDialR &dial_R = PseudoDialR::getInstance();
-            WallSensor &ws = WallSensor::getInstance();
+            Gamepad& gamepad = Gamepad::getInstance();
+            ICM20602& icm = ICM20602::getInstance();
+            adis16470& adis = adis16470::getInstance();
+            PseudoDialL& dial_L = PseudoDialL::getInstance();
+            PseudoDialR& dial_R = PseudoDialR::getInstance();
+            WallSensor& ws = WallSensor::getInstance();
             dial_position_L_now = dial_L.getDialPosition();
             dial_position_R_now = dial_R.getDialPosition();
-            UMouse &m = UMouse::getInstance();
+            UMouse& m = UMouse::getInstance();
 
 
 
@@ -71,13 +71,12 @@ namespace umouse {
             }
 
             // タイヤ掃除用に前壁センサONのときは制御をかけない
-            if(ws.isAhead()){
+            if(ws.isAhead()) {
                 dial_L.setEnable(false);
                 dial_R.setEnable(false);
-            }
-            else if(!was_gamepad_input && !dial_L.getEnable() && !dial_R.getEnable()){
-                PseudoDialL &dial_L = PseudoDialL::getInstance();
-                PseudoDialR &dial_R = PseudoDialR::getInstance();
+            } else if(!was_gamepad_input && !dial_L.getEnable() && !dial_R.getEnable()) {
+                PseudoDialL& dial_L = PseudoDialL::getInstance();
+                PseudoDialR& dial_R = PseudoDialR::getInstance();
                 dial_L.reset();
                 dial_R.reset();
                 dial_L.setEnable(true);
@@ -137,8 +136,8 @@ namespace umouse {
         };
 
         void onFinish() {
-            PseudoDialL &dial_L = PseudoDialL::getInstance();
-            PseudoDialR &dial_R = PseudoDialR::getInstance();
+            PseudoDialL& dial_L = PseudoDialL::getInstance();
+            PseudoDialR& dial_R = PseudoDialR::getInstance();
             dial_L.setEnable(0);
             dial_R.setEnable(0);
             uint8_t mode = dial_L.getDialPosition();
@@ -148,7 +147,7 @@ namespace umouse {
             auto activity = ActivityFactory::create(color);
             activity->start();
         }
-    private:
+      private:
         uint8_t dial_position_R_now;
         uint8_t dial_position_R_pre;
         uint8_t dial_position_L_now;
@@ -156,15 +155,15 @@ namespace umouse {
         bool was_gamepad_input;
 
         void turnFcled() {
-            PseudoDialL &dial_L = PseudoDialL::getInstance();
-            FcLed &fcled = FcLed::getInstance();
+            PseudoDialL& dial_L = PseudoDialL::getInstance();
+            FcLed& fcled = FcLed::getInstance();
             uint8_t mode = dial_L.getDialPosition();
-            UMouse &m = UMouse::getInstance(); 
-            ParameterManager &pm = ParameterManager::getInstance();
+            UMouse& m = UMouse::getInstance();
+            ParameterManager& pm = ParameterManager::getInstance();
             m.maze.makeFastestMap(0, 0);
             bool ableGoal = m.maze.isExistPath(pm.goal_x, pm.goal_y);
 
-            if(ableGoal){
+            if(ableGoal) {
                 if (mode == 0) fcled.turn(0, 0, 0); //BLACK
                 else if (mode == 1) fcled.flash(1, 0, 0, 400, 100);//RED
                 else if (mode == 2) fcled.flash(0, 1, 0, 400, 100);//GREEN
@@ -173,8 +172,7 @@ namespace umouse {
                 else if (mode == 5) fcled.flash(1, 0, 1, 400, 100);//MAGENTA
                 else if (mode == 6) fcled.flash(0, 1, 1, 400, 100);//CYAN
                 else if (mode == 7) fcled.flash(1, 1, 1, 400, 100);//WHITE
-            }
-            else{
+            } else {
                 if (mode == 0) fcled.turn(0, 0, 0); //BLACK
                 else if (mode == 1) fcled.turn(1, 0, 0);//RED
                 else if (mode == 2) fcled.turn(0, 1, 0);//GREEN

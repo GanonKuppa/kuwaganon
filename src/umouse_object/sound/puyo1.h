@@ -1,5 +1,5 @@
 //======================
-const uint16_t puyo10[][2]={ 
+const uint16_t puyo10[][2]= {
     {nR,1920},
     {69,220},
     {nR,20},
@@ -572,7 +572,7 @@ const uint16_t puyo10[][2]={
     {65,220}
 };
 //======================
-const uint16_t puyo11[][2]={ 
+const uint16_t puyo11[][2]= {
     {nR,2040},
     {69,220},
     {nR,20},
@@ -1144,7 +1144,7 @@ const uint16_t puyo11[][2]={
     {nR,20},
     {65,220}
 };
-void puyo1(void){
+void puyo1(void) {
     Note note;
     BGMM.enable=false;
     BGMM.wave_form_data[0] = KUKEI12_5;
@@ -1155,14 +1155,14 @@ void puyo1(void){
     BGMM.time_resolution = 480;
     //-------------
     uint16_t len0 = sizeof(puyo10)/sizeof(puyo10[0]);
-    for(int i=0;i<len0;i++){
+    for(int i=0; i<len0; i++) {
         note.pitch = puyo10[i][0];
         note.len = puyo10[i][1];
         BGMM.noteBuff[0].push(note);
     }
     //-------------
     uint16_t len1 = sizeof(puyo11)/sizeof(puyo11[0]);
-    for(int i=0;i<len1;i++){
+    for(int i=0; i<len1; i++) {
         note.pitch = puyo11[i][0];
         note.len = puyo11[i][1];
         BGMM.noteBuff[1].push(note);

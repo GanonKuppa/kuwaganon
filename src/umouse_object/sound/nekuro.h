@@ -1,5 +1,5 @@
 //======================
-const uint16_t nekuro0[][2]={ 
+const uint16_t nekuro0[][2]= {
     {nR,288},
     {51,12},
     {53,12},
@@ -669,7 +669,7 @@ const uint16_t nekuro0[][2]={
     {46,432}
 };
 //======================
-const uint16_t nekuro1[][2]={ 
+const uint16_t nekuro1[][2]= {
     {nR,384},
     {75,48},
     {78,48},
@@ -1194,7 +1194,7 @@ const uint16_t nekuro1[][2]={
     {98,24}
 };
 //======================
-const uint16_t nekuro2[][2]={ 
+const uint16_t nekuro2[][2]= {
     {nR,384},
     {51,144},
     {53,240},
@@ -2047,7 +2047,7 @@ const uint16_t nekuro2[][2]={
     {89,24}
 };
 //======================
-const uint16_t nekuro3[][2]={ 
+const uint16_t nekuro3[][2]= {
     {nR,12672},
     {45,48},
     {52,48},
@@ -2159,7 +2159,7 @@ const uint16_t nekuro3[][2]={
     {56,96}
 };
 //======================
-const uint16_t nekuro4[][2]={ 
+const uint16_t nekuro4[][2]= {
     {nR,13440},
     {49,144},
     {47,144},
@@ -2177,7 +2177,7 @@ const uint16_t nekuro4[][2]={
     {48,144},
     {48,96}
 };
-void nekuro(void){
+void nekuro(void) {
     Note note;
     BGMM.enable=false;
     BGMM.wave_form_data[0] = KUKEI25;
@@ -2200,49 +2200,49 @@ void nekuro(void){
     BGMM.time_resolution = 96;
     //-------------
     uint16_t len0 = sizeof(nekuro0)/sizeof(nekuro0[0]);
-    for(int i=0;i<len0;i++){
+    for(int i=0; i<len0; i++) {
         note.pitch = nekuro0[i][0];
         note.len = nekuro0[i][1];
         BGMM.noteBuff[0].push(note);
     }
     //-------------
     uint16_t len1 = sizeof(nekuro1)/sizeof(nekuro1[0]);
-    for(int i=0;i<len1;i++){
+    for(int i=0; i<len1; i++) {
         note.pitch = nekuro1[i][0];
         note.len = nekuro1[i][1];
         BGMM.noteBuff[1].push(note);
     }
     //-------------
     uint16_t len2 = sizeof(nekuro2)/sizeof(nekuro2[0]);
-    for(int i=0;i<len2;i++){
+    for(int i=0; i<len2; i++) {
         note.pitch = nekuro2[i][0];
         note.len = nekuro2[i][1];
         BGMM.noteBuff[2].push(note);
     }
     //-------------
     uint16_t len3 = sizeof(nekuro3)/sizeof(nekuro3[0]);
-    for(int i=0;i<len3;i++){
+    for(int i=0; i<len3; i++) {
         note.pitch = nekuro3[i][0];
         note.len = nekuro3[i][1];
         BGMM.noteBuff[3].push(note);
     }
     //-------------
     uint16_t len4 = sizeof(nekuro4)/sizeof(nekuro4[0]);
-    for(int i=0;i<len4;i++){
+    for(int i=0; i<len4; i++) {
         note.pitch = nekuro4[i][0];
         note.len = nekuro4[i][1];
         BGMM.noteBuff[4].push(note);
     }
     //-------------
     uint16_t len5 = sizeof(nekuro0)/sizeof(nekuro0[0]);
-    for(int i=0;i<len5;i++){
+    for(int i=0; i<len5; i++) {
         note.pitch = nekuro0[i][0]+12;
         note.len = nekuro0[i][1];
         BGMM.noteBuff[5].push(note);
     }
     //-------------
     uint16_t len6 = sizeof(nekuro1)/sizeof(nekuro1[0]);
-    for(int i=0;i<len6;i++){
+    for(int i=0; i<len6; i++) {
         note.pitch = nekuro1[i][0]+12;
         note.len = nekuro1[i][1];
         BGMM.noteBuff[6].push(note);

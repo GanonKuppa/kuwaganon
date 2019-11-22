@@ -1,5 +1,5 @@
 //======================
-const uint16_t sky_high0[][2]={ 
+const uint16_t sky_high0[][2]= {
     {nR,1920},
     {79,108},
     {nR,12},
@@ -1702,7 +1702,7 @@ const uint16_t sky_high0[][2]={
     {84,120}
 };
 //======================
-const uint16_t sky_high1[][2]={ 
+const uint16_t sky_high1[][2]= {
     {nR,1920},
     {44,172},
     {nR,68},
@@ -3177,7 +3177,7 @@ const uint16_t sky_high1[][2]={
     {48,172}
 };
 //======================
-const uint16_t sky_high2[][2]={ 
+const uint16_t sky_high2[][2]= {
     {nR,2160},
     {56,172},
     {nR,308},
@@ -4316,7 +4316,7 @@ const uint16_t sky_high2[][2]={
     {55,172}
 };
 //======================
-const uint16_t sky_high3[][2]={ 
+const uint16_t sky_high3[][2]= {
     {nR,17520},
     {53,172},
     {nR,308},
@@ -4719,7 +4719,7 @@ const uint16_t sky_high3[][2]={
     {50,172}
 };
 //======================
-const uint16_t sky_high4[][2]={ 
+const uint16_t sky_high4[][2]= {
     {nR,38640},
     {75,108},
     {nR,12},
@@ -4753,7 +4753,7 @@ const uint16_t sky_high4[][2]={
     {nR,264},
     {55,172}
 };
-void sky_high(void){
+void sky_high(void) {
     Note note;
     BGMM.wave_form_data[0] = KUKEI12_5;
     BGMM.wave_volume_data[0] = 8;
@@ -4769,35 +4769,35 @@ void sky_high(void){
     BGMM.enable=false;
     //-------------
     uint16_t len0 = sizeof(sky_high0)/sizeof(sky_high0[0]);
-    for(int i=0;i<len0;i++){
+    for(int i=0; i<len0; i++) {
         note.pitch = sky_high0[i][0];
         note.len = sky_high0[i][1];
         BGMM.noteBuff[0].push(note);
     }
     //-------------
     uint16_t len1 = sizeof(sky_high1)/sizeof(sky_high1[0]);
-    for(int i=0;i<len1;i++){
+    for(int i=0; i<len1; i++) {
         note.pitch = sky_high1[i][0];
         note.len = sky_high1[i][1];
         BGMM.noteBuff[1].push(note);
     }
     //-------------
     uint16_t len2 = sizeof(sky_high2)/sizeof(sky_high2[0]);
-    for(int i=0;i<len2;i++){
+    for(int i=0; i<len2; i++) {
         note.pitch = sky_high2[i][0];
         note.len = sky_high2[i][1];
         BGMM.noteBuff[2].push(note);
     }
     //-------------
     uint16_t len3 = sizeof(sky_high3)/sizeof(sky_high3[0]);
-    for(int i=0;i<len3;i++){
+    for(int i=0; i<len3; i++) {
         note.pitch = sky_high3[i][0];
         note.len = sky_high3[i][1];
         BGMM.noteBuff[3].push(note);
     }
     //-------------
     uint16_t len4 = sizeof(sky_high4)/sizeof(sky_high4[0]);
-    for(int i=0;i<len4;i++){
+    for(int i=0; i<len4; i++) {
         note.pitch = sky_high4[i][0];
         note.len = sky_high4[i][1];
         BGMM.noteBuff[4].push(note);
