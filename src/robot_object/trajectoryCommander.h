@@ -208,13 +208,14 @@ namespace umouse {
             if(trajQueue.empty() == true) {
                 traj->setInitPos(x, y, ang);
 
-                auto s = trajQueue.front()->getMotionTypeString().c_str();
-                uint16_t hash = trajQueue.front()->hash;
                 /*
-                            printfAsync("★    ------- traj begin --------\n");
-                            printfAsync("★    motion_type: %s %04x\n", s, hash);
-                            printfAsync("★    (x_t, y_t, ang_t)=(%f, %f, %f) queue num:%d | dist:%f \n", x, y, ang ,trajQueue.size(), trajQueue.front()->target_dist);
-                            printfAsync("★    -------------------------\n");
+                    auto s = trajQueue.front()->getMotionTypeString().c_str(); // null参照
+                    uint16_t hash = trajQueue.front()->hash;
+
+                    printfAsync("★    ------- traj begin --------\n");
+                    printfAsync("★    motion_type: %s %04x\n", s, hash);
+                    printfAsync("★    (x_t, y_t, ang_t)=(%f, %f, %f) queue num:%d | dist:%f \n", x, y, ang ,trajQueue.size(), trajQueue.front()->target_dist);
+                    printfAsync("★    -------------------------\n");
                 */
             }
             trajQueue.push_back(std::move(traj));
