@@ -25,7 +25,7 @@ int main(int argc, const char* argv[]) {
     TrajectoryCommander trajCommander;
 
     //----------- 迷路に壁をセット
-    maze_archive::AllJapan2011Final_HF md;
+    maze_archive::AllJapan2014Final_HF md;
     //maze_archive::TestFewWall_HF md;
 
     for(int i=0; i<31; i++) {

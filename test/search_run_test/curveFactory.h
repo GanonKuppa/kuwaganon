@@ -14,7 +14,10 @@ namespace umouse {
         TURN_D_90,
         TURN_D2S_45,
         TURN_D2S_135,
-        D_STRAIGHT
+        D_STRAIGHT,
+        STOP,
+        CIRCULAR
+
     };
 
     enum class turn_dir_e {

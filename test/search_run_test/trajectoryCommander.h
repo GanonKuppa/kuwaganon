@@ -177,8 +177,8 @@ namespace umouse {
             if(trajQueue.empty() == true) {
                 traj->setInitPos(x, y, ang);
 
-                auto s = trajQueue.front()->getMotionTypeString().c_str();
-                uint16_t hash = trajQueue.front()->hash;
+                //auto s = trajQueue.front()->getMotionTypeString().c_str();
+                //uint16_t hash = trajQueue.front()->hash;
                 /*
                             printfAsync("★    ------- traj begin --------\n");
                             printfAsync("★    motion_type: %s %04x\n", s, hash);

@@ -356,7 +356,7 @@ namespace umouse {
             if(potential_min == potential_S) return S;
         };
 
-        uint8_t get_unknown_direction(uint16_t x, uint16_t y, direction_e dir) {
+        uint8_t getUnknownDirection(uint16_t x, uint16_t y, direction_e dir) {
             uint8_t ran_judge_E = 0;
             uint8_t ran_judge_N = 0;
             uint8_t ran_judge_W = 0;
@@ -375,11 +375,22 @@ namespace umouse {
             if( (y != 0) && (isReached(x,y-1) == false) && (wall.S == 0)) {
                 ran_judge_S = 1;
             }
+            
+            if(x < 3){
+                if(ran_judge_W == 1) return 4;
+            }
 
-            if( (ran_judge_E == 1) && (dir == E) ) return 0;
-            if( (ran_judge_N == 1) && (dir == N) ) return 2;
-            if( (ran_judge_W == 1) && (dir == W) ) return 4;
-            if( (ran_judge_S == 1) && (dir == S) ) return 6;
+            if(x > 28){
+                if(ran_judge_E == 1) return 0;
+            }
+
+            if(y < 3){
+                if(ran_judge_S == 1) return 6;
+            }
+
+            if(y > 28){
+                if(ran_judge_N == 1) return 2;
+            }
 
             if(ran_judge_E == 1) return 0;
             if(ran_judge_N == 1) return 2;
@@ -388,6 +399,26 @@ namespace umouse {
 
             return 255;
         }
+
+        direction_e getSearchDirection(uint16_t x, uint16_t y, direction_e dir) {
+            uint8_t min_dir = (uint8_t)getMinDirection(x, y, dir);
+            uint8_t unknown_dir = (uint8_t)getUnknownDirection(x, y, dir);
+            
+            if( (x > 3 && x < 28) && (y > 3 && y < 28) ) return (direction_e)min_dir;
+            else if(unknown_dir == 255) return (direction_e)min_dir;
+            else if(unknown_dir != min_dir) return (direction_e)unknown_dir;
+            else return (direction_e)min_dir;
+        }
+
+        direction_e getSearchDirection2(uint16_t x, uint16_t y, direction_e dir) {
+            uint8_t min_dir = (uint8_t)getMinDirection(x, y, dir);
+            uint8_t unknown_dir = (uint8_t)getUnknownDirection(x, y, dir);
+            
+            if(unknown_dir == 255) return (direction_e)min_dir;
+            else if(unknown_dir != min_dir) return (direction_e)unknown_dir;
+            else return (direction_e)min_dir;
+        }
+
 
         void makeSearchMap(uint16_t x, uint16_t y) {
             std::queue<std::pair<uint16_t, uint16_t>> que;
