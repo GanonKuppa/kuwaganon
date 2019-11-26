@@ -84,11 +84,12 @@ namespace umouse {
             if(motion_type == EMotionType::STRAIGHT ||
                     motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
                     motion_type == EMotionType::DIAGONAL ||
-                    motion_type == EMotionType::DIAGONAL_CENTER) {
+                    motion_type == EMotionType::DIAGONAL_CENTER ||
+                    motion_type == EMotionType::CURVE) {
                 // 並進速度算出
                 double gain = (double)pm.v_comp_gain;
                 //a_y = (double)adis.acc_f[2];
-                if(fabs(a_y) < 3.0) gain = 0.0;
+                //if(fabs(a_y) < 0.5) gain = 0.0;
                 v = (gain)*(v + a_y * DELTA_T) + (1.0 - gain)*(v_);
 
                 // 加速度積分速度算出
@@ -258,8 +259,8 @@ namespace umouse {
             return constrainL(dist, 0.045);
         }
 
-        void aheadWallCorrection(WallSensor& ws, EMotionType motion_type) {
-            float gain = 0.8;
+
+        void aheadWallCorrection(WallSensor& ws, uint8_t x_next, uint8_t y_next) {
             float ang_ = getAng();
             float x_ = getX();
             float y_ = getY();
@@ -269,39 +270,26 @@ namespace umouse {
                                 (ang_ >= 175.0 && ang_ < 185.0) ||
                                 (ang_ >= 265.0 && ang_ < 275.0);
 
-            bool is_straight = (motion_type == EMotionType::STRAIGHT ||
-                                motion_type == EMotionType::STRAIGHT_WALL_CENTER);
-
             if( !good_posture ||
                     !(ws.isAhead()) ||
-                    (wall_dist > 0.135 - 0.015) ||
-                    (ws.isLeft() && ws.isRight()) ||
-                    !(is_straight)
+                    (wall_dist > 0.135) ||
+                    (ws.isLeft() && ws.isRight())
               ) {
-                //FcLed::getInstance().turn(1,0,1);
                 return;
             }
-            //FcLed::getInstance().turn(1,0,0);
+
             if(ang_ >= 315.0 || ang_ < 45.0) {
-                uint8_t x_coor = (uint8_t)((x_ + 0.045) / 0.09f);
-                float nearest_wall_x = (x_coor + 1) * 0.09;
-                float x__ = nearest_wall_x - wall_dist;
-                x = x_ * (1.0 - gain) + x__ * gain;
+                float nearest_wall_x = (x_next + 1) * 0.09;
+                x = nearest_wall_x - wall_dist;                
             } else if(ang_ >= 45.0 && ang_ < 135.0) {
-                uint8_t y_coor = (uint8_t)((y_ + 0.045) / 0.09f);
-                float nearest_wall_y = (y_coor + 1) * 0.09;
-                float y__ = nearest_wall_y - wall_dist;
-                y = y_ * (1.0 - gain) + y__ * gain;
+                float nearest_wall_y = (y_next + 1) * 0.09;
+                y = nearest_wall_y - wall_dist;
             } else if(ang_ >= 135.0 && ang_ < 225.0) {
-                uint8_t x_coor = (uint8_t)((x_ + 0.045) / 0.09f);
-                float nearest_wall_x = (x_coor - 1) * 0.09;
-                float x__ = nearest_wall_x + wall_dist;
-                x = x_ * (1.0 - gain) + x__ * gain;
+                float nearest_wall_x = (x_next) * 0.09;
+                x = nearest_wall_x + wall_dist;
             } else if(ang_ >= 225.0 && ang_ < 315.0) {
-                uint8_t y_coor = (uint8_t)((y_ + 0.045) / 0.09f);
-                float nearest_wall_y = (y_coor - 1) * 0.09;
-                float y__ = nearest_wall_y + wall_dist;
-                y = y_ * (1.0 - gain) + y__ * gain;
+                float nearest_wall_y = (y_next) * 0.09;
+                y = nearest_wall_y + wall_dist;
             }
         }
 
@@ -526,6 +514,8 @@ namespace umouse {
 
 
         double calcAdamsBashforthDelta(double s_0, double s_1, double s_2 ) {
+            return s_0 * DELTA_T; // 単純なオイラー法
+
             if(s_1 == 0.0 && s_2 == 0.0) return s_0 * DELTA_T;
             else return (23.0 * s_0 - 16.0 * s_1 + 5.0 * s_2) / 12.0 * DELTA_T;
         }

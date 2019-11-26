@@ -3,6 +3,7 @@
 #include <math.h>
 #include <memory>
 #include <string>
+#include <cfloat>
 #include "curveFactory.h"
 #include "arcLengthParameterizedCurve.h"
 #include "kappa.h"
@@ -111,6 +112,7 @@ namespace umouse {
             turn_type = turn_type_e::STOP;
             motion_type = EMotionType::STOP;
             hash = (uint16_t)xor32();
+            on_start_func = nullptr;
             on_end_func = nullptr;
         }
 
@@ -158,11 +160,16 @@ namespace umouse {
             if(on_end_func)on_end_func();
         }
 
+        void setOnStartFunc(std::function< void(void) > on_start_func_) {
+            on_start_func = on_start_func_;
+        }
+
         void setOnEndFunc(std::function< void(void) > on_end_func_) {
             on_end_func = on_end_func_;
         }
 
-      private:
+      protected:
+        std::function< void(void) > on_start_func;
         std::function< void(void) > on_end_func;
 
     };
@@ -292,7 +299,13 @@ namespace umouse {
 
 
         virtual void update() {
+            if(cumulative_dist < FLT_EPSILON) {
+                printfAsync("first_call\n");
+                if(on_start_func != nullptr) on_start_func();
+            }
+
             BaseTrajectory::update();
+
             if( (a_acc == 0.0f && a_dec == 0.0f)||
                     (v_max == v_0 && v_max == v_end)
               ) {
@@ -506,6 +519,11 @@ namespace umouse {
 
         virtual void update() {
             //std::cout << ang <<" " << ang_v << std::endl;
+            static bool first_call = true;
+            if(first_call == true) {
+                if(on_start_func != nullptr) on_start_func();
+                first_call = false;
+            }
 
             v += DELTA_T * a;
             cumulative_dist += DELTA_T * v;

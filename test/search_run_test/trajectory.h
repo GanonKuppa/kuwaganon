@@ -112,6 +112,7 @@ namespace umouse {
             turn_type = turn_type_e::STOP;
             motion_type = EMotionType::STOP;
             hash = (uint16_t)xor32();
+            on_start_func = nullptr;
             on_end_func = nullptr;
         }
 
@@ -156,7 +157,11 @@ namespace umouse {
         }
 
         virtual ~BaseTrajectory() {
-            if(on_end_func)on_end_func();
+            if(on_end_func != nullptr) on_end_func();
+        }
+
+        void setOnStartFunc(std::function< void(void) > on_start_func_) {
+            on_start_func = on_start_func_;
         }
 
         void setOnEndFunc(std::function< void(void) > on_end_func_) {
@@ -164,8 +169,9 @@ namespace umouse {
         }
 
       private:
+        std::function< void(void) > on_start_func;
         std::function< void(void) > on_end_func;
-
+        
     };
 
     class StraightTrajectory : public BaseTrajectory {
@@ -294,6 +300,12 @@ namespace umouse {
 
         virtual void update() {
             BaseTrajectory::update();
+            static bool first_call = true;
+            if(first_call == true) {
+                if(on_start_func != nullptr) on_start_func();
+                first_call = false;
+            }
+
             if( (a_acc == 0.0f && a_dec == 0.0f)||
                     (v_max == v_0 && v_max == v_end)
               ) {
@@ -326,7 +338,8 @@ namespace umouse {
             wall_contact = enable;
         }
 
-        virtual bool isEnd() {
+        virtual bool isEnd() {            
+
             if(wall_contact == false) {
                 if (cumulative_dist >= target_dist) {
                     x = getEndX();
@@ -506,6 +519,12 @@ namespace umouse {
 
 
         virtual void update() {
+            static bool first_call = true;
+            if(first_call == true) {
+                if(on_start_func != nullptr) on_start_func();
+                first_call = false;
+            }
+
             //std::cout << ang <<" " << ang_v << std::endl;
 
             v += DELTA_T * a;

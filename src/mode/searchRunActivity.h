@@ -118,7 +118,7 @@ namespace umouse {
 
                 if(in_read_wall_area) fcled.turn(0,1,0);
                 else fcled.turn(0,0,1);
-
+/*
                 if(m.trajCommander.empty()) {
                     SE_I7();
                     waitmsec(200);
@@ -167,7 +167,7 @@ namespace umouse {
                     m.trajCommander.push(std::move(traj5));
 
                 }
-
+*/
 
                 if(in_read_wall_area && pre_in_read_wall_area == false && pre_read_wall_coor != m.coor) {
                     printfAsync("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝\n");
@@ -179,11 +179,19 @@ namespace umouse {
                     else if (m.direction == direction_e::W) x_next--;
                     else if (m.direction == direction_e::S) y_next--;
 
-                    printfAsync("msg_flag:%f,%f,壁|| 左 %d 前 (%d %d) 右 %d\n", m.posEsti.getX(), m.posEsti.getY(), ws.left(), ws.ahead_l(), ws.ahead_r(), ws.right());
+                    //printfAsync("msg_flag:%f,%f,壁|| 左 %d 前 (%d %d) 右 %d\n", m.posEsti.getX(), m.posEsti.getY(), ws.left(), ws.ahead_l(), ws.ahead_r(), ws.right());
+                    
+                    if (ws.isAhead()){
+                        printfAsync("pre:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
+                        m.posEsti.aheadWallCorrection(ws, x_next, y_next);
+                        printfAsync("fol:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
+                        SE_I7();
+                    }
 
                     m.maze.updateWall(x_next, y_next, m.direction, ws);
                     m.maze.makeSearchMap(desti_coor.x, desti_coor.y);
                     bool able_goal = m.maze.isExistPath(x_next, y_next);
+/*                    
                     if(!able_goal) {
                         auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.1, a, a);
                         m.trajCommander.push(std::move(traj0));
@@ -194,6 +202,7 @@ namespace umouse {
                         }
                         return; //以降の処理を行わず次のループへ
                     }
+*/
                     direction_e dest_dir_next = m.maze.getSearchDirection(x_next, y_next, m.direction);
                     int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
 
@@ -220,7 +229,7 @@ namespace umouse {
                         }
 
                         else if(ABS(rot_times) == 2) {
-                            slalom90(rot_times);
+                            slalom90(rot_times, x_next, y_next);
                         }
                     }
                 }
@@ -239,12 +248,24 @@ namespace umouse {
                 return false;
             }
 
-            void slalom90(int8_t rot_times) {
+            void slalom90(int8_t rot_times, uint8_t x_next, uint8_t y_next) {
                 auto traj0 = StraightTrajectory::create(CurveFactory::getPreDistWithOffset(turn_type_e::TURN_90, v), v, v, v, a, a);
                 auto traj1 = CurveTrajectory::createAsNoStraght(v, turn_type_e::TURN_90, (turn_dir_e)SIGN(rot_times));
                 auto traj2 = StraightTrajectory::create(CurveFactory::getFolDist(turn_type_e::TURN_90), v, v, v, a, a);
-
+                WallSensor &ws = WallSensor::getInstance();
                 UMouse& m = UMouse::getInstance();
+/*
+                std::function< void(void) > on_start_func = [&m, &ws, &x_next, &y_next]() {
+                    printfAsync("in on_start_func\n");
+                    if (ws.isAhead()){
+                        printfAsync("pre:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
+                        m.posEsti.aheadWallCorrection(ws, x_next, y_next);
+                        printfAsync("fol:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
+                        SE_I7();
+                    }
+                };
+                traj2->setOnStartFunc(on_start_func);
+*/
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));
                 m.trajCommander.push(std::move(traj2));
@@ -347,7 +368,7 @@ namespace umouse {
                         }
                         m.posEsti.setX(m.trajCommander.x);
                         m.posEsti.setY(m.trajCommander.y);
-                        m.posEsti.setAng(m.trajCommander.ang);
+                        //m.posEsti.setAng(m.trajCommander.ang);
                         m.ctrlMixer.reset();
                     };
 

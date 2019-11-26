@@ -222,10 +222,13 @@ namespace umouse {
             }
             if( imu.isUpsideDown() == true ||
                     (ctrlMixer.isOutOfControl() == true && (ABS(pt.getDuty_R()) > 0.1f || ABS(pt.getDuty_L()) > 0.1f )) ||
-                    (ABS(ctrlMixer.ang_pidf.e_k0) > 30.0f )
+                    (ABS(ctrlMixer.ang_pidf.e_k0) > 100.0f )
 
               ) {
                 printfAsync("◇◇◇◇ OutOfControl!\n");
+                printfAsync("is upside down: %d\n", imu.isUpsideDown());
+                printfAsync("is out of control: %d\n", ctrlMixer.isOutOfControl());
+                printfAsync("ang_pidf.e_k0: %f\n", ctrlMixer.ang_pidf.e_k0);
                 printfAsync("motion_type: %d\n", trajCommander.getTraj().motion_type);
                 printfAsync("(ang_v_t, wodo, gyro)=(%f, %f, %f)\n",trajCommander.ang_v, wo.ang_v, imu.omega_f[2]);
                 printfAsync("(x_t, y_t, ang_t)=(%f, %f, %f)\n", trajCommander.x, trajCommander.y, trajCommander.ang);
