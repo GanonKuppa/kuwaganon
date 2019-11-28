@@ -274,28 +274,30 @@ namespace umouse {
         }
 
 
-        bool inReadWallArea() {
+        bool inReadWallArea(float read_wall_offset = READ_WALL_OFFSET) {
             float fmod_x = fmodf(posEsti.getX(), 0.09f);
             float fmod_y = fmodf(posEsti.getY(), 0.09f);
 
             if(getDirection() == direction_e::E) {
-                if(fmod_x < 0.089f && fmod_x >= 0.09f - READ_WALL_OFFSET) return true;
+                if(fmod_x < 0.089f && fmod_x >= 0.09f - read_wall_offset) return true;
                 else return false;
             }
             if(getDirection() == direction_e::N) {
-                if(fmod_y < 0.089f && fmod_y >= 0.09f - READ_WALL_OFFSET) return true;
+                if(fmod_y < 0.089f && fmod_y >= 0.09f - read_wall_offset) return true;
                 else return false;
             }
             if(getDirection() == direction_e::W) {
-                if(fmod_x > 0.001f && fmod_x <= READ_WALL_OFFSET) return true;
+                if(fmod_x > 0.001f && fmod_x <= read_wall_offset) return true;
                 else return false;
             }
             if(getDirection() == direction_e::S) {
-                if(fmod_y > 0.001f && fmod_y <= READ_WALL_OFFSET) return true;
+                if(fmod_y > 0.001f && fmod_y <= read_wall_offset) return true;
                 else return false;
             }
             return false;
         }
+
+
 
         float calcDistNextSection() {
             float fmod_x = fmodf(posEsti.getX(), 0.09f);

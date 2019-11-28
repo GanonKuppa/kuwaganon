@@ -10,6 +10,7 @@
 #include "myUtil.h"
 #include "wallsensor.h"
 
+
 namespace umouse {
 
 
@@ -50,7 +51,7 @@ namespace umouse {
         turn_dir_e turn_dir;
         turn_type_e turn_type;
         uint16_t hash;
-        const float DELTA_T = 0.0005;
+        float DELTA_T = 0.0005;
 
         void setInitPos(float x_, float y_, float ang_) {
             x = x_;
@@ -74,6 +75,7 @@ namespace umouse {
         }
 
         float getNecessaryTime() {
+            DELTA_T = 0.01;
             float necessary_time = 0.0f;
             while(!isEnd()) {
                 update();
@@ -299,8 +301,7 @@ namespace umouse {
 
 
         virtual void update() {
-            if(cumulative_dist < FLT_EPSILON) {
-                printfAsync("first_call\n");
+            if(cumulative_dist < FLT_EPSILON) {                
                 if(on_start_func != nullptr) on_start_func();
             }
 

@@ -181,7 +181,7 @@ void timeInterrupt(void) {
     endTimeuCountIntCMT0();
 
     int_tick_count++;
-    resetWdt();
+    //resetWdt();
 }
 
 //-------------メイン関数---------------//
@@ -241,8 +241,8 @@ void periperalInit() {
     pm.init();
 
     //ウォッチドックタイマー
-    initWdt();
-    startWdt();
+    //initWdt();
+    //startWdt();
 }
 
 

@@ -4,7 +4,7 @@
 #include "wallsensor.h"
 #include "stdint.h"
 #include <map> // pair
-#include <queue>
+#include <deque>
 #include "communication.h"
 #include "dataFlash.h"
 
@@ -88,6 +88,7 @@ namespace umouse {
         uint32_t walls_vertical[31];
         uint32_t walls_horizontal[31];
         uint32_t reached[32];
+        uint32_t no_entry[32];
         uint16_t p_map[32][32];
 
         bool isReached(uint16_t x, uint16_t y) {
@@ -103,6 +104,32 @@ namespace umouse {
                 else reached[x] &= reached[x] &= ~(0x01 << y);
             }
         };
+
+        bool isNoEntry(uint16_t x, uint16_t y) {
+            bool is_no_entry;
+            if( 0<=x && x<=31 && 0<=y && y<=31) is_no_entry = (no_entry[x] >> y) & 0x00000001;
+            else is_no_entry = 1;
+            return is_no_entry;
+        };
+
+        void writeNoEntry(uint16_t x, uint16_t y, bool no_entry_) {
+            if( 0<=x && x<=31 && 0<=y && y<=31) {
+                if(no_entry_ == true) no_entry[x] |= (0x01 << y);
+                else no_entry[x] &= no_entry[x] &= ~(0x01 << y);
+            }
+        }
+
+        void writeNoEntryAllFalse() {
+            for(int i=0; i<32; i++) {
+                no_entry[i] = 0;
+            }
+        }
+
+        void writeNoEntryAllTrue() {
+            for(int i=0; i<32; i++) {
+                no_entry[i] = 0xFFFFFFFF;
+            }
+        }
 
         void writeAheadWall(uint16_t x, uint16_t y, direction_e dir, bool ahead) {
             printfAsync("  Ahead: %d\n", ahead );
@@ -383,6 +410,7 @@ namespace umouse {
             return min_dir;
         };
 
+
         uint8_t getUnknownDirection(uint16_t x, uint16_t y, direction_e dir) {
             uint8_t ran_judge_E = 0;
             uint8_t ran_judge_N = 0;
@@ -402,11 +430,22 @@ namespace umouse {
             if( (y != 0) && (isReached(x,y-1) == false) && (wall.S == 0)) {
                 ran_judge_S = 1;
             }
+            
+            if(x < 3){
+                if(ran_judge_W == 1) return 4;
+            }
 
-            if( (ran_judge_E == 1) && (dir == E) ) return 0;
-            if( (ran_judge_N == 1) && (dir == N) ) return 2;
-            if( (ran_judge_W == 1) && (dir == W) ) return 4;
-            if( (ran_judge_S == 1) && (dir == S) ) return 6;
+            if(x > 28){
+                if(ran_judge_E == 1) return 0;
+            }
+
+            if(y < 3){
+                if(ran_judge_S == 1) return 6;
+            }
+
+            if(y > 28){
+                if(ran_judge_N == 1) return 2;
+            }
 
             if(ran_judge_E == 1) return 0;
             if(ran_judge_N == 1) return 2;
@@ -416,17 +455,29 @@ namespace umouse {
             return 255;
         }
 
+
         direction_e getSearchDirection(uint16_t x, uint16_t y, direction_e dir) {
             uint8_t min_dir = (uint8_t)getMinDirection(x, y, dir);
             uint8_t unknown_dir = (uint8_t)getUnknownDirection(x, y, dir);
-            return (direction_e)min_dir;
+            
+            if( (x > 3 && x < 28) && (y > 3 && y < 28) ) return (direction_e)min_dir;
+            else if(unknown_dir == 255) return (direction_e)min_dir;
+            else if(unknown_dir != min_dir) return (direction_e)unknown_dir;
+            else return (direction_e)min_dir;
+        }
+
+        direction_e getSearchDirection2(uint16_t x, uint16_t y, direction_e dir) {
+            uint8_t min_dir = (uint8_t)getMinDirection(x, y, dir);
+            uint8_t unknown_dir = (uint8_t)getUnknownDirection(x, y, dir);
+            
             if(unknown_dir == 255) return (direction_e)min_dir;
             else if(unknown_dir != min_dir) return (direction_e)unknown_dir;
             else return (direction_e)min_dir;
         }
 
+
         void makeSearchMap(uint16_t x, uint16_t y) {
-            std::queue<std::pair<uint16_t, uint16_t>> que;
+            std::deque<std::pair<uint16_t, uint16_t>> que;            
 
             //歩数マップの初期化
             for(uint8_t i=0; i<32; i++) {
@@ -436,27 +487,27 @@ namespace umouse {
             }
             p_map[x][y] = 0; //目的地のテンシャルは0
 
-            que.push(std::make_pair(x, y));
+            que.push_back(std::make_pair(x, y));
             while(que.empty() == false) {
                 x = que.front().first;
                 y = que.front().second;
                 Wall wall = readWall(x, y);
-                que.pop();
+                que.pop_front();
                 if( (wall.E == 0) && (x != 31) && (p_map[x+1][y] == 0xffff) ) {
                     p_map[x+1][y] = p_map[x][y] + 1;
-                    que.push(std::make_pair(x+1,y));
+                    que.push_back(std::make_pair(x+1,y));
                 }
                 if( (wall.N == 0 ) && (y != 31) && (p_map[x][y+1] == 0xffff) ) {
                     p_map[x][y+1] = p_map[x][y] + 1;
-                    que.push(std::make_pair(x,y+1));
+                    que.push_back(std::make_pair(x,y+1));
                 }
                 if( (wall.W == 0) && (x != 0) && (p_map[x-1][y] == 0xffff) ) {
                     p_map[x-1][y] = p_map[x][y] + 1;
-                    que.push(std::make_pair(x-1,y));
+                    que.push_back(std::make_pair(x-1,y));
                 }
                 if( (wall.S == 0) && (y != 0) && (p_map[x][y-1] == 0xffff) ) {
                     p_map[x][y-1] = p_map[x][y] + 1;
-                    que.push(std::make_pair(x,y-1));
+                    que.push_back(std::make_pair(x,y-1));
                 }
             }
 
@@ -467,8 +518,48 @@ namespace umouse {
             if(p_map[x][y] == 0xffff) return false;
             else return true;
         }
+
+        void makeRandomFastestMap(uint16_t x, uint16_t y) {
+            std::deque<std::pair<uint16_t, uint16_t>> que;
+            //srand((unsigned int)time(NULL));
+            //歩数マップの初期化
+            for(uint8_t i=0; i<32; i++) {
+                for(uint8_t j=0; j<32; j++) {
+                    p_map[i][j] = 0xffff;
+                }
+            }
+            p_map[x][y] = 0; //目的地のテンシャルは0
+
+            que.push_back(std::make_pair(x,y));
+            while(que.empty() == false) {
+                x = que.front().first;
+                y = que.front().second;
+                Wall wall = readWall(x, y);
+                que.pop_front();
+                if( (wall.E == 0) && (wall.EF == 1) && (x != 31) && (p_map[x+1][y] == 0xffff) ) {
+                    p_map[x+1][y] = p_map[x][y] + 1 + xor32() % 10;
+                    que.push_back(std::make_pair(x+1,y));
+                }
+                if( (wall.N == 0 ) && (wall.NF == 1 ) && (y != 31) && (p_map[x][y+1] == 0xffff) ) {
+                    p_map[x][y+1] = p_map[x][y] + 1 + xor32() % 10;
+                    que.push_back(std::make_pair(x,y+1));
+                }
+                if( (wall.W == 0) && (wall.WF == 1) && (x != 0) && (p_map[x-1][y] == 0xffff) ) {
+                    p_map[x-1][y] = p_map[x][y] + 1 + xor32() % 10;
+                    que.push_back(std::make_pair(x-1,y));
+                }
+                if( (wall.S == 0) && (wall.SF == 1) && (y != 0) && (p_map[x][y-1] == 0xffff) ) {
+                    p_map[x][y-1] = p_map[x][y] + 1 + xor32() % 10;
+                    que.push_back(std::make_pair(x,y-1));
+                }
+            }
+
+        };
+
+
         void makeFastestMap(uint16_t x, uint16_t y) {
-            std::queue<std::pair<uint16_t, uint16_t>> que;
+
+            std::deque<std::pair<uint16_t, uint16_t>> que;
 
             //歩数マップの初期化
             for(uint8_t i=0; i<32; i++) {
@@ -478,31 +569,68 @@ namespace umouse {
             }
             p_map[x][y] = 0; //目的地のテンシャルは0
 
-            que.push(std::make_pair(x,y));
+            que.push_back(std::make_pair(x,y));
             while(que.empty() == false) {
                 x = que.front().first;
                 y = que.front().second;
-                Wall wall = readWall((uint16_t)(que.front().first), (uint16_t)(que.front().second));
-                que.pop();
+                Wall wall = readWall(x, y);
+                que.pop_front();
                 if( (wall.E == 0) && (wall.EF == 1) && (x != 31) && (p_map[x+1][y] == 0xffff) ) {
                     p_map[x+1][y] = p_map[x][y] + 1;
-                    que.push(std::make_pair(x+1,y));
+                    que.push_back(std::make_pair(x+1,y));
                 }
                 if( (wall.N == 0 ) && (wall.NF == 1 ) && (y != 31) && (p_map[x][y+1] == 0xffff) ) {
                     p_map[x][y+1] = p_map[x][y] + 1;
-                    que.push(std::make_pair(x,y+1));
+                    que.push_back(std::make_pair(x,y+1));
                 }
                 if( (wall.W == 0) && (wall.WF == 1) && (x != 0) && (p_map[x-1][y] == 0xffff) ) {
                     p_map[x-1][y] = p_map[x][y] + 1;
-                    que.push(std::make_pair(x-1,y));
+                    que.push_back(std::make_pair(x-1,y));
                 }
                 if( (wall.S == 0) && (wall.SF == 1) && (y != 0) && (p_map[x][y-1] == 0xffff) ) {
                     p_map[x][y-1] = p_map[x][y] + 1;
-                    que.push(std::make_pair(x,y-1));
+                    que.push_back(std::make_pair(x,y-1));
                 }
             }
 
         };
+
+        void makeRandomNoEntryMaskMap(uint16_t x, uint16_t y) {
+            std::deque<std::pair<uint16_t, uint16_t>> que;
+            //srand((unsigned int)time(NULL));
+            //歩数マップの初期化
+            for(uint8_t i=0; i<32; i++) {
+                for(uint8_t j=0; j<32; j++) {
+                    p_map[i][j] = 0xffff;
+                }
+            }
+            p_map[x][y] = 0; //目的地のテンシャルは0
+
+            que.push_back(std::make_pair(x,y));
+            while(que.empty() == false) {
+                x = que.front().first;
+                y = que.front().second;
+                Wall wall = readWall((uint16_t)(que.front().first), (uint16_t)(que.front().second));
+                que.pop_front();
+                if( (wall.E == 0) && !isNoEntry(x+1,y) &&(wall.EF == 1) && (x != 31) && (p_map[x+1][y] == 0xffff) ) {
+                    p_map[x+1][y] = p_map[x][y] + 1 + xor32() % 10;
+                    que.push_back(std::make_pair(x+1,y));
+                }
+                if( (wall.N == 0 ) && !isNoEntry(x,y+1) && (wall.NF == 1 ) && (y != 31) && (p_map[x][y+1] == 0xffff) ) {
+                    p_map[x][y+1] = p_map[x][y] + 1 + xor32() % 10;
+                    que.push_back(std::make_pair(x,y+1));
+                }
+                if( (wall.W == 0) && !isNoEntry(x-1,y) && (wall.WF == 1) && (x != 0) && (p_map[x-1][y] == 0xffff) ) {
+                    p_map[x-1][y] = p_map[x][y] + 1 + xor32() % 10;
+                    que.push_back(std::make_pair(x-1,y));
+                }
+                if( (wall.S == 0) && !isNoEntry(x,y-1) && (wall.SF == 1) && (y != 0) && (p_map[x][y-1] == 0xffff) ) {
+                    p_map[x][y-1] = p_map[x][y] + 1 + xor32() % 10;
+                    que.push_back(std::make_pair(x,y-1));
+                }
+            }
+        };
+
 
 
         void watchPotentialMap(void) {

@@ -56,8 +56,9 @@ namespace umouse {
     static const uint16_t PARAM_MNG_PART_NUM = 80;
     static const uint16_t CMD_SIZE  = 16;
     static const uint16_t part_num  = 5;
+    static const uint16_t PRINTF_BUFF_MAX_SIZE = 5000;
 
-    static std::queue<uint8_t> printfBuff;
+    static std::deque<uint8_t> printfBuff;
     static uint8_t periodicMsg[PERIODIC_MSG_LEN];
 
     static void packDataMaze(uint8_t part_num, uint8_t* buf);
@@ -83,7 +84,7 @@ namespace umouse {
 
     /***********非同期printf関数******************/
     int printfAsync(const char* fmt, ...) {
-        static char buffer[1000];
+        static char buffer[PRINTF_BUFF_MAX_SIZE];
         int len;
 
         va_list ap;
@@ -92,7 +93,7 @@ namespace umouse {
         len = vsprintf(buffer, fmt, ap);
 
         for (int c = 0; c < len; c++) {
-            printfBuff.push(buffer[c]);
+            if(printfBuff.size() < PRINTF_BUFF_MAX_SIZE) printfBuff.push_back(buffer[c]);
         }
 
         va_end(ap);
@@ -405,7 +406,7 @@ namespace umouse {
         for (int i = start_byte; i < end_byte; i++) {
             if (printfBuff.empty() == false) {
                 buf[i] = printfBuff.front();
-                printfBuff.pop();
+                printfBuff.pop_front();
                 printfDataNum++;
             } else {
                 buf[i] = 0;
@@ -462,7 +463,7 @@ namespace umouse {
         for (int i = start_byte; i < end_byte; i++) {
             if (printfBuff.empty() == false) {
                 buf[i] = printfBuff.front();
-                printfBuff.pop();
+                printfBuff.pop_front();
                 printfDataNum++;
             } else {
                 buf[i] = 0;
@@ -525,7 +526,7 @@ namespace umouse {
         for (int i = start_byte; i < end_byte; i++) {
             if (printfBuff.empty() == false) {
                 buf[i] = printfBuff.front();
-                printfBuff.pop();
+                printfBuff.pop_front();
                 printfDataNum++;
             } else {
                 buf[i] = 0;
@@ -680,7 +681,7 @@ namespace umouse {
         for (int i = start_byte; i < end_byte; i++) {
             if (printfBuff.empty() == false) {
                 buf[i] = printfBuff.front();
-                printfBuff.pop();
+                printfBuff.pop_front();
                 printfDataNum++;
             } else {
                 buf[i] = 0;

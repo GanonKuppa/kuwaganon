@@ -84,7 +84,7 @@ namespace umouse {
 
             float right_err = ABS(right() - center_r());
             float left_err = ABS(left() - center_l());
-            if(right_err < 50 || left_err < 50) in_wall_center_time += DELTA_T;
+            if(right_err < 50 && left_err < 50) in_wall_center_time += DELTA_T;
             else in_wall_center_time = 0.0f;
 
 

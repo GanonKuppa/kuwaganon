@@ -154,7 +154,7 @@ namespace umouse {
                     break;
                 while (path_vec[i + 1].turn_type == turn_type_e::STRAIGHT) {
                     path_vec.erase(path_vec.begin() + i + 1);
-                    printfAsync("          -- i=%d -- size=%d --block_num=%d \n", i, path_vec.size(), path_vec[i].block_num);
+                    //printfAsync("          -- i=%d -- size=%d --block_num=%d \n", i, path_vec.size(), path_vec[i].block_num);
                     path_vec[i].block_num++;
                     if (i + 1 == (uint16_t)path_vec.size())
                         break;
@@ -188,7 +188,7 @@ namespace umouse {
                 while (path_vec[i + 1].turn_type == turn_type_e::TURN_90 &&
                         path_vec[i].turn_dir != path_vec[i+1].turn_dir) {
 
-                    printfAsync("          -- i=%d -- size=%d --block_num=%d \n", i, path_vec.size(), path_vec[i].block_num);
+                    //printfAsync("          -- i=%d -- size=%d --block_num=%d \n", i, path_vec.size(), path_vec[i].block_num);
                     path_vec[i].block_num++;
                     path_vec[i].turn_type = turn_type_e::D_STRAIGHT;
                     path_vec[i].turn_dir = path_vec[i+1].turn_dir;

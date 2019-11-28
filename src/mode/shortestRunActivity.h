@@ -12,14 +12,42 @@
 #include "ICM20602.h"
 #include "adis16470.h"
 #include <vector>
+#include "wallsensor.h"
 
 namespace umouse {
 
     class ShortestRunActivity : public BaseActivity {
       protected:
+        bool pre_in_read_wall_area;
+        Coor2D<uint16_t> pre_read_wall_coor;
+
         ELoopStatus loop() {
-            waitmsec(100);
             UMouse& m = UMouse::getInstance();
+            WallSensor& ws = WallSensor::getInstance();
+            bool in_read_wall_area = m.inReadWallArea(0.035);
+
+            if(in_read_wall_area && pre_in_read_wall_area == false && pre_read_wall_coor != m.coor) {
+                pre_read_wall_coor = m.coor;
+                uint8_t x_next = m.coor.x;
+                uint8_t y_next = m.coor.y;
+                if (m.direction == direction_e::E) x_next++;
+                else if (m.direction == direction_e::N) y_next++;
+                else if (m.direction == direction_e::W) x_next--;
+                else if (m.direction == direction_e::S) y_next--;
+
+
+                if (m.maze.existAWall(x_next, y_next, m.direction) && m.trajCommander.isStraight()){
+                    printfAsync("pre:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
+                    m.posEsti.aheadWallCorrection(ws, x_next, y_next);
+                    printfAsync("fol:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
+                    SE_I7();
+                }
+                
+            }
+            pre_in_read_wall_area = in_read_wall_area;
+
+
+            
             if(m.trajCommander.empty()== true) return ELoopStatus::FINISH;
             else return ELoopStatus::CONTINUE;
         }
@@ -99,32 +127,40 @@ namespace umouse {
             //else if(param_mode == 7) turn_p.set(1.0, 0.60, 0.60, 0.60, 0.48, 0.60, 0.60, 0.60, 5.0, 3.0);
 
             std::vector<Path> path_vec;
-            makeMinStepPath(pm.goal_x, pm.goal_y, m.maze, path_vec);
-            printfAsync("--- makeMinStepPath ----\n");
-            printPath(path_vec);
 
 
             if(run_mode == 0 ) {
                 return;
             } else if(run_mode == 1 ) {
+                makeMinStepPath(pm.goal_x, pm.goal_y, m.maze, path_vec);
                 translatePathSpin(path_vec);
                 HF_playPathSpin(turn_p, path_vec, m.trajCommander);
             } else if(run_mode == 2) {
+                makeMinStepPath(pm.goal_x, pm.goal_y, m.maze, path_vec);
                 translatePathDiagonal(path_vec);
                 HF_playPathSpinDiagonal(turn_p, path_vec, m.trajCommander);
             } else if(run_mode == 3) {
+                makeMinStepPath(pm.goal_x, pm.goal_y, m.maze, path_vec);
                 translatePath90Deg(path_vec);
                 HF_playPath(turn_p, path_vec, m.trajCommander);
             } else if(run_mode == 4) {
+                makeMinStepPath(pm.goal_x, pm.goal_y, m.maze, path_vec);
                 translatePathLong(path_vec);
                 HF_playPath(turn_p, path_vec, m.trajCommander);
             } else if(run_mode == 5) {
-                translatePathDiagonal(path_vec);
+                makeFastestDiagonalPath(500, turn_p, pm.goal_x, pm.goal_y, m.maze, path_vec);
                 HF_playPath(turn_p, path_vec, m.trajCommander);
             }
+            printfAsync("--- makeMinStepPath ----\n");
+            printPath(path_vec);
+
+
             // ゴール区画に微妙に入り切れないことを防ぐための処理
             auto traj0 = StraightTrajectory::create(0.09f, 0.1f);
             m.trajCommander.push(std::move(traj0));
+
+            pre_read_wall_coor.set(255, 255);
+            pre_in_read_wall_area = false;
 
         }
         void onFinish() { }

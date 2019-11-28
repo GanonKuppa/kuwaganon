@@ -120,6 +120,14 @@ namespace umouse {
         }
 
 
+        void setOmegaOffset(float offset){
+            ParameterManager& pm = ParameterManager::getInstance();
+            pm.write<float>(192, offset);
+
+            pm.gyro2_z_ref = offset;
+        }
+
+
         void calibOmegaOffset(uint32_t ref_num) {
 
             int64_t omega_z_sum = 0;
@@ -133,12 +141,10 @@ namespace umouse {
             ref_z = omega_z_sum / (ref_num);
 
             printfAsync("=====adis16470=====\n gyro offset %f\n", (float)ref_z);
-
-            ParameterManager& pm = ParameterManager::getInstance();
-            pm.write<float>(192, (float)ref_z);
-
-            pm.gyro2_z_ref = (float)ref_z;
+            setOmegaOffset((float)ref_z);
         }
+        
+
 
 
       private:

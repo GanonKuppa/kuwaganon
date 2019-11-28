@@ -393,16 +393,16 @@ namespace umouse {
             if(ws.isOnWallCenter() == true && ws.isAhead() == false && v > 0.1f && v < 0.34f && fabsf(ang_v) < 50.0f) {
 
                 if(ang >= 315.0 || ang < 45.0) {
-                    //if(ws.getOnWallCenterTime() > 0.3) ang = 0.0f;
+                    if(ws.getOnWallCenterTime() > 0.15) ang = 0.0f;
                     y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;
                 } else if(ang >= 45.0 && ang < 135.0) {
-                    //if(ws.getOnWallCenterTime() > 0.4) ang = 90.0f;
+                    if(ws.getOnWallCenterTime() > 0.15) ang = 90.0f;
                     x = (uint8_t)(x / 0.09) * 0.09 + 0.09/2.0;
                 } else if(ang >= 135.0 && ang < 225.0) {
-                    //if(ws.getOnWallCenterTime() > 0.3) ang = 180.0f;
+                    if(ws.getOnWallCenterTime() > 0.15) ang = 180.0f;
                     y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;
                 } else if(ang >= 225.0 && ang < 315.0) {
-                    //if(ws.getOnWallCenterTime() > 0.3) ang = 270.0f;
+                    if(ws.getOnWallCenterTime() > 0.15) ang = 270.0f;
                     x = (uint8_t)(x / 0.09) * 0.09 + 0.09/2.0;
                 }
                 if(ws.getOnWallCenterTime() > 0.1 && ws.getOnWallCenterTime() < 0.11)SE_POSITION_CHANGE();
