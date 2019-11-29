@@ -58,7 +58,7 @@ namespace umouse {
     static const uint16_t part_num  = 5;
     static const uint16_t PRINTF_BUFF_MAX_SIZE = 5000;
 
-    static std::deque<uint8_t> printfBuff;
+    static std::queue<uint8_t> printfBuff;
     static uint8_t periodicMsg[PERIODIC_MSG_LEN];
 
     static void packDataMaze(uint8_t part_num, uint8_t* buf);
@@ -93,7 +93,7 @@ namespace umouse {
         len = vsprintf(buffer, fmt, ap);
 
         for (int c = 0; c < len; c++) {
-            if(printfBuff.size() < PRINTF_BUFF_MAX_SIZE) printfBuff.push_back(buffer[c]);
+            if(printfBuff.size() < PRINTF_BUFF_MAX_SIZE) printfBuff.push(buffer[c]);
         }
 
         va_end(ap);
@@ -406,7 +406,7 @@ namespace umouse {
         for (int i = start_byte; i < end_byte; i++) {
             if (printfBuff.empty() == false) {
                 buf[i] = printfBuff.front();
-                printfBuff.pop_front();
+                printfBuff.pop();
                 printfDataNum++;
             } else {
                 buf[i] = 0;
@@ -463,7 +463,7 @@ namespace umouse {
         for (int i = start_byte; i < end_byte; i++) {
             if (printfBuff.empty() == false) {
                 buf[i] = printfBuff.front();
-                printfBuff.pop_front();
+                printfBuff.pop();
                 printfDataNum++;
             } else {
                 buf[i] = 0;
@@ -526,7 +526,7 @@ namespace umouse {
         for (int i = start_byte; i < end_byte; i++) {
             if (printfBuff.empty() == false) {
                 buf[i] = printfBuff.front();
-                printfBuff.pop_front();
+                printfBuff.pop();
                 printfDataNum++;
             } else {
                 buf[i] = 0;
@@ -681,7 +681,7 @@ namespace umouse {
         for (int i = start_byte; i < end_byte; i++) {
             if (printfBuff.empty() == false) {
                 buf[i] = printfBuff.front();
-                printfBuff.pop_front();
+                printfBuff.pop();
                 printfDataNum++;
             } else {
                 buf[i] = 0;

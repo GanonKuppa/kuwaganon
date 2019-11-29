@@ -206,7 +206,7 @@ namespace umouse {
         }
 
         bool isOnWallCenter() {
-            if(in_wall_center_time > 0.1) {
+            if(in_wall_center_time > 0.05) {
                 return true;
             } else return false;
 

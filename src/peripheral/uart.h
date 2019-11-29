@@ -9,8 +9,8 @@
 
 #include <stdint.h>
 
-#include <deque>
-//#include <queue>
+//#include <deque>
+#include <queue>
 
 
 void initSCI1();
@@ -22,7 +22,7 @@ void putnbyteSCIFA9(uint8_t* buf, uint16_t len);
 void recieveDataSCIFA9();
 void sendDataSCIFA9();
 
-extern std::deque<uint8_t> transBuff; //送信用データバッファ
+extern std::queue<uint8_t> transBuff; //送信用データバッファ
 extern uint8_t recieveBuff[512];
 extern uint16_t recieveBuffCount;
 

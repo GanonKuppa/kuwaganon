@@ -390,7 +390,7 @@ namespace umouse {
         double y_d_2;
 
         void onWallCenterCorrection(WallSensor& ws) {
-            if(ws.isOnWallCenter() == true && ws.isAhead() == false && v > 0.1f && v < 0.34f && fabsf(ang_v) < 50.0f) {
+            if(ws.isOnWallCenter() == true && ws.isAhead() == false && v > 0.1f && fabsf(ang_v) < 50.0f) {
 
                 if(ang >= 315.0 || ang < 45.0) {
                     if(ws.getOnWallCenterTime() > 0.15) ang = 0.0f;

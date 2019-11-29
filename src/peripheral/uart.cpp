@@ -98,7 +98,7 @@ void initSCIFA9() {
 }
 
 /***********SCIFA9用送受信バッファ*******************/
-deque<uint8_t> transBuff; //送信用データバッファ
+queue<uint8_t> transBuff; //送信用データバッファ
 uint8_t recieveBuff[512];
 uint16_t recieveBuffCount = 0;
 
@@ -109,7 +109,7 @@ void putnbyteSCIFA9(uint8_t* buf, uint16_t len) {
     int c;
 
     for (c = 0; c < len; c++) {
-        transBuff.push_back(buf[c]);
+        transBuff.push(buf[c]);
     }
 
 }
@@ -143,7 +143,7 @@ void sendDataSCIFA9() {
     while (SCIFA9.FDR.BIT.T < 0x10) {
         if (transBuff.empty() == true) return;
         SCIFA9.FTDR = transBuff.front();
-        transBuff.pop_front();
+        transBuff.pop();
         count++;
         if (count == 16) return;
     }

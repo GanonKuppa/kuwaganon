@@ -222,7 +222,7 @@ namespace umouse {
             }
             if( imu.isUpsideDown() == true ||
                     (ctrlMixer.isOutOfControl() == true && (ABS(pt.getDuty_R()) > 0.1f || ABS(pt.getDuty_L()) > 0.1f )) ||
-                    (ABS(ctrlMixer.ang_pidf.e_k0) > 100.0f )
+                    (ABS(ctrlMixer.ang_pidf.e_k0) > 50.0f )
 
               ) {
                 printfAsync("◇◇◇◇ OutOfControl!\n");

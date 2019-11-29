@@ -203,6 +203,15 @@ namespace umouse {
                     }
 */
                     direction_e dest_dir_next = m.maze.getSearchDirection2(x_next, y_next, m.direction);
+                    if(x_next == 14 && y_next==1){
+                        Wall wall = m.maze.readWall(x_next, y_next);
+                        printfAsync("★min_dir:%d\n",m.maze.getMinDirection(x_next,y_next,m.direction));
+                        printfAsync("★unknown_dir:%d\n",m.maze.getUnknownDirection(x_next,y_next,m.direction));
+                        printfAsync("★search2_dir:%d\n",dest_dir_next);
+                        printfAsync("★wall:E%d N%d W%d S%d\n",wall.E, wall.N, wall.W, wall.S);
+                        int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
+                        printfAsync("★rot_times%d\n", rot_times);                        
+                    }
                     int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
 
                     printfAsync("XXXXX read wall. rot_times=%d\n",rot_times);
@@ -218,9 +227,9 @@ namespace umouse {
                     else {
 
                         if(rot_times == 0) {
-                            //auto traj0 = StraightTrajectory::createAsWallCenter(0.09f, v, v, v, a, a);
-                            //m.trajCommander.push(std::move(traj0));
-                            straight(x_next, y_next);                            
+                            auto traj0 = StraightTrajectory::createAsWallCenter(0.09f, v, v, v, a, a);
+                            m.trajCommander.push(std::move(traj0));
+                            //straight(x_next, y_next);                            
                         } else if (ABS(rot_times) == 4) {
                             spin180(rot_times);
                         }

@@ -5,6 +5,7 @@
 #include "stdint.h"
 #include <map> // pair
 #include <deque>
+#include <queue>
 #include "communication.h"
 #include "dataFlash.h"
 
@@ -393,7 +394,7 @@ namespace umouse {
             else if(potential_min == potential_W) min_dir = direction_e::W;
             else if(potential_min == potential_S) min_dir = direction_e::S;
 
-#ifdef MAZE_DEBUG
+//#ifdef MAZE_DEBUG
             printfAsync("■■■ x:%d, y%d, dir:%d, mindir: %d p(x,y): %d|| Ep:%d, Np:%d, Wp:%d, Sp:%d\n",
                         x, y, dir, min_dir,p_map[x][y], potential_E, potential_N, potential_W, potential_S);
             printfAsync("(%d, %d)|",x, y);
@@ -406,7 +407,7 @@ namespace umouse {
             readWall(x, y + 1).print();
             printfAsync("(%d, %d-1)|",x, y);
             readWall(x,y - 1).print();
-#endif
+//#endif
             return min_dir;
         };
 
@@ -477,7 +478,7 @@ namespace umouse {
 
 
         void makeSearchMap(uint16_t x, uint16_t y) {
-            std::deque<std::pair<uint16_t, uint16_t>> que;            
+            std::queue<std::pair<uint16_t, uint16_t>> que;            
 
             //歩数マップの初期化
             for(uint8_t i=0; i<32; i++) {
@@ -487,27 +488,27 @@ namespace umouse {
             }
             p_map[x][y] = 0; //目的地のテンシャルは0
 
-            que.push_back(std::make_pair(x, y));
+            que.push(std::make_pair(x, y));
             while(que.empty() == false) {
                 x = que.front().first;
                 y = que.front().second;
                 Wall wall = readWall(x, y);
-                que.pop_front();
+                que.pop();
                 if( (wall.E == 0) && (x != 31) && (p_map[x+1][y] == 0xffff) ) {
                     p_map[x+1][y] = p_map[x][y] + 1;
-                    que.push_back(std::make_pair(x+1,y));
+                    que.push(std::make_pair(x+1,y));
                 }
                 if( (wall.N == 0 ) && (y != 31) && (p_map[x][y+1] == 0xffff) ) {
                     p_map[x][y+1] = p_map[x][y] + 1;
-                    que.push_back(std::make_pair(x,y+1));
+                    que.push(std::make_pair(x,y+1));
                 }
                 if( (wall.W == 0) && (x != 0) && (p_map[x-1][y] == 0xffff) ) {
                     p_map[x-1][y] = p_map[x][y] + 1;
-                    que.push_back(std::make_pair(x-1,y));
+                    que.push(std::make_pair(x-1,y));
                 }
                 if( (wall.S == 0) && (y != 0) && (p_map[x][y-1] == 0xffff) ) {
                     p_map[x][y-1] = p_map[x][y] + 1;
-                    que.push_back(std::make_pair(x,y-1));
+                    que.push(std::make_pair(x,y-1));
                 }
             }
 
