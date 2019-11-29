@@ -69,6 +69,7 @@ namespace umouse {
           public:
             float a;
             float v;
+            float v_max;
             ESearchMode mode;
             bool pre_in_read_wall_area;
             Coor2D<uint16_t> pre_read_wall_coor;
@@ -89,6 +90,7 @@ namespace umouse {
                 float y = 0.09f/2.0f - m.WALL2MOUSE_CENTER_DIST;
                 a = pm.a_search_run;
                 v = pm.v_search_run;
+                v_max = 0.6;
                 pre_in_read_wall_area = false;
                 float ang = 90.0f;
                 m.posEsti.reset(x,y,ang);
@@ -216,8 +218,9 @@ namespace umouse {
                     else {
 
                         if(rot_times == 0) {
-                            auto traj0 = StraightTrajectory::createAsWallCenter(0.09f, v, v, v, a, a);
-                            m.trajCommander.push(std::move(traj0));
+                            //auto traj0 = StraightTrajectory::createAsWallCenter(0.09f, v, v, v, a, a);
+                            //m.trajCommander.push(std::move(traj0));
+                            straight(x_next, y_next);                            
                         } else if (ABS(rot_times) == 4) {
                             spin180(rot_times);
                         }
@@ -262,6 +265,11 @@ namespace umouse {
             }
 
             void spin90GyroCalib(int8_t rot_times, float& v) {
+                if(rot_times == 4){
+                     spin180(rot_times);
+                     return;
+                }
+
                 UMouse& m = UMouse::getInstance();
                 WallSensor& ws = WallSensor::getInstance();
                 ParameterManager& pm = ParameterManager::getInstance();
@@ -333,11 +341,53 @@ namespace umouse {
 
             }
 
+            void straight(uint8_t x_next, uint8_t y_next) {
+                UMouse& m = UMouse::getInstance();
+                WallSensor& ws = WallSensor::getInstance();
+                ParameterManager& pm = ParameterManager::getInstance();
+                uint8_t block_count = 1;
+
+                while(1) {
+                    if (m.direction == direction_e::E) x_next++;
+                    else if (m.direction == direction_e::N) y_next++;
+                    else if (m.direction == direction_e::W) x_next--;
+                    else if (m.direction == direction_e::S) y_next--;
+                    if(!m.maze.isReached(x_next, y_next) ||
+                      (x_next == m.goal.x && y_next == m.goal.y) ||
+                      (x_next == 0 && y_next == 0)){
+                        break;
+                    }
+                    direction_e dest_dir_next = m.maze.getSearchDirection2(x_next, y_next, m.direction);
+                    int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
+                    if(rot_times == 0) {
+                        block_count ++;
+                    }else {
+                        break;
+                    }
+                }
+                if(block_count == 1){
+                    auto traj0 = StraightTrajectory::createAsWallCenter(0.09f * block_count, v, v, v, a, a);
+                    m.trajCommander.push(std::move(traj0));
+                }
+                else{
+                    auto traj0 = StraightTrajectory::createAsWallCenter(0.09f * block_count - 0.045, v, v_max, v, a, a);
+                    m.trajCommander.push(std::move(traj0));
+                    while(!m.trajCommander.empty()) {waitmsec(1);}
+                    auto traj1 = StraightTrajectory::createAsWallCenter(0.045f, v, v, v, a, a);
+                    m.trajCommander.push(std::move(traj1));
+                }
+
+            }
+
 
             void spin90(int8_t rot_times) {
                 UMouse& m = UMouse::getInstance();
                 WallSensor& ws = WallSensor::getInstance();
                 ParameterManager& pm = ParameterManager::getInstance();
+                if(rot_times == 4){
+                     spin180(rot_times);
+                     return;
+                }
 
                 if (ws.isAhead() == true) {
                     std::function< void(void) > update_func = [&m, &ws]() {
@@ -538,6 +588,7 @@ namespace umouse {
                 desti_coor = m.start;
                 a = pm.a_search_run;
                 v = pm.v_search_run;
+                v_max = 0.6;
                 pre_in_read_wall_area = false;
 
                 direction_e dest_dir_next = m.maze.getSearchDirection(m.goal.x, m.goal.y, m.direction);
