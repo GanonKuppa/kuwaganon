@@ -88,18 +88,20 @@ namespace umouse {
                 m.trajCommander.push(std::move(traj4));
                 m.trajCommander.push(std::move(traj5));
             } else if(mode == 4) {
-                auto traj1 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                auto traj2 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                auto traj3 = StopTrajectory::create(2.0);
-                auto traj4 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                auto traj5 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                auto traj6 = StopTrajectory::create(1.0);
-                m.trajCommander.push(std::move(traj1));
-                m.trajCommander.push(std::move(traj2));
-                m.trajCommander.push(std::move(traj3));
-                m.trajCommander.push(std::move(traj4));
-                m.trajCommander.push(std::move(traj5));
-                m.trajCommander.push(std::move(traj6));
+                for(int i=0; i<20; i++) {
+                    auto traj1 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj2 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj3 = StopTrajectory::create(2.0);
+                    auto traj4 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj5 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj6 = StopTrajectory::create(1.0);
+                    m.trajCommander.push(std::move(traj1));
+                    m.trajCommander.push(std::move(traj2));
+                    m.trajCommander.push(std::move(traj3));
+                    m.trajCommander.push(std::move(traj4));
+                    m.trajCommander.push(std::move(traj5));
+                    m.trajCommander.push(std::move(traj6));
+                }
             } else if(mode == 5) {
                 auto traj1 = SpinTurnTrajectory::create( -90.0f, pm.spin_ang_v, pm.spin_ang_a);
                 auto traj2 = SpinTurnTrajectory::create( -90.0f, pm.spin_ang_v, pm.spin_ang_a);

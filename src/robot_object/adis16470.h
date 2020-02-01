@@ -85,7 +85,7 @@ namespace umouse {
 
             float omega_pre = omega_f[2];
             omega_f[2] = GYRO32BIT_SCALE * scaler * (double)omega_c[2];
-            if(fabs(omega_f[2]) < 0.01)omega_f[2] = 0.0;
+            //if(fabs(omega_f[2]) < 0.01)omega_f[2] = 0.0;
             alpha = (omega_f[2] - omega_pre) / DELTA_T;
 
             // ACC Y

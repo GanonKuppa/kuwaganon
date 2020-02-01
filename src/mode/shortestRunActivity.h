@@ -38,7 +38,7 @@ namespace umouse {
 
                 if (m.maze.existAWall(x_next, y_next, m.direction) && m.trajCommander.isStraight()){
                     printfAsync("pre:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
-                    m.posEsti.aheadWallCorrection(ws, x_next, y_next);
+                    //m.posEsti.aheadWallCorrection(ws, x_next, y_next);
                     printfAsync("fol:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
                     SE_I7();
                 }

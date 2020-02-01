@@ -180,9 +180,9 @@ namespace umouse {
 
                     //printfAsync("msg_flag:%f,%f,壁|| 左 %d 前 (%d %d) 右 %d\n", m.posEsti.getX(), m.posEsti.getY(), ws.left(), ws.ahead_l(), ws.ahead_r(), ws.right());
                     
-                    if (ws.isAhead()){
+                    if (m.maze.existAWall(x_next, y_next, m.direction)){
                         printfAsync("pre:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
-                        m.posEsti.aheadWallCorrection(ws, x_next, y_next);
+                        //m.posEsti.aheadWallCorrection(ws, x_next, y_next);
                         printfAsync("fol:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
                         SE_I7();
                     }
@@ -203,15 +203,6 @@ namespace umouse {
                     }
 */
                     direction_e dest_dir_next = m.maze.getSearchDirection2(x_next, y_next, m.direction);
-                    if(x_next == 14 && y_next==1){
-                        Wall wall = m.maze.readWall(x_next, y_next);
-                        printfAsync("★min_dir:%d\n",m.maze.getMinDirection(x_next,y_next,m.direction));
-                        printfAsync("★unknown_dir:%d\n",m.maze.getUnknownDirection(x_next,y_next,m.direction));
-                        printfAsync("★search2_dir:%d\n",dest_dir_next);
-                        printfAsync("★wall:E%d N%d W%d S%d\n",wall.E, wall.N, wall.W, wall.S);
-                        int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
-                        printfAsync("★rot_times%d\n", rot_times);                        
-                    }
                     int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
 
                     printfAsync("XXXXX read wall. rot_times=%d\n",rot_times);
@@ -227,9 +218,9 @@ namespace umouse {
                     else {
 
                         if(rot_times == 0) {
-                            auto traj0 = StraightTrajectory::createAsWallCenter(0.09f, v, v, v, a, a);
-                            m.trajCommander.push(std::move(traj0));
-                            //straight(x_next, y_next);                            
+                            //auto traj0 = StraightTrajectory::createAsWallCenter(0.09f, v, v, v, a, a);
+                            //m.trajCommander.push(std::move(traj0));
+                            straight(x_next, y_next);                            
                         } else if (ABS(rot_times) == 4) {
                             spin180(rot_times);
                         }
@@ -310,8 +301,11 @@ namespace umouse {
                     else if(m.running_sec > 120.0) v = pm.v_search_run * 0.90;
                     else if(m.running_sec > 180.0) v = pm.v_search_run * 0.85;
 
+
                     adis16470& adis = adis16470::getInstance();
+                    ICM20602& icm = ICM20602::getInstance();
                     adis.calibOmegaOffset(800);
+                    //icm.calibOmegaOffset(200);
                     if(rot_times != 0){
                         auto traj3 = UpdateInjectionTrajectory::create(0.35f, update_func);
                         auto traj4 = SpinTurnTrajectory::create(- rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
@@ -338,8 +332,9 @@ namespace umouse {
                     else if(m.running_sec > 180.0) v = pm.v_search_run * 0.85;
 
                     adis16470& adis = adis16470::getInstance();
+                    ICM20602& icm = ICM20602::getInstance();
                     adis.calibOmegaOffset(800);
-
+                    //icm.calibOmegaOffset(200);
                     if(rot_times != 0){
                         auto traj3 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
                         m.trajCommander.push(std::move(traj3));
@@ -591,6 +586,7 @@ namespace umouse {
 
             void onStart() {
                 ICM20602& icm = ICM20602::getInstance();
+
                 ParameterManager& pm = ParameterManager::getInstance();
 
                 UMouse& m = UMouse::getInstance();

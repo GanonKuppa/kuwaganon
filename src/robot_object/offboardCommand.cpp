@@ -130,6 +130,7 @@ namespace umouse {
         float ang = parseFloat(buf[9], buf[10], 1.0f);
         UMouse& m = UMouse::getInstance();
         m.trajCommander.reset(x,y,ang);
+        m.posEsti.reset(x,y,ang);
         m.ctrlMixer.reset();
     }
 
