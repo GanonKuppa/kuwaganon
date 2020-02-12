@@ -231,6 +231,7 @@ void periperalInit() {
     initMTU3();
     initMTU4();
 
+
     //DA
     initDA();
     umouse::printfAsync("-------各種ペリフェラル初期化完了-------\n");

@@ -21,7 +21,7 @@ namespace umouse {
 
         PseudoDial() {
             enable = false;
-            ang_ctrl.set(0.01, 1000000.0, 0.0);
+            ang_ctrl.set(0.03, 1000000.0, 0.0);
             dial_position = 0;
             division_num = 8;
             target_ang = 0.0f;
@@ -50,7 +50,7 @@ namespace umouse {
                 target_ang = fmod(360.0 * (float)dial_position / (float)division_num, 360.0);
                 ang_ctrl.update(target_ang, getAngle());
 
-                float duty = constrain(ang_ctrl.getControlVal(), -0.55, 0.55) ;
+                float duty = constrain(ang_ctrl.getControlVal(), -0.65, 0.65) ;
                 if(ABS(getVelocity()) >0.05) duty = 0.0;
                 setDuty(duty);
             }

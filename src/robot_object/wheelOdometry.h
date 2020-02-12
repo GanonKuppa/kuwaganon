@@ -29,8 +29,8 @@ namespace umouse {
 
         const float BIG_R = 500000.0;
         const double DELTA_T = 0.0005;
-        const double TIRE_GEAR_NUM = 49.0;
-        const double ENC_GEAR_NUM = 49.0;
+        const double TIRE_GEAR_NUM = 41.0;
+        const double ENC_GEAR_NUM = 41.0;
         const double GEAR_RATIO = TIRE_GEAR_NUM / ENC_GEAR_NUM;
         const double ENC_RESOLUTION = 4096.0;
         const double ENC_R_DIR = -1.0; // 機体が進む方向にタイヤを回した場合に位相係数カウント値が増えるか減るか

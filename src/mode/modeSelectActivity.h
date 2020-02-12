@@ -101,7 +101,8 @@ namespace umouse {
                 m.posEsti.reset(x,y,ang);
                 m.trajCommander.reset(x,y,ang);
                 m.ctrlMixer.reset();
-
+                umouse::WallSensor& wallSen = umouse::WallSensor::getInstance();
+                wallSen.debug();
                 SEF();
                 waitmsec(100);
             }

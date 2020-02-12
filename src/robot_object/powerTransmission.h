@@ -286,8 +286,8 @@ namespace umouse {
         float duty_L;
 
         const float PI = 3.1415926535;
-        const float TIRE_GEAR_NUM = 49.0;
-        const float PINION_GEAR_NUM = 12.0;
+        const float TIRE_GEAR_NUM = 41.0;
+        const float PINION_GEAR_NUM = 9.0;
         const float GEAR_RATIO = TIRE_GEAR_NUM / PINION_GEAR_NUM;
 
         float getVoltage() {

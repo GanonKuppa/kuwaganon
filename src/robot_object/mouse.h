@@ -68,8 +68,8 @@ namespace umouse {
 
     class UMouse {
       public:
-        static constexpr float WALL2MOUSE_CENTER_DIST = 0.01765;
-        static constexpr float READ_WALL_OFFSET = 0.0125;
+        static constexpr float WALL2MOUSE_CENTER_DIST = 0.00859;
+        static constexpr float READ_WALL_OFFSET = 0.01;
         static constexpr float DELTA_T = 0.0005;
 
         // -32768 から 32767
@@ -189,7 +189,7 @@ namespace umouse {
 
 
             //posEsti.update(wo.getV_double(), (double)adis.omega_f[2], (double)adis.originOffsetCompAy(), (double)adis.originOffsetCompAx(), trajCommander.getMotionType(), ws);
-            posEsti.update(wo.getV_double(), (double)adis.omega_f[2], (double)imu.acc_f[1], (double)imu.acc_f[0], trajCommander.getMotionType(), ws);
+            posEsti.update(wo.getV_double(), (double)imu.omega_f[2], (double)imu.acc_f[1], (double)imu.acc_f[0], trajCommander.getMotionType(), ws);
 
             trajCommander.update(posEsti);
 

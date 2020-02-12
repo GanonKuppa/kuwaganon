@@ -57,13 +57,13 @@ namespace umouse {
             if(enable == true) {
                 updateAllOffVal();
 
-                turnLed(true, true, false, false);
+                turnLed(true, false, true, false);
                 waitusec_sub(LED_ON_USEC);
-                updateOnVal(true, true, false, false);
+                updateOnVal(true, false, true, false);
 
-                turnLed(false, false, true, true);
+                turnLed(false, true, false, true);
                 waitusec_sub(LED_ON_USEC);
-                updateOnVal(false, false, true, true);
+                updateOnVal(false, true, false, true);
                 /*
                  turnLed(false, false, true, false);
                  waitusec_sub(LED_ON_USEC);
@@ -320,18 +320,20 @@ namespace umouse {
         void updateAllOffVal() {
             ahead_l_off = startAD_AN101(); //AD_SLED1
             ahead_l_off = startAD_AN101(); //AD_SLED1
-            right_off = startAD_AN100();//AD_SLED2
-            right_off = startAD_AN100();//AD_SLED2
-            left_off = startAD_AN001();//AD_SLED3
-            left_off = startAD_AN001();//AD_SLED3
+            ahead_l_off = startAD_AN101(); //AD_SLED1
+            ahead_l_off = startAD_AN101(); //AD_SLED1
+            left_off = startAD_AN100();//AD_SLED2
+            left_off = startAD_AN100();//AD_SLED2
+            right_off = startAD_AN001();//AD_SLED3
+            right_off = startAD_AN001();//AD_SLED3
             ahead_r_off = startAD_AN002();//AD_SLED4
             ahead_r_off = startAD_AN002();//AD_SLED4
         }
 
         void updateAllOnVal() {
             ahead_l_on = startAD_AN101(); //AD_SLED1
-            right_on = startAD_AN100();//AD_SLED2
-            left_on = startAD_AN001();//AD_SLED3
+            left_on = startAD_AN100();//AD_SLED2
+            right_on = startAD_AN001();//AD_SLED3
             ahead_r_on = startAD_AN002();//AD_SLED4
         }
 
@@ -341,12 +343,12 @@ namespace umouse {
                 ahead_l_on = startAD_AN101(); //AD_SLED1
             }
             if(sled2 == true) {
-                right_on = startAD_AN100();//AD_SLED2
-                right_on = startAD_AN100();//AD_SLED2
+                left_on = startAD_AN100();//AD_SLED2
+                left_on = startAD_AN100();//AD_SLED2
             }
             if(sled3 == true) {
-                left_on = startAD_AN001();//AD_SLED3
-                left_on = startAD_AN001();//AD_SLED3
+                right_on = startAD_AN001();//AD_SLED3
+                right_on = startAD_AN001();//AD_SLED3
             }
             if(sled4 == true) {
                 ahead_r_on = startAD_AN002();//AD_SLED4
@@ -371,10 +373,10 @@ namespace umouse {
             int16_t l_mod = left_on - left_off;
             int16_t r_mod = right_on - right_off;
 
-            ahead_l_q.push_front(0.5 * (ahl_mod + ahead_l_q.at(0)) );
-            ahead_r_q.push_front(0.5 * (ahr_mod + ahead_r_q.at(0)));
-            left_q.push_front(0.5 * (l_mod + left_q.at(0)));
-            right_q.push_front(0.5 * (r_mod + right_q.at(0)));
+            ahead_l_q.push_front(ahl_mod);//0.5 * (ahl_mod + ahead_l_q.at(0)) );
+            ahead_r_q.push_front(ahr_mod);//0.5 * (ahr_mod + ahead_r_q.at(0)));
+            left_q.push_front(l_mod);//0.5 * (l_mod + left_q.at(0)));
+            right_q.push_front(r_mod);//0.5 * (r_mod + right_q.at(0)));
 
             ahead_l_q.pop_back();
             ahead_r_q.pop_back();
