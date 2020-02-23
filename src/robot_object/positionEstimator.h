@@ -1,7 +1,7 @@
 #pragma once
 #include <math.h>
 #include "ICM20602.h"
-#include "adis16470.h"
+//#include "adis16470.h"
 #include "sound.h"
 #include "trajectory.h"
 #include "communication.h"
@@ -64,7 +64,7 @@ namespace umouse {
 
         void update(double v_, double ang_v_, double a_y, double a_x, EMotionType motion_type, WallSensor& ws) {
             ICM20602& icm = ICM20602::getInstance();
-            umouse::adis16470& adis = umouse::adis16470::getInstance();
+            //umouse::adis16470& adis = umouse::adis16470::getInstance();
             ParameterManager& pm = ParameterManager::getInstance();
 
             double ang_v_rad = deg2rad(ang_v);

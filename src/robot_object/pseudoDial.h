@@ -16,12 +16,14 @@ namespace umouse {
         VelocityTypePidController ang_ctrl;
 
         float target_ang;
+        float duty;
         uint8_t dial_position;
         uint8_t division_num;
 
         PseudoDial() {
             enable = false;
-            ang_ctrl.set(0.03, 1000000.0, 0.0);
+            duty = 0.0f;
+            ang_ctrl.set(0.003, 1000000.0, 0.0);
             dial_position = 0;
             division_num = 8;
             target_ang = 0.0f;
@@ -31,17 +33,18 @@ namespace umouse {
         virtual ~PseudoDial() {}
 
         virtual float getAngle() = 0;
-        virtual void setDuty(float duty) = 0;
         virtual float getVelocity() = 0;
       public:
         void setEnable(bool enable_) {
             enable = enable_;
-            if(enable == false) setDuty(0.0);
+            if(enable == false) duty = 0.0f;
         }
 
         bool getEnable() {
             return enable;
         }
+
+        float getDuty(){return duty;}
 
         void update() {
             if(enable == true) {
@@ -50,9 +53,8 @@ namespace umouse {
                 target_ang = fmod(360.0 * (float)dial_position / (float)division_num, 360.0);
                 ang_ctrl.update(target_ang, getAngle());
 
-                float duty = constrain(ang_ctrl.getControlVal(), -0.65, 0.65) ;
-                if(ABS(getVelocity()) >0.05) duty = 0.0;
-                setDuty(duty);
+                duty = constrain(ang_ctrl.getControlVal(), -0.65, 0.65) ;
+                if(ABS(getVelocity()) >0.05) duty = 0.0;                
             }
         }
 
@@ -104,10 +106,6 @@ namespace umouse {
             return wodo.getTireAng_L();
         }
 
-        void setDuty(float duty) {
-            PowerTransmission& pt = PowerTransmission::getInstance();
-            pt.setDuty_L(duty);
-        }
 
         float getVelocity() {
             WheelOdometry& wodo = WheelOdometry::getInstance();
@@ -132,10 +130,6 @@ namespace umouse {
             return wodo.getTireAng_R();
         }
 
-        void setDuty(float duty) {
-            PowerTransmission& pt = PowerTransmission::getInstance();
-            pt.setDuty_R(duty);
-        }
 
         float getVelocity() {
             WheelOdometry& wodo = WheelOdometry::getInstance();

@@ -28,6 +28,7 @@ namespace umouse {
 
 
         const float BIG_R = 500000.0;
+        const uint32_t AVERAGE_NUM = 40;
         const double DELTA_T = 0.0005;
         const double TIRE_GEAR_NUM = 41.0;
         const double ENC_GEAR_NUM = 41.0;
@@ -69,8 +70,10 @@ namespace umouse {
             R_count_32bit_2 = 0;
             L_count_32bit_2 = 0;
 
-            for (uint8_t i = 0; i < 10; i++) {
-                v_list.push_front(0.0);
+            for (uint8_t i = 0; i < AVERAGE_NUM; i++) {
+                v_R_list.push_front(0);
+                v_L_list.push_front(0);
+                v_list.push_front(0);
             }
 
         }
@@ -98,8 +101,12 @@ namespace umouse {
         float ab_ang;
         float tire_ang_R;
         float tire_ang_L;
-        float v_ave;
-        std::deque<float> v_list;
+        double v_ave;
+        double v_R_ave;
+        double v_L_ave;
+        std::deque<int32_t> v_list;
+        std::deque<int32_t> v_R_list;
+        std::deque<int32_t> v_L_list;
 
         void update() {
             R_ENC_pre = R_ENC_now;
@@ -139,7 +146,7 @@ namespace umouse {
 
             double v_pre = v;
             v = (v_R + v_L) * 0.5;
-            a = (v - v_pre) / 0.0005;
+            a = (v - v_pre) / DELTA_T;
             if( fabs(v_R + v_L) > 0.001)kappa = 2.0 * (v_R - v_L) / (pm.tread * (v_R + v_L));
             float ang_v_rad = (v_R - v_L) / pm.tread; //v * kappa;
             ang_v = RAD2DEG(ang_v_rad);
@@ -161,14 +168,47 @@ namespace umouse {
             tire_ang_R = fmod(tire_ang_R+360.0, 360.0);
             tire_ang_L = fmod(tire_ang_L+360.0, 360.0);
 
-            v_list.push_front(v);
-            v_list.pop_back();
-            v_ave = 0.1 * (v_list[0] + v_list[1] + v_list[2] + v_list[3] + v_list[4] + v_list[5] + v_list[6] + v_list[7] + v_list[8] + v_list[9]);
+            v_R_list.push_front(count_diff_R);
+            v_R_list.pop_back();
+            v_L_list.push_front(count_diff_L);
+            v_L_list.pop_back();
+            
         }
 
-        float getAveV() {
+        double getAveV() {
+            ParameterManager& pm = ParameterManager::getInstance();
+            int32_t sum = 0;
+            for (uint8_t i = 0; i < AVERAGE_NUM; i++) {
+                sum += SIGN(ENC_R_DIR) * v_R_list[i] + SIGN(ENC_L_DIR) * v_L_list[i];
+            }
+            v_ave = (PI * pm.dia_tire / GEAR_RATIO / ENC_RESOLUTION) *
+                  (double)sum  * 0.5 / DELTA_T  / AVERAGE_NUM;
             return v_ave;
         }
+
+        double getAveV_R() {
+            ParameterManager& pm = ParameterManager::getInstance();
+            int32_t sum  = 0;
+            for (uint8_t i = 0; i < AVERAGE_NUM; i++) {
+                sum += v_R_list[i];
+            }
+            v_R_ave = (ENC_R_DIR * PI * pm.dia_tire / GEAR_RATIO / ENC_RESOLUTION) *
+                  (double)sum / DELTA_T / AVERAGE_NUM;
+            return v_R_ave;
+        }
+
+        double getAveV_L() {
+            ParameterManager& pm = ParameterManager::getInstance();
+            int32_t sum;
+            for (uint8_t i = 0; i < AVERAGE_NUM; i++) {
+                sum += v_L_list[i];
+            }
+            v_L_ave = (ENC_L_DIR * PI * pm.dia_tire / GEAR_RATIO / ENC_RESOLUTION) *
+                  (double)sum / DELTA_T / AVERAGE_NUM;
+            return v_L_ave;
+        }
+
+
         float getV() {
             return (float)v;
         };

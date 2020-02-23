@@ -8,7 +8,7 @@
 
 
 #include <ICM20602.h>
-#include "adis16470.h"
+//#include "adis16470.h"
 #include <mouse.h>
 #include <myUtil.h>
 #include "communication.h"
@@ -145,9 +145,11 @@ namespace umouse {
         ParameterManager& pm = ParameterManager::getInstance();
 
         if(pm.send_data_mode == 0) packData(periodicMsg);
+#if 0
         else if(pm.send_data_mode == 1) packPidPrmAdjData(periodicMsg);
         else if(pm.send_data_mode == 2) packWallSenAdjData(periodicMsg);
         else if(pm.send_data_mode == 3) packVelocityAdjData(periodicMsg);
+#endif
         else packData(periodicMsg);
         putnbyteSCIFA9(periodicMsg, PERIODIC_MSG_LEN);
     }
@@ -354,6 +356,7 @@ namespace umouse {
         }
     }
 
+#if 0
     void packWallSenAdjData(uint8_t* buf) {
         uint8_t printfDataNum = 0;
         const uint8_t printfFieldNum = 10;
@@ -421,8 +424,9 @@ namespace umouse {
             sum += buf[i];
         buf[6] = sum;
     }
+#endif
 
-
+#if 0
     void packPidPrmAdjData(uint8_t* buf) {
         uint8_t printfDataNum = 0;
         const uint8_t printfFieldNum = 20;
@@ -478,7 +482,9 @@ namespace umouse {
             sum += buf[i];
         buf[6] = sum;
     }
+#endif
 
+#if 0
     void packVelocityAdjData(uint8_t* buf) {
         uint8_t printfDataNum = 0;
         const uint8_t printfFieldNum = 20;
@@ -541,7 +547,7 @@ namespace umouse {
             sum += buf[i];
         buf[6] = sum;
     }
-
+#endif
 
 
     void packData(uint8_t* buf) {
@@ -554,7 +560,7 @@ namespace umouse {
         WallSensor& ws = WallSensor::getInstance();
         WheelOdometry& wo = WheelOdometry::getInstance();
         ICM20602& icm = ICM20602::getInstance();
-        adis16470& adis = adis16470::getInstance();
+        //adis16470& adis = adis16470::getInstance();
 
         PowerTransmission& pt = PowerTransmission::getInstance();
         FcLed& fcled = FcLed::getInstance();
@@ -605,10 +611,10 @@ namespace umouse {
         set2ByteVal(buf, 66, (uint16_t)(fcled.R.getState()));
         set2ByteVal(buf, 68, (uint16_t)(fcled.G.getState()));
         set2ByteVal(buf, 70, (uint16_t)(fcled.B.getState()));
-        set2ByteVal(buf, 72, adis.omega_raw[2]);
+        //set2ByteVal(buf, 72, adis.omega_raw[2]);
         set2ByteVal(buf, 74, (uint16_t)0);
-        set2ByteVal(buf, 76, adis.acc_raw[0]);
-        set2ByteVal(buf, 78, adis.acc_raw[1]);
+        //set2ByteVal(buf, 76, adis.acc_raw[0]);
+        //set2ByteVal(buf, 78, adis.acc_raw[1]);
 
 
         set2ByteVal(buf, 80, (uint16_t)m.trajCommander.getMotionType());
@@ -626,7 +632,7 @@ namespace umouse {
         set2ByteVal(buf, 102, m.trajCommander.y, 1000);
         set2ByteVal(buf, 104, m.trajCommander.ang, 100);
 
-        set2ByteVal(buf, 106, (float)wo.v, 10000);
+        set2ByteVal(buf, 106, (float)wo.getAveV(), 10000);
         set2ByteVal(buf, 108, (float)m.posEsti.getV(), 10000);
         set2ByteVal(buf, 110, m.trajCommander.v, 10000);
         set2ByteVal(buf, 112, (float)m.posEsti.getVAcc(), 10000);
@@ -660,8 +666,8 @@ namespace umouse {
         set2ByteVal(buf, 152, (float)m.posEsti.getBeta(), 100);
 
         set2ByteVal(buf, 154, (float)m.ctrlMixer.ang_pidf.getControlVal(), 10);
-        set2ByteVal(buf, 156, adis.getAlpha(), 2);
-        set2ByteVal(buf, 158, wo.getA(), 1000);
+        set2ByteVal(buf, 156, (float)wo.v_R, 1000);
+        set2ByteVal(buf, 158, (float)wo.v_L, 1000);
 
         //迷路データ
         static uint8_t count = 0;

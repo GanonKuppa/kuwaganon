@@ -21,14 +21,14 @@ namespace umouse {
         registration<float>(5, K_T_right);
         registration<float>(6, circuit_res_left);
         registration<float>(7, circuit_res_right);
-        ;//8
-        ;//9
-        ;//10
-        ;//11
-        ;//12
-        ;//13
-        ;//14
-        ;//15
+        registration<float>(8, duty_coef_left_p);
+        registration<float>(9, duty_offset_left_p);
+        registration<float>(10, duty_coef_right_p);
+        registration<float>(11, duty_offset_right_p);
+        registration<float>(12, duty_coef_left_m);
+        registration<float>(13, duty_offset_left_m);
+        registration<float>(14, duty_coef_right_m);
+        registration<float>(15, duty_offset_right_m);
         registration<float>(16, ff_v_coef);
         registration<float>(17, ff_v_offset);
         registration<float>(18, ff_a_coef);

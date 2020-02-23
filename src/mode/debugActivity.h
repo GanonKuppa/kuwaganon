@@ -8,7 +8,10 @@
 #include "fcLed.h"
 #include "sound.h"
 #include "ICM20602.h"
-#include "adis16470.h"
+#include "powerTransmission.h"
+#include "wheelOdometry.h"
+#include "batVoltageMonitor.h"
+//#include "adis16470.h"
 
 
 namespace umouse {
@@ -44,10 +47,10 @@ namespace umouse {
             UMouse& m = UMouse::getInstance();
 
             ICM20602& icm = ICM20602::getInstance();
-            adis16470& adis = adis16470::getInstance();
+            //adis16470& adis = adis16470::getInstance();
             icm.calibOmegaOffset(800);
             icm.calibAccOffset(800);
-            adis.calibOmegaOffset(1600);
+            //adis.calibOmegaOffset(1600);
             SEF();
 
             float x = 0.09f/2.0f;
@@ -64,8 +67,24 @@ namespace umouse {
 
 
             if(mode == 1) {
-                auto traj = StraightTrajectory::createAsWallCenter(0.09 * 15 + m.WALL2MOUSE_CENTER_DIST, 0.0, 0.1f, 0.1f, 1.0f,1.0f);
+                PowerTransmission& pt = PowerTransmission::getInstance();
+                FcLed& fcled = FcLed::getInstance();
+                WheelOdometry &wodo = WheelOdometry::getInstance();
+                auto traj = StopTrajectory::createAsDirectDutySet(500.0);
                 m.trajCommander.push(std::move(traj));
+                for(int i=-50;i<50;i++){
+                    fcled.turn(0,0,0);
+                    pt.setDuty(i*0.01, i*0.01);
+                    waitmsec(3000);
+                    for(int j=0;j<50;j++){
+                        float vol =  BatVoltageMonitor::getInstance().bat_vol * pt.getDuty_R();
+                        printfSync("%d, %f, %f, %f\n",i , vol, wodo.getAveV_L(), wodo.getAveV_R());
+                        waitmsec(1);
+                    }
+                    pt.setDuty(0.0, 0.0);
+                    waitmsec(500);
+                }
+
             } else if(mode == 2) {
                 float v = pm.v_search_run;
                 float a = pm.a_search_run;
@@ -91,10 +110,10 @@ namespace umouse {
                 for(int i=0; i<20; i++) {
                     auto traj1 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
                     auto traj2 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj3 = StopTrajectory::create(2.0);
+                    auto traj3 = StopTrajectory::create(0.5);
                     auto traj4 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
                     auto traj5 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj6 = StopTrajectory::create(1.0);
+                    auto traj6 = StopTrajectory::create(0.5);
                     m.trajCommander.push(std::move(traj1));
                     m.trajCommander.push(std::move(traj2));
                     m.trajCommander.push(std::move(traj3));
@@ -103,22 +122,28 @@ namespace umouse {
                     m.trajCommander.push(std::move(traj6));
                 }
             } else if(mode == 5) {
-                auto traj1 = SpinTurnTrajectory::create( -90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                auto traj2 = SpinTurnTrajectory::create( -90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                auto traj3 = SpinTurnTrajectory::create( -90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                auto traj4 = SpinTurnTrajectory::create( -90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                auto traj5 = StopTrajectory::create(1.0);
-                m.trajCommander.push(std::move(traj1));
-                m.trajCommander.push(std::move(traj2));
-                m.trajCommander.push(std::move(traj3));
-                m.trajCommander.push(std::move(traj4));
-                m.trajCommander.push(std::move(traj5));
+                for(int i=0; i<20; i++) {
+                    auto traj1 = SpinTurnTrajectory::create(-90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj2 = SpinTurnTrajectory::create(-90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj3 = StopTrajectory::create(0.5);
+                    auto traj4 = SpinTurnTrajectory::create(-90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj5 = SpinTurnTrajectory::create(-90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                    auto traj6 = StopTrajectory::create(0.5);
+                    m.trajCommander.push(std::move(traj1));
+                    m.trajCommander.push(std::move(traj2));
+                    m.trajCommander.push(std::move(traj3));
+                    m.trajCommander.push(std::move(traj4));
+                    m.trajCommander.push(std::move(traj5));
+                    m.trajCommander.push(std::move(traj6));
+                }
+
 
 
             } else if(mode == 6) {
-
-                auto traj1 = StraightTrajectory::createAsWallCenter(0.09f * 8.0f, 0.0, 0.1f, 0.1f, 1.0f,1.0f);
-                auto traj2 = StopTrajectory::create(1.0);
+                float v = pm.v_search_run;
+                float a = pm.a_search_run;
+                auto traj1 = StraightTrajectory::createAsWallCenter(0.09f * 8.0f, 0.0, v, 0.0f, a, a );
+                auto traj2 = StopTrajectory::create(4.0);
                 m.trajCommander.push(std::move(traj1));
                 m.trajCommander.push(std::move(traj2));
 
@@ -126,7 +151,7 @@ namespace umouse {
                 SEF();
                 icm.calibOmegaOffset(800);
                 icm.calibAccOffset(800);
-                adis.calibOmegaOffset(1600);
+                //adis.calibOmegaOffset(1600);
 
                 float v_slalom = pm.v_search_run;
                 float a = pm.a_search_run;
@@ -134,7 +159,7 @@ namespace umouse {
                 m.trajCommander.push(std::move(traj0));
 
                 for(int i=0; i<100; i++) {
-                    straight_n_blocks(5.0f);
+                    straight_n_blocks(4.0f);
                     slalom90(turn_dir_e::CW);
                 }
 

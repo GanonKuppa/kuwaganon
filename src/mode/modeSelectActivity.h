@@ -12,7 +12,7 @@
 #include "communication.h"
 #include "gamepad.h"
 #include "ICM20602.h"
-#include "adis16470.h"
+//#include "adis16470.h"
 #include "wallsensor.h"
 #include "mouse.h"
 #include "parameterManager.h"
@@ -55,7 +55,7 @@ namespace umouse {
         ELoopStatus loop() {
             Gamepad& gamepad = Gamepad::getInstance();
             ICM20602& icm = ICM20602::getInstance();
-            adis16470& adis = adis16470::getInstance();
+            //adis16470& adis = adis16470::getInstance();
             PseudoDialL& dial_L = PseudoDialL::getInstance();
             PseudoDialR& dial_R = PseudoDialR::getInstance();
             WallSensor& ws = WallSensor::getInstance();
@@ -94,7 +94,7 @@ namespace umouse {
                 SEA();
                 icm.calibOmegaOffset(800);
                 icm.calibAccOffset(800);
-                adis.calibOmegaOffset(1600);
+                //adis.calibOmegaOffset(1600);
                 float x = 0.09f/2.0f;
                 float y = 0.09f/2.0f;
                 float ang = 90.0;

@@ -88,10 +88,10 @@ namespace umouse {
 
             waitmsec(1000);
             ICM20602& icm = ICM20602::getInstance();
-            adis16470& adis = adis16470::getInstance();
+            //adis16470& adis = adis16470::getInstance();
             icm.calibOmegaOffset(800);
             icm.calibAccOffset(800);
-            adis.calibOmegaOffset(800);
+            //adis.calibOmegaOffset(800);
 
             float x = 0.09f/2.0f;
             float y = 0.09f/2.0f - m.WALL2MOUSE_CENTER_DIST;

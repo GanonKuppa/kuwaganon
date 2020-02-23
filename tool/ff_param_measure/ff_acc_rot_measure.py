@@ -170,8 +170,8 @@ def on_message(client, userdata, msg):
             #print("check_sum error!")
             return
 
-        V_L = parse_float(msg.payload[29], msg.payload[28], 5000.0)
-        V_R = parse_float(msg.payload[31], msg.payload[30], 5000.0)
+        duty_L = parse_float(msg.payload[25], msg.payload[24], 10000.0)
+        duty_R = parse_float(msg.payload[27], msg.payload[26], 10000.0)
         v = parse_float(msg.payload[107], msg.payload[106], 10000.0)
         a = parse_float(msg.payload[159], msg.payload[158], 1000.0)
         target_v = parse_float(msg.payload[111], msg.payload[110], 10000.0)
@@ -183,13 +183,13 @@ def on_message(client, userdata, msg):
         alpha = parse_float(msg.payload[157], msg.payload[156], 2.0) * 3.14159265 / 180.0
         #print("%f, %f, %f, %f, %f, %f" % (V_L, V_R, v, a, target_v, target_a))
 
-        if (not (-0.01 < V_L < 0.01)) and (not (-0.01 < V_R < 0.01) ) and (traj_type == 5):
-            output_list.append("%f, %f, %f, %f, %f, %f, %f, %f\n" % (V_L, V_R, (V_L + V_R)/2, (V_L - V_R)/2, v, a, target_ang_v, target_ang_a))
-            ff_v_coef = 0.3511
-            ff_v_offset = 0.8178
-            V_uniform_velo = ff_v_coef * target_v + ff_v_offset
-            V_acc_velo = (V_L + V_R)/2 - V_uniform_velo
-            measure_list.append([V_L, V_R,V_acc_velo , (V_R - V_L)/2, v, a, target_ang_v, target_ang_a])
+        if (not (-0.01 < duty_L < 0.01)) and (not (-0.01 < duty_R < 0.01) ) and (traj_type == 5):
+            output_list.append("%f, %f, %f, %f, %f, %f, %f, %f\n" % (duty_L, duty_R, (duty_L + duty_R)/2, (duty_L - duty_R)/2, v, a, target_ang_v, target_ang_a))
+            ff_v_coef = 0.08
+            ff_v_offset = 0.0
+            duty_uniform_velo = ff_v_coef * target_v + ff_v_offset
+            duty_acc_velo = (duty_L + duty_R)/2 - duty_uniform_velo
+            measure_list.append([duty_L, duty_R,duty_acc_velo , (duty_R - duty_L)/2, v, a, target_ang_v, target_ang_a])
 
 
 

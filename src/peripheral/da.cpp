@@ -24,8 +24,10 @@ void initDA(void) {
 
 //RX71MのDACは12bit分解能なので0から4095までの値を設定可能
 void setDA(uint16_t da) {
-    DA.DADR1 = da;
-    DA.DACR.BIT.DAOE1 = 1;
+    if(DA.DADR1 != da){
+        DA.DADR1 = da;
+        DA.DACR.BIT.DAOE1 = 1;
+    } 
 }
 
 uint16_t getDA() {

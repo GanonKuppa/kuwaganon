@@ -56,14 +56,14 @@ namespace umouse {
         float K_T_right; //5
         float circuit_res_left; //6
         float circuit_res_right; //7
-        ; //8
-        ; //9
-        ; //10
-        ; //11
-        ; //12
-        ; //13
-        ; //14
-        ; //15
+        float duty_coef_left_p; //8
+        float duty_offset_left_p; //9
+        float duty_coef_right_p; //10
+        float duty_offset_right_p; //11
+        float duty_coef_left_m; //12
+        float duty_offset_left_m; //13
+        float duty_coef_right_m; //14
+        float duty_offset_right_m; //15
         float ff_v_coef; //16
         float ff_v_offset; //17
         float ff_a_coef; //18

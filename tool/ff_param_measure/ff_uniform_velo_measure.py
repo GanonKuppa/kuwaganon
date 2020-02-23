@@ -145,8 +145,8 @@ def on_message(client, userdata, msg):
             #print("check_sum error!")
             return
 
-        V_L = parse_float(msg.payload[29], msg.payload[28], 5000.0)
-        V_R = parse_float(msg.payload[31], msg.payload[30], 5000.0)
+        duty_L = parse_float(msg.payload[25], msg.payload[24], 10000.0)
+        duty_R = parse_float(msg.payload[27], msg.payload[26], 10000.0)
         v = parse_float(msg.payload[107], msg.payload[106], 10000.0)
         a = parse_float(msg.payload[159], msg.payload[158], 1000.0)
         target_v = parse_float(msg.payload[111], msg.payload[110], 10000.0)
@@ -158,9 +158,9 @@ def on_message(client, userdata, msg):
         alpha = parse_float(msg.payload[157], msg.payload[156], 2.0) * 3.14159265 / 180.0
         #print("%f, %f, %f, %f, %f, %f" % (V_L, V_R, v, a, target_v, target_a))
 
-        if (not (-0.01 < V_L < 0.01)) and (not (-0.01 < V_R < 0.01) ) and (-0.01 < target_a < 0.01) and (target_v > 0.05):
-            output_list.append("%f, %f, %f, %f, %f, %f, %f, %f\n" % (V_L, V_R, (V_L + V_R)/2, (V_L - V_R)/2, v, a, target_v, target_a))
-            measure_list.append([V_L, V_R, (V_L + V_R)/2, (V_L - V_R)/2, v, a, target_v, target_a])
+        if (not (-0.01 < duty_L < 0.01)) and (not (-0.01 < duty_R < 0.01) ) and (-0.01 < target_a < 0.01) and (target_v > 0.05):
+            output_list.append("%f, %f, %f, %f, %f, %f, %f, %f\n" % (V_L, V_R, (duty_L + duty_R)/2, (duty_L - duty_R)/2, v, a, target_v, target_a))
+            measure_list.append([duty_L, duty_R, (duty_L + duty_R)/2, (duty_L - duty_R)/2, v, a, target_v, target_a])
 
 
 
@@ -193,7 +193,7 @@ def main():
     v_end = 0.1
     v_max = 0.1
     a = 5.0
-    x = 7 * 0.09
+    x = 6 * 0.09
     stop_time = 0.3
     run_num = 160
     now = datetime.datetime.now()

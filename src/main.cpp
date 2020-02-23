@@ -71,7 +71,7 @@ extern "C" void __main() {
 #include "batVoltageMonitor.h"
 #include "wheelOdometry.h"
 #include "ICM20602.h"
-#include "adis16470.h"
+//#include "adis16470.h"
 
 #include "powerTransmission.h"
 #include "pseudoDial.h"
@@ -101,7 +101,7 @@ void timeInterrupt(void) {
 
     //--------------------------------------//
     umouse::ICM20602& icm = umouse::ICM20602::getInstance();
-    umouse::adis16470& adis = umouse::adis16470::getInstance();
+    //umouse::adis16470& adis = umouse::adis16470::getInstance();
     umouse::FcLed& fcled = umouse::FcLed::getInstance();
     umouse::WallSensor& wallSen = umouse::WallSensor::getInstance();
     umouse::Gamepad& gamepad = umouse::Gamepad::getInstance();
@@ -131,11 +131,18 @@ void timeInterrupt(void) {
     //スロット0
     if (int_tick_count % 4 == 0) {
         if (getElapsedMsec() > 5000) {
+#if 0            
             std::function< void(void) > w1 = [&wallSen]() {wallSen.update();};
             std::function< void(void) > w2 = [&icm]() {icm.update();};
             std::function< void(void) > w3 = [&mouse]() {mouse.update();};
             std::function< void(void) > w4 = []() {waitusec_sub(20);};
+#endif            
+            wallSen.update();
+            icm.update();
+            mouse.update();
+#if 0     
             adis.update(w1, w2, w3, w4);
+#endif 
             sendDataSCIFA9();
         } else {
             wallSen.update();
@@ -150,11 +157,19 @@ void timeInterrupt(void) {
     //スロット2
     if (int_tick_count % 4 == 2) {
         if (getElapsedMsec() > 5000) {
+#if 0
             std::function< void(void) > w1 = [&wallSen]() {wallSen.update();};
             std::function< void(void) > w2 = [&icm]() {icm.update();};
             std::function< void(void) > w3 = [&mouse]() {mouse.update();};
             std::function< void(void) > w4 = []() {waitusec_sub(20);};
+#endif
+            wallSen.update();
+            icm.update();
+            mouse.update();
+
+#if 0            
             adis.update(w1, w2, w3, w4);
+#endif
             sendDataSCIFA9();
         } else {
             wallSen.update();
@@ -228,9 +243,11 @@ void periperalInit() {
     initMTU2();
 
     //PWM
+
+    initMTU0();
     initMTU3();
     initMTU4();
-
+    initTPU3();
 
     //DA
     initDA();
@@ -249,8 +266,10 @@ void periperalInit() {
 
 //起動時の処理
 void startUpInit() {
-    setDutyMTU3(0.0);
-    setDutyMTU4(0.0);
+    setDutyMTU0(1.0);
+    setDutyMTU3(1.0);
+    setDutyMTU4(1.0);
+    setDutyTPU3(1.0);
 
     setPriorityCMT0(12);
     setPriorityCMT1(15);

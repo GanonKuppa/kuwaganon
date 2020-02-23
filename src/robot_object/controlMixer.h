@@ -255,14 +255,14 @@ namespace umouse {
             if(pm.rot_v_FF_enable == true) duty += duty_ang_v_FF;
 
             float voltage = BatVoltageMonitor::getInstance().bat_vol;
-            float duty_v_saturation = (pm.trans_v_saturation_FF_multiplier * ABS(duty_v_FF(0)) + pm.trans_v_saturation_offset_duty) * voltage / 4.2f;
-            float duty_ang_v_saturation = (pm.rot_v_saturation_FF_multiplier * ABS(duty_ang_v_FF(0)) + pm.rot_v_saturation_offset_duty) * voltage / 4.2f;
+            float duty_v_saturation = (pm.trans_v_saturation_FF_multiplier * ABS(duty_v_FF(0)) + pm.trans_v_saturation_offset_duty);
+            float duty_ang_v_saturation = (pm.rot_v_saturation_FF_multiplier * ABS(duty_ang_v_FF(0)) + pm.rot_v_saturation_offset_duty);
 
             if(pm.trans_v_PIDF_saturation_enable == true) v_pidf.setSaturation(duty_v_saturation);
             if(pm.rot_v_PIDF_saturation_enable == true ) ang_v_pidf.setSaturation(duty_ang_v_saturation);
 
-            duty(0) += (v_pidf.getControlVal() - ang_v_pidf.getControlVal()) * 4.2f / voltage;
-            duty(1) += (v_pidf.getControlVal() + ang_v_pidf.getControlVal()) * 4.2f / voltage;
+            duty(0) += (v_pidf.getControlVal() - ang_v_pidf.getControlVal());
+            duty(1) += (v_pidf.getControlVal() + ang_v_pidf.getControlVal());
             // duty飽和時には回転系制御を優先
             if(duty(0) > 1.0 || duty(1) > 1.0) {
                 float duty_overflow = 0.0f;
