@@ -108,8 +108,8 @@ namespace umouse {
 
             if (param_mode == 0) return;
             //                                  v   turn_v a
-            else if(param_mode == 1) turn_p.set(1.0, 0.35, 4.0);
-            else if(param_mode == 2) turn_p.set(1.5, 0.35, 4.0);
+            else if(param_mode == 1) turn_p.set(0.2, 0.2, 4.0);
+            else if(param_mode == 2) turn_p.set(0.3, 0.3, 4.0);
             else {
                 if(param_mode == 3) setParamFromFlash(0, turn_p);
                 else if(param_mode == 4) setParamFromFlash(1, turn_p);

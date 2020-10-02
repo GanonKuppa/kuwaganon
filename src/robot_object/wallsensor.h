@@ -84,9 +84,20 @@ namespace umouse {
 
             float right_err = ABS(right() - center_r());
             float left_err = ABS(left() - center_l());
-            if(right_err < 50 && left_err < 50) in_wall_center_time += DELTA_T;
-            else in_wall_center_time = 0.0f;
-
+            
+            if(isLeft() && isRight()){
+                if(right_err < 40 && left_err < 40) in_wall_center_time += DELTA_T;
+            }
+            else if(isLeft()){
+                if(left_err < 40) in_wall_center_time += DELTA_T;
+            }
+            else if(isRight()){
+                if(right_err < 40) in_wall_center_time += DELTA_T;
+            }
+            else {
+                in_wall_center_time = 0.0f;
+            }
+            
 
             if(isAhead() == true) ahead_on_time += DELTA_T;
             else ahead_on_time = 0.0f;
@@ -206,7 +217,7 @@ namespace umouse {
         }
 
         bool isOnWallCenter() {
-            if(in_wall_center_time > 0.05) {
+            if(in_wall_center_time > 0.1) {
                 return true;
             } else return false;
 

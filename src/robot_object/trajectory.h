@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <memory>
+#include <functional>
 #include <string>
 #include <cfloat>
 #include "curveFactory.h"
@@ -192,8 +193,7 @@ namespace umouse {
             init(x_, y_, v_0_, a_acc, ang_, 0.0f, 0.0f);
             motion_type = EMotionType::STRAIGHT;
             turn_type = turn_type_e::STRAIGHT;
-            turn_dir = turn_dir_e::NO_TURN;
-
+            turn_dir = turn_dir_e::NO_TURN;            
         }
 
         StraightTrajectory(float target_dist_, float v_0_, float v_max_, float v_end_, float a_acc_, float a_dec_) {
@@ -210,8 +210,7 @@ namespace umouse {
             init(x_, y_, v_0_, a_acc, ang_, 0.0f, 0.0f);
             motion_type = EMotionType::STRAIGHT;
             turn_type = turn_type_e::STRAIGHT;
-            turn_dir = turn_dir_e::NO_TURN;
-
+            turn_dir = turn_dir_e::NO_TURN;            
         }
 
         static std::unique_ptr<BaseTrajectory> create(float target_dist_, float v_0_) {
@@ -329,7 +328,7 @@ namespace umouse {
             }
             if (v < v_end && a < 0.0f) {
                 v = v_end;
-                if(wall_contact == true && v_end == 0.0f) v = 0.1f;
+                if(wall_contact == true && v_end == 0.0f) v = 0.05f;
                 cumulative_dist = target_dist;
                 //printfAsync("EEEEEEE\n");
             }
@@ -340,6 +339,15 @@ namespace umouse {
         }
 
         virtual bool isEnd() {
+            if (cumulative_dist >= target_dist) {
+                    x = getEndX();
+                    y = getEndY();
+                    ang = getEndAng();
+                    return true;
+                } else {
+                    return false;
+            }
+#if 0
             if(wall_contact == false) {
                 if (cumulative_dist >= target_dist) {
                     x = getEndX();
@@ -363,6 +371,7 @@ namespace umouse {
                     return false;
 
             }
+#endif 
         }
 
 

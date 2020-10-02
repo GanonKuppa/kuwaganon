@@ -262,7 +262,7 @@ namespace umouse {
                 if (i == 0) v_pre = 0.0;
                 else v_pre = turn_p.getTurnV(path_vec[i-1].turn_type);
 
-                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.1;
+                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.05;
                 else v_fol = turn_p.getTurnV(path_vec[i+1].turn_type);
 
                 {
@@ -283,7 +283,7 @@ namespace umouse {
                 x = float(path_vec[i].block_num) * 0.045 * 1.4142356;
                 v_pre = turn_p.getTurnV(path_vec[i-1].turn_type);
 
-                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.1;
+                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.05;
                 else v_fol = turn_p.getTurnV(path_vec[i+1].turn_type);
 
                 {
@@ -300,7 +300,7 @@ namespace umouse {
                     if (i == 0) v_pre = 0.0;
                     else v_pre = turn_p.getTurnV(path_vec[i-1].turn_type);
 
-                    if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.1;
+                    if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.05;
                     else v_fol = turn_p.getTurnV(path_vec[i+1].turn_type);
                     a = turn_p.a_straight;
                     float a_pre = MAX(a, ABS(v_pre * v_pre -  v * v) / (2.0f * CurveFactory::getPreDist(path_vec[i].turn_type)));
@@ -362,7 +362,7 @@ namespace umouse {
                 if (i == 0) v_pre = 0.0;
                 else v_pre = turn_p.getTurnV(path_vec[i-1].turn_type);
 
-                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.1;
+                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.05;
                 else v_fol = turn_p.getTurnV(path_vec[i+1].turn_type);
 
                 {
@@ -383,7 +383,7 @@ namespace umouse {
                 x = float(path_vec[i].block_num) * 0.045 * 1.4142356;
                 v_pre = turn_p.getTurnV(path_vec[i-1].turn_type);
 
-                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.1;
+                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.05;
                 else v_fol = turn_p.getTurnV(path_vec[i+1].turn_type);
 
                 {
@@ -400,7 +400,7 @@ namespace umouse {
                     if (i == 0) v_pre = 0.0;
                     else v_pre = turn_p.getTurnV(path_vec[i-1].turn_type);
 
-                    if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.1;
+                    if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.05;
                     else v_fol = turn_p.getTurnV(path_vec[i+1].turn_type);
                     a = turn_p.a_straight;
                     float a_pre = MAX(a, ABS(v_pre * v_pre -  v * v) / (2.0f * CurveFactory::getPreDist(path_vec[i].turn_type)));
@@ -454,7 +454,7 @@ namespace umouse {
                     v_max = turn_p.getTurnV(turn_type_e::STRAIGHT);
 
                     if (i + 1 == (uint16_t)path_vec.size())
-                        v_fol = 0.1;
+                        v_fol = 0.05;
                     else
                         v_fol = turn_p.getTurnV((turn_type_e)path_vec[i + 1].turn_type);
 
@@ -468,13 +468,14 @@ namespace umouse {
                     a = turn_p.a_straight;
                     dir = SIGN((float)path_vec[i].turn_dir);
                     {
-                        auto traj0 = StraightTrajectory::createAsWallCenter(0.03, v, v, 0.1, a, a);
-                        auto traj1 = StraightTrajectory::createAsWallCenter(0.015, 0.1, 0.1, 0.0, a, a);
+                        auto traj0 = StraightTrajectory::create(0.03, v, v, 0.05, a, a);
+                        auto traj1 = StraightTrajectory::create(0.015, 0.05, 0.05, 0.05, a, a);
 
-                        auto traj2 = StopTrajectory::create(0.05);
+                        auto traj2 = StopTrajectory::create(0.15);
                         auto traj3 = SpinTurnTrajectory::create(dir * 90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                        auto traj4 = StopTrajectory::create(0.05);
-                        auto traj5 = StraightTrajectory::createAsWallCenter(0.09 / 2.0, 0.0, v, v, a, a);
+                        auto traj4 = StopTrajectory::create(0.15);
+                        auto traj5 = StraightTrajectory::create(0.03, 0.0, v, v, a, a);
+                        auto traj6 = StraightTrajectory::create(0.015, v, v, v, a, a);
 
                         trajCommander.push(std::move(traj0));
                         trajCommander.push(std::move(traj1));
@@ -482,6 +483,7 @@ namespace umouse {
                         trajCommander.push(std::move(traj3));
                         trajCommander.push(std::move(traj4));
                         trajCommander.push(std::move(traj5));
+                        trajCommander.push(std::move(traj6));
                     }
                     break;
             }
@@ -516,7 +518,7 @@ namespace umouse {
                 if (i == 0) v_pre = 0.0;
                 else v_pre = turn_p.v_turn_90;
 
-                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.1;
+                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.05;
                 else v_fol = turn_p.v_turn_90;
 
                 {
@@ -537,7 +539,7 @@ namespace umouse {
                 x = float(path_vec[i].block_num) * 0.045 * 1.4142356;
                 v_pre = turn_p.v_turn_90;
 
-                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.1;
+                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.05;
                 else v_fol = turn_p.v_turn_90;
 
                 {
@@ -553,13 +555,13 @@ namespace umouse {
                 if (i == 0) v_pre = 0.0;
                 else v_pre = turn_p.v_turn_90;
 
-                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.1;
+                if (i + 1 == (uint16_t)path_vec.size()) v_fol = 0.05;
                 else v_fol = turn_p.v_turn_90;
                 a = turn_p.a_straight;
 
                 switch (path_vec[i].turn_type) {
                     case turn_type_e::TURN_90: {
-                            auto traj0 = StraightTrajectory::createAsWallCenter(0.045, v_pre, v_pre, 0.1, a, a);
+                            auto traj0 = StraightTrajectory::createAsWallCenter(0.045, v_pre, v_pre, 0.05, a, a);
                             auto traj1 = SpinTurnTrajectory::create(dir * 90.0f, 2000.0f, 10000.0f);//pm.spin_ang_v, pm.spin_ang_a);
                             auto traj2 = StraightTrajectory::createAsWallCenter(0.045, 0.0, v_fol, v_fol, a, a);
 
@@ -569,7 +571,7 @@ namespace umouse {
                         }
                         break;
                     case turn_type_e::TURN_L_90: {
-                            auto traj0 = StraightTrajectory::createAsWallCenter(0.09, v_pre, v_pre, 0.1, a, a);
+                            auto traj0 = StraightTrajectory::createAsWallCenter(0.09, v_pre, v_pre, 0.05, a, a);
                             auto traj1 = SpinTurnTrajectory::create(dir * 90.0f, 2000.0f, 10000.0f);//pm.spin_ang_v, pm.spin_ang_a);
                             auto traj2 = StraightTrajectory::createAsWallCenter(0.09, 0.0, v_fol, v_fol, a, a);
 
@@ -579,9 +581,9 @@ namespace umouse {
                         }
                         break;
                     case turn_type_e::TURN_180: {
-                            auto traj0 = StraightTrajectory::createAsWallCenter(0.09, v_pre, v_pre, 0.1, a, a);
+                            auto traj0 = StraightTrajectory::createAsWallCenter(0.09, v_pre, v_pre, 0.05, a, a);
                             auto traj1 = SpinTurnTrajectory::create(dir * 90.0f, 2000.0f, 10000.0f);//pm.spin_ang_v, pm.spin_ang_a);
-                            auto traj2 = StraightTrajectory::createAsWallCenter(0.09, 0.0, v_fol, 0.1, a, a);
+                            auto traj2 = StraightTrajectory::createAsWallCenter(0.09, 0.0, v_fol, 0.05, a, a);
                             auto traj3 = SpinTurnTrajectory::create(dir * 90.0f, 2000.0f, 10000.0f);//pm.spin_ang_v, pm.spin_ang_a);
                             auto traj4 = StraightTrajectory::createAsWallCenter(0.09, 0.0, v_fol, v_fol, a, a);
 
@@ -594,7 +596,7 @@ namespace umouse {
                         }
                         break;
                     case turn_type_e::TURN_S2D_45: {
-                            auto traj0 = StraightTrajectory::createAsWallCenter(0.045, v_pre, v_pre, 0.1, a, a);
+                            auto traj0 = StraightTrajectory::createAsWallCenter(0.045, v_pre, v_pre, 0.05, a, a);
                             auto traj1 = SpinTurnTrajectory::create(dir * 45.0f, 2000.0f, 10000.0f);//pm.spin_ang_v, pm.spin_ang_a);
                             auto traj2 = StraightTrajectory::createAsDiagonal(0.045 * 1.4142356, 0.0, v_fol, v_fol, a, a);
 
@@ -605,9 +607,9 @@ namespace umouse {
 
                         break;
                     case turn_type_e::TURN_S2D_135: {
-                            auto traj0 = StraightTrajectory::createAsWallCenter(0.045, v_pre, v_pre, 0.1, a, a);
+                            auto traj0 = StraightTrajectory::createAsWallCenter(0.045, v_pre, v_pre, 0.05, a, a);
                             auto traj1 = SpinTurnTrajectory::create(dir * 45.0f, 2000.0f, 10000.0f);//pm.spin_ang_v, pm.spin_ang_a);
-                            auto traj2 = StraightTrajectory::createAsDiagonal(0.045*1.4142356, 0.0, v_fol, 0.1, a, a);
+                            auto traj2 = StraightTrajectory::createAsDiagonal(0.045*1.4142356, 0.0, v_fol, 0.05, a, a);
                             auto traj3 = SpinTurnTrajectory::create(dir * 90.0f, 2000.0f, 10000.0f);//pm.spin_ang_v, pm.spin_ang_a);
                             auto traj4 = StraightTrajectory::createAsDiagonal(0.045*1.4142356, 0.0, v_fol, v_fol, a, a);
 
@@ -620,7 +622,7 @@ namespace umouse {
 
                         break;
                     case turn_type_e::TURN_D_90: {
-                            auto traj0 = StraightTrajectory::createAsDiagonal(0.045 * 1.4142356, v_pre, v_pre, 0.1, a, a);
+                            auto traj0 = StraightTrajectory::createAsDiagonal(0.045 * 1.4142356, v_pre, v_pre, 0.05, a, a);
                             auto traj1 = SpinTurnTrajectory::create(dir * 90.0f, 2000.0f, 10000.0f);//pm.spin_ang_v, pm.spin_ang_a);
                             auto traj2 = StraightTrajectory::createAsDiagonal(0.045 * 1.4142356, 0.0, v_fol, v_fol, a, a);
 
@@ -632,7 +634,7 @@ namespace umouse {
 
                         break;
                     case turn_type_e::TURN_D2S_45: {
-                            auto traj0 = StraightTrajectory::createAsDiagonal(0.045 * 1.4142356, v_pre, v_pre, 0.1, a, a);
+                            auto traj0 = StraightTrajectory::createAsDiagonal(0.045 * 1.4142356, v_pre, v_pre, 0.05, a, a);
                             auto traj1 = SpinTurnTrajectory::create(dir * 45.0f, 2000.0f, 10000.0f);//pm.spin_ang_v, pm.spin_ang_a);
                             auto traj2 = StraightTrajectory::createAsWallCenter(0.045, 0.0, v_fol, v_fol, a, a);
 
@@ -643,7 +645,7 @@ namespace umouse {
 
                         break;
                     case turn_type_e::TURN_D2S_135: {
-                            auto traj0 = StraightTrajectory::createAsDiagonal(0.045 * 1.4142356, v_pre, v_pre, 0.1, a, a);
+                            auto traj0 = StraightTrajectory::createAsDiagonal(0.045 * 1.4142356, v_pre, v_pre, 0.05, a, a);
                             auto traj1 = SpinTurnTrajectory::create(dir * 90.0f, 2000.0f, 10000.0f);//pm.spin_ang_v, pm.spin_ang_a);
                             auto traj2 = StraightTrajectory::createAsDiagonal(0.045 * 1.4142356, 0.0, v_fol, v_fol, a, a);
                             auto traj3 = SpinTurnTrajectory::create(dir * 45.0f, 2000.0f, 10000.0f);//pm.spin_ang_v, pm.spin_ang_a);

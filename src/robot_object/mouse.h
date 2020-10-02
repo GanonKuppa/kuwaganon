@@ -68,7 +68,7 @@ namespace umouse {
 
     class UMouse {
       public:
-        static constexpr float WALL2MOUSE_CENTER_DIST = 0.00859;
+        static constexpr float WALL2MOUSE_CENTER_DIST = 0.0183;
         static constexpr float READ_WALL_OFFSET = 0.01;
         static constexpr float DELTA_T = 0.0005;
 
@@ -129,9 +129,18 @@ namespace umouse {
                     }
                 }
 
-                if( icm.isUpsideDown() == true ||
-                    (ctrlMixer.isOutOfControl() == true && (ABS(pt.getDuty_R()) > 0.1f || ABS(pt.getDuty_L()) > 0.1f )) ||
-                    (ABS(ctrlMixer.ang_pidf.e_k0) > 50.0f )
+                float x0 = trajCommander.x;
+                float x1 = posEsti.getX();
+                float y0 = trajCommander.y;
+                float y1 = posEsti.getY();
+
+                float esti_target_diff = sqrtf((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
+
+                if( !trajCommander.empty() &&
+                    (icm.isUpsideDown()      ||
+                     esti_target_diff > 0.045 ||
+                    (ctrlMixer.isOutOfControl() && (ABS(pt.getDuty_R()) > 0.01f || ABS(pt.getDuty_L()) > 0.01f ))
+                    )
                 ) {                    
                     printOutOfControl();
                     trajCommander.clear();

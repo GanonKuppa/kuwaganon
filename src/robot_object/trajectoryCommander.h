@@ -10,6 +10,8 @@
 #include "positionEstimator.h"
 #include <functional>
 
+#define DEBUG 0
+
 namespace umouse {
 
     class TrajectoryCommander {
@@ -86,6 +88,7 @@ namespace umouse {
 
                 float dist = residualDist(esti);
 
+                // 距離を超過
                 if((motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
                         motion_type == EMotionType::STRAIGHT ||
                         motion_type == EMotionType::DIAGONAL ||
@@ -94,34 +97,36 @@ namespace umouse {
                         dist < 0.0) {
                     auto s = trajQueue.front()->getMotionTypeString().c_str();
                     uint16_t hash = trajQueue.front()->hash;
-                    /*
+#if DEBUG                    
                                     printfAsync(">    ------- exceeded traj end! --------\n");
                                     printfAsync(">    motion_type: %s %04x\n", s, hash);
                                     printfAsync(">    (x_t, y_t, ang_t)=(%f, %f, %f) queue num:%d | dist:%f \n", x, y, ang ,trajQueue.size(), trajQueue.front()->target_dist);
                                     printfAsync(">    (x_e, y_e, ang_e)=(%f, %f, %f)\n", esti.getX(), esti.getY(), esti.getAng());
                                     printfAsync(">    cumulative_dist overwrited!\n");
-                    */
+#endif                    
                     x = trajQueue.front()->getEndX();
                     y = trajQueue.front()->getEndY();
                     ang = trajQueue.front()->getEndAng();
-                    trajQueue.front()->cumulative_dist = trajQueue.front()->target_dist;
+                    //trajQueue.front()->cumulative_dist = trajQueue.front()->target_dist;
+                    trajQueue.front()->forceEnd();
                 }
 
+                
                 if(trajQueue.front()->isEnd() == true) {
-                    x = trajQueue.front()->x;
-                    y = trajQueue.front()->y;
-                    ang = trajQueue.front()->ang;
+                    x = trajQueue.front()->getEndX();
+                    y = trajQueue.front()->getEndY();
+                    ang = trajQueue.front()->getEndAng();
 
                     auto s = trajQueue.front()->getMotionTypeString().c_str();
                     uint16_t hash = trajQueue.front()->hash;
-                    /*
+#if DEBUG                    
                                     printfAsync(">    ------- traj end --------\n");
                                     printfAsync(">    motion_type: %s %04x\n", s, hash);
                                     printfAsync(">    (x_t, y_t, ang_t)=(%f, %f, %f) queue num:%d | dist:%f \n", x, y, ang ,trajQueue.size(), trajQueue.front()->target_dist);
                                     printfAsync(">    (x_e, y_e, ang_e)=(%f, %f, %f)\n", esti.getX(), esti.getY(), esti.getAng());
                                     printfAsync(">    residualDist: %f\n", dist);
                                     printfAsync(">    -------------------------\n");
-                    */
+#endif                    
                     trajQueue.pop_front();
 
                     WallSensor& ws = WallSensor::getInstance();
@@ -131,11 +136,13 @@ namespace umouse {
                             motion_type == EMotionType::DIAGONAL ||
                             motion_type == EMotionType::DIAGONAL_CENTER
                        ) &&
-                            ws.isContactWall() == false &&
-                            dist > 0.0
+                            //ws.isContactWall() == false &&
+                            dist > 0.0001 
                       ) {
+                        //printfAsync(">    push_front residual straight %f\n", dist);
+                        printfAsync("★pf (%f, %f, %f) %f \n", esti.getX(), esti.getY(), esti.getAng(), dist);
+
                         residualCompensation(esti, dist);
-                        printfAsync(">    push_front residual straight\n");
                     }
 
                     if(trajQueue.empty() == false) {
@@ -144,14 +151,14 @@ namespace umouse {
 
                         auto s = trajQueue.front()->getMotionTypeString().c_str();
                         uint16_t hash = trajQueue.front()->hash;
-                        /*
+#if DEBUG                        
                                             printfAsync("★    ------- traj begin --------\n");
                                             printfAsync("★    motion_type: %s %04x\n", s, hash);
                                             printfAsync("★    (x_t, y_t, ang_t)=(%f, %f, %f) queue num:%d | dist:%f \n", x, y, ang ,trajQueue.size(), trajQueue.front()->target_dist);
                                             printfAsync("★    (x_e, y_e, ang_e)=(%f, %f, %f)\n", esti.getX(), esti.getY(), esti.getAng());
                                             printfAsync("★    residualDist: %f\n", dist);
                                             printfAsync("★    -------------------------\n");
-                        */
+#endif
 
                     }
                 }
@@ -161,8 +168,8 @@ namespace umouse {
         }
 
         void residualCompensation(const PositionEstimator& esti, float dist) {
-            printfAsync(">    <<<<< %f %f %f\n", x, y, ang);
-            float v_0 = constrainL(v, 0.1);
+            //printfAsync(">    <<<<< %f %f %f\n", x, y, ang);
+            float v_0 = constrainL(v, 0.05f);
             float a_0 = 0.0f;
             std::unique_ptr<BaseTrajectory> traj = nullptr;
 
@@ -185,14 +192,14 @@ namespace umouse {
             y -= sinf(rad) * dist;
 
             traj->setInitPos(x, y, ang);
-            printfAsync(">    >>>>> %f %f %f\n", x, y, ang);
+            //printfAsync(">    >>>>> %f %f %f\n", x, y, ang);
             trajQueue.push_front(std::move(traj));
             //SE_Im7();
         }
 
         float residualDist(PositionEstimator& esti) {
             float dist = 0.0f;
-            if(trajQueue.empty() == false) {
+            if(!trajQueue.empty()) {
 
                 float rad = DEG2RAD(ang);
                 float x1 = trajQueue.front()->getEndX();
@@ -205,18 +212,18 @@ namespace umouse {
         }
 
         void push(std::unique_ptr<BaseTrajectory>&& traj) {
-            if(trajQueue.empty() == true) {
+            if(trajQueue.empty()) {
                 traj->setInitPos(x, y, ang);
 
-                /*
+                
                     auto s = trajQueue.front()->getMotionTypeString().c_str(); // null参照
                     uint16_t hash = trajQueue.front()->hash;
-
+#if DEBUG
                     printfAsync("★    ------- traj begin --------\n");
                     printfAsync("★    motion_type: %s %04x\n", s, hash);
                     printfAsync("★    (x_t, y_t, ang_t)=(%f, %f, %f) queue num:%d | dist:%f \n", x, y, ang ,trajQueue.size(), trajQueue.front()->target_dist);
                     printfAsync("★    -------------------------\n");
-                */
+#endif                
             }
             trajQueue.push_back(std::move(traj));
         }

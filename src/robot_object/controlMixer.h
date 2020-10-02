@@ -65,9 +65,9 @@ namespace umouse {
             ang_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
 
             error_sec = 0.0f;
-            error_limit_sec = 1.0f; // 秒
-            ang_v_error_th = 270.0f;
-            v_error_th = 0.5;
+            error_limit_sec = 0.2f; // 秒
+            ang_v_error_th = 180.0f;
+            v_error_th = 0.3;
 
             duty = Eigen::Vector2f::Zero();
         }
@@ -109,7 +109,10 @@ namespace umouse {
             ICM20602& icm = ICM20602::getInstance();
             if( ABS(v_pidf.e_k0) > v_error_th ||
                     ABS(ang_v_pidf.e_k0) > ang_v_error_th ||
-                    ABS(icm.omega_f[2] - wodo. getAng_v()) > ang_v_error_th ) error_sec += DELTA_T;
+                    ABS(icm.omega_f[2] - wodo. getAng_v()) > ang_v_error_th ||
+                    ABS(ang_pidf.e_k0) > 5.0f ||
+                    ABS(v_pidf.e_k0) > ABS(v_error_th)
+                    ) error_sec += DELTA_T;
             else error_sec = 0.0f;
             error_sec = 0.0f;
             if(error_sec > error_limit_sec) return true;
@@ -214,9 +217,9 @@ namespace umouse {
             if( (traj.motion_type != motion_type_pre &&
                     motion_type_pre == EMotionType::STOP)
                     || traj.motion_type == EMotionType::DIRECT_DUTY_SET) {
-                ang_v_pidf.reset();
-                ang_pidf.reset();
-                v_pidf.reset();
+                //ang_v_pidf.reset();
+                //ang_pidf.reset();
+                //v_pidf.reset();
                 wall_pidf.reset();
                 pos_pidf.reset();
             }

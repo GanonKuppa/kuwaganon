@@ -48,9 +48,9 @@ namespace umouse {
             waitmsec(1000);
             ICM20602& icm = ICM20602::getInstance();
             adis16470& adis = adis16470::getInstance();
-            icm.calibOmegaOffset(200);
+            icm.calibOmegaOffset(800);
             icm.calibAccOffset(200);
-            adis.calibOmegaOffset(800);
+            //adis.calibOmegaOffset(800);
 
             std::unique_ptr<BaseState> state = std::unique_ptr<BaseState>(new Start2GoalState(intent));
             m.ang_no_calib_sec = 0.0f;
@@ -117,56 +117,7 @@ namespace umouse {
 
                 if(in_read_wall_area) fcled.turn(0,1,0);
                 else fcled.turn(0,0,1);
-/*
-                if(m.trajCommander.empty()) {
-                    SE_I7();
-                    waitmsec(200);
-                    // 前壁を見る
-                    m.maze.writeAheadWall(m.coor.x, m.coor.y, m.getDirection(), ws.isAhead());
-                    headBudWall(0.3);
-                    // 左壁を見る
-                    auto traj0 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    m.trajCommander.push(std::move(traj0));
-                    while(!m.trajCommander.empty()) {waitmsec(1);}
-                    m.maze.writeAheadWall(m.coor.x, m.coor.y, m.getDirection(), ws.isAhead());
-                    headBudWall(0.3);
-                    // 後壁を見る
-                    auto traj1 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    m.trajCommander.push(std::move(traj1));
-                    while(!m.trajCommander.empty()) {waitmsec(1);}
-                    m.maze.writeAheadWall(m.coor.x, m.coor.y, m.getDirection(), ws.isAhead());
-                    headBudWall(0.3);
-                    // 右壁を見る
-                    auto traj2 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    m.trajCommander.push(std::move(traj2));
-                    while(!m.trajCommander.empty()) {waitmsec(1);}
-                    m.maze.writeAheadWall(m.coor.x, m.coor.y, m.getDirection(), ws.isAhead());
-                    headBudWall(0.3);
 
-                    // 最初の向きに戻る
-                    auto traj3 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    m.trajCommander.push(std::move(traj3));
-                    while(!m.trajCommander.empty()) {waitmsec(1);}
-
-                    m.maze.makeSearchMap(desti_coor.x, desti_coor.y);
-                    bool able_goal = m.maze.isExistPath(m.coor.x, m.coor.y);
-                    if(!able_goal) {
-                        for(int i=0; i<3; i++) {
-                            SE_Im7();
-                            waitmsec(500);
-                        }
-                        return; //以降の処理を行わず次のループへ
-                    }
-
-                    direction_e dest_dir_next = m.maze.getMinDirection(m.coor.x, m.coor.y, m.direction);
-                    int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
-                    auto traj4 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj5 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
-                    m.trajCommander.push(std::move(traj4));
-                    m.trajCommander.push(std::move(traj5));
-
-                }
-*/
 
                 if(in_read_wall_area && pre_in_read_wall_area == false && pre_read_wall_coor != m.coor) {
                     printfAsync("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝\n");
@@ -190,18 +141,6 @@ namespace umouse {
                     m.maze.updateWall(x_next, y_next, m.direction, ws);
                     m.maze.makeSearchMap(desti_coor.x, desti_coor.y);
                     bool able_goal = m.maze.isExistPath(x_next, y_next);
-/*                    
-                    if(!able_goal) {
-                        auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.1, a, a);
-                        m.trajCommander.push(std::move(traj0));
-
-                        for(int i=0; i<3; i++) {
-                            SE_Im7();
-                            waitmsec(500);
-                        }
-                        return; //以降の処理を行わず次のループへ
-                    }
-*/
                     direction_e dest_dir_next = m.maze.getSearchDirection2(x_next, y_next, m.direction);
                     int8_t rot_times = m.maze.calcRotTimes(dest_dir_next, m.direction);
 
@@ -211,15 +150,9 @@ namespace umouse {
                     if(x_next == desti_coor.x && y_next == desti_coor.y) {
                         destiMove();
                     }
-                    else if(m.ang_no_calib_sec > ANG_CALIB_TIME) {
-                        spin90GyroCalib(rot_times, v);
-                        m.ang_no_calib_sec = 0.0f;
-                    }
                     else {
 
                         if(rot_times == 0) {
-                            //auto traj0 = StraightTrajectory::createAsWallCenter(0.09f, v, v, v, a, a);
-                            //m.trajCommander.push(std::move(traj0));
                             straight(x_next, y_next);                            
                         } else if (ABS(rot_times) == 4) {
                             spin180(rot_times);
@@ -264,86 +197,6 @@ namespace umouse {
                 m.trajCommander.push(std::move(traj2));
             }
 
-            void spin90GyroCalib(int8_t rot_times, float& v) {
-                if(rot_times == 4){
-                     spin180(rot_times);
-                     return;
-                }
-
-                UMouse& m = UMouse::getInstance();
-                WallSensor& ws = WallSensor::getInstance();
-                ParameterManager& pm = ParameterManager::getInstance();
-                SEF();
-
-                if (ws.isAhead() == true) {
-                    std::function< void(void) > update_func = [&m, &ws]() {
-                        if(m.maze.existAWall(m.coor.x, m.coor.y, m.direction)) {
-                            if(m.posEsti.getV() > 0.05) {
-                                PowerTransmission::getInstance().setDuty(0.35, 0.35);
-                            } else {
-                                PowerTransmission::getInstance().setDuty(0.45, 0.45);
-                            }
-                        }
-                        m.posEsti.setX(m.trajCommander.x);
-                        m.posEsti.setY(m.trajCommander.y);
-                        m.ctrlMixer.reset();
-                    };
-
-                    auto traj0 = StraightTrajectory::create(0.035f, v, v, 0.1f, a, a);
-                    auto traj1 = StraightTrajectory::create(0.01f, 0.1f, 0.1f, 0.1f, a, a);
-                    auto traj2 = StopTrajectory::create(0.5f);
-                    m.trajCommander.push(std::move(traj0));
-                    m.trajCommander.push(std::move(traj1));
-                    m.trajCommander.push(std::move(traj2));
-                    while(!m.trajCommander.empty()) {waitmsec(1);}
-                    waitmsec(500);
-                    if(m.running_sec > 60.0) v = pm.v_search_run * 0.95;
-                    else if(m.running_sec > 120.0) v = pm.v_search_run * 0.90;
-                    else if(m.running_sec > 180.0) v = pm.v_search_run * 0.85;
-
-
-                    adis16470& adis = adis16470::getInstance();
-                    ICM20602& icm = ICM20602::getInstance();
-                    adis.calibOmegaOffset(800);
-                    //icm.calibOmegaOffset(200);
-                    if(rot_times != 0){
-                        auto traj3 = UpdateInjectionTrajectory::create(0.35f, update_func);
-                        auto traj4 = SpinTurnTrajectory::create(- rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                        auto traj5 = UpdateInjectionTrajectory::create(0.35f, update_func);
-                        m.trajCommander.push(std::move(traj3));
-                        m.trajCommander.push(std::move(traj4));
-                        m.trajCommander.push(std::move(traj5));
-                    }
-                    auto traj6 = SpinTurnTrajectory::create(180.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj7 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
-                    m.trajCommander.push(std::move(traj6));
-                    m.trajCommander.push(std::move(traj7));                    
-                } else {
-                    auto traj0 = StraightTrajectory::createAsWallCenter(0.035f, v, v, 0.1f, a, a);
-                    auto traj1 = StraightTrajectory::create(0.01f, 0.1f, 0.1f, 0.1f, a, a);
-                    auto traj2 = StopTrajectory::create(0.5f);
-                    m.trajCommander.push(std::move(traj0));
-                    m.trajCommander.push(std::move(traj1));
-                    m.trajCommander.push(std::move(traj2));
-                    while(!m.trajCommander.empty()) {waitmsec(1);}
-                    waitmsec(500);
-                    if(m.running_sec > 60.0) v = pm.v_search_run * 0.95;
-                    else if(m.running_sec > 120.0) v = pm.v_search_run * 0.90;
-                    else if(m.running_sec > 180.0) v = pm.v_search_run * 0.85;
-
-                    adis16470& adis = adis16470::getInstance();
-                    ICM20602& icm = ICM20602::getInstance();
-                    adis.calibOmegaOffset(800);
-                    //icm.calibOmegaOffset(200);
-                    if(rot_times != 0){
-                        auto traj3 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                        m.trajCommander.push(std::move(traj3));
-                    }
-                    auto traj4 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);                    
-                    m.trajCommander.push(std::move(traj4));
-                }
-
-            }
 
             void straight(uint8_t x_next, uint8_t y_next) {
                 UMouse& m = UMouse::getInstance();
@@ -393,72 +246,20 @@ namespace umouse {
                      return;
                 }
 
-                if (ws.isAhead() == true) {
-                    std::function< void(void) > update_func = [&m, &ws]() {
-                        if(m.maze.existAWall(m.coor.x, m.coor.y, m.direction)) {
-                            if(m.posEsti.getV() > 0.05) {
-                                PowerTransmission::getInstance().setDuty(0.35, 0.35);
-                            } else {
-                                PowerTransmission::getInstance().setDuty(0.45, 0.45);
-                            }
-                        }
-                        m.posEsti.setX(m.trajCommander.x);
-                        m.posEsti.setY(m.trajCommander.y);
-                        m.ctrlMixer.reset();
-                    };
-
-                    auto traj0 = StraightTrajectory::create(0.035f, v, v, 0.1f, a, a);
-                    auto traj1 = StraightTrajectory::create(0.01f, 0.1f, 0.1f, 0.1f, a, a);
-                    auto traj2 = StopTrajectory::create(0.1f);
-                    auto traj3 = UpdateInjectionTrajectory::create(0.35f, update_func);
-                    auto traj4 = SpinTurnTrajectory::create(- rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj5 = UpdateInjectionTrajectory::create(0.35f, update_func);
-                    auto traj6 = SpinTurnTrajectory::create(180.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj7 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
-                    m.trajCommander.push(std::move(traj0));
-                    m.trajCommander.push(std::move(traj1));
-                    m.trajCommander.push(std::move(traj2));
-                    m.trajCommander.push(std::move(traj3));
-                    m.trajCommander.push(std::move(traj4));
-                    m.trajCommander.push(std::move(traj5));
-                    m.trajCommander.push(std::move(traj6));
-                    m.trajCommander.push(std::move(traj7));
-                    SEG();
-                } else {
-                    auto traj0 = StraightTrajectory::createAsWallCenter(0.035f, v, v, 0.1f, a, a);
-                    auto traj1 = StraightTrajectory::create(0.01f, 0.1f, 0.1f, 0.1f, a, a);
-                    auto traj2 = StopTrajectory::create(0.2f);
-                    auto traj3 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj4 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
-                    m.trajCommander.push(std::move(traj0));
-                    m.trajCommander.push(std::move(traj1));
-                    m.trajCommander.push(std::move(traj2));
-                    m.trajCommander.push(std::move(traj3));
-                    m.trajCommander.push(std::move(traj4));
-                }
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.04f, v, v, 0.05f, a, a);
+                auto traj1 = StraightTrajectory::create(0.005f, 0.05f, 0.05f, 0.05f, 0.0f, 0.0f);
+                auto traj2 = StopTrajectory::create(0.2f);
+                auto traj3 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
+                auto traj4 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
+                m.trajCommander.push(std::move(traj0));
+                m.trajCommander.push(std::move(traj1));
+                m.trajCommander.push(std::move(traj2));
+                m.trajCommander.push(std::move(traj3));
+                m.trajCommander.push(std::move(traj4));
 
             }
 
 
-            void headBudWall(float time) {
-                UMouse& m = UMouse::getInstance();
-                WallSensor& ws = WallSensor::getInstance();
-                std::function< void(void) > update_func = [&m, &ws]() {
-                    if(m.maze.existAWall(m.coor.x, m.coor.y, m.direction)) {
-                        if(m.posEsti.getV() > 0.05) {
-                            PowerTransmission::getInstance().setDuty(0.35, 0.35);
-                        } else {
-                            PowerTransmission::getInstance().setDuty(0.45, 0.45);
-                        }
-                    }
-                    m.posEsti.setX(m.trajCommander.x);
-                    m.posEsti.setY(m.trajCommander.y);
-                    //m.posEsti.setAng(m.trajCommander.ang);
-                    m.ctrlMixer.reset();
-                };
-                auto traj = UpdateInjectionTrajectory::create(time, update_func);
-                m.trajCommander.push(std::move(traj));
-            }
 
             void spin180(int8_t rot_times) {
                 UMouse& m = UMouse::getInstance();
@@ -466,74 +267,16 @@ namespace umouse {
                 ParameterManager& pm = ParameterManager::getInstance();
                 rot_times *= SIGN(m.posEsti.calcWallCenterOffset());
 
-                if (ws.isAhead()) {
-                    std::function< void(void) > update_func = [&m, &ws]() {
-                        if(m.maze.existAWall(m.coor.x, m.coor.y, m.direction)) {
-                            if(m.posEsti.getV() > 0.05) {
-                                PowerTransmission::getInstance().setDuty(0.35, 0.35);
-                            } else {
-                                PowerTransmission::getInstance().setDuty(0.45, 0.45);
-                            }
-                        }
-                        m.posEsti.setX(m.trajCommander.x);
-                        m.posEsti.setY(m.trajCommander.y);
-                        m.ctrlMixer.reset();
-                    };
-
-                    std::function< void(void) > update_func2 = [&m, &ws]() {
-                        if(m.maze.existAWall(m.coor.x, m.coor.y, m.direction)) {
-                            PowerTransmission::getInstance().setDuty(0.6, 0.6);
-                        }
-                        m.posEsti.setX(m.trajCommander.x);
-                        m.posEsti.setY(m.trajCommander.y);
-                        //m.posEsti.setAng(m.trajCommander.ang);
-                        m.ctrlMixer.reset();
-                    };
-
-
-                    auto traj0 = StraightTrajectory::create(0.035f, v, v, 0.1f, a, a);
-                    auto traj1 = StraightTrajectory::create(0.01f, 0.1f, 0.1f, 0.1f, a, a);
-                    auto traj2 = StopTrajectory::create(0.05f);
-                    std::unique_ptr<BaseTrajectory> traj3;
-                    if(true || m.ang_no_calib_sec < ANG_CALIB_TIME ) {
-                        traj3 = UpdateInjectionTrajectory::create(0.35f, update_func);
-                        SEG();
-                    } else {
-                        traj3 = UpdateInjectionTrajectory::create(1.0f, update_func2);
-                        m.ang_no_calib_sec = 0.0f;
-                        SE_Im7();
-                    }
-                    auto traj4 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj5 = UpdateInjectionTrajectory::create(0.35f, update_func);
-                    auto traj6 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj7 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
-                    m.trajCommander.push(std::move(traj0));
-                    m.trajCommander.push(std::move(traj1));
-                    m.trajCommander.push(std::move(traj2));
-                    m.trajCommander.push(std::move(traj3));
-                    m.trajCommander.push(std::move(traj4));
-                    m.trajCommander.push(std::move(traj5));
-                    m.trajCommander.push(std::move(traj6));
-                    m.trajCommander.push(std::move(traj7));
-
-                    m.maze.writeMazeData2Flash();
-                } else {
-                    auto traj0 = StraightTrajectory::createAsWallCenter(0.035f, v, v, 0.1f, a, a);
-                    auto traj1 = StraightTrajectory::create(0.01f, 0.1f, 0.1f, 0.1f, a, a);
-                    auto traj2 = StopTrajectory::create(0.4f);
-                    auto traj3 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj4 = SpinTurnTrajectory::create(rot_times/2 * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj5 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
-                    m.trajCommander.push(std::move(traj0));
-                    m.trajCommander.push(std::move(traj1));
-                    m.trajCommander.push(std::move(traj2));
-                    m.trajCommander.push(std::move(traj3));
-                    m.trajCommander.push(std::move(traj4));
-                    m.trajCommander.push(std::move(traj5));
-                }
-
-
-
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.04f, v, v, 0.05f, a, a);
+                auto traj1 = StraightTrajectory::create(0.005f, 0.05f, 0.05f, 0.05f, 0.0, 0.0);
+                auto traj2 = StopTrajectory::create(0.4f);
+                auto traj3 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
+                auto traj4 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
+                m.trajCommander.push(std::move(traj0));
+                m.trajCommander.push(std::move(traj1));
+                m.trajCommander.push(std::move(traj2));
+                m.trajCommander.push(std::move(traj3));
+                m.trajCommander.push(std::move(traj4));
             }
 
             virtual void destiMove() {
@@ -541,30 +284,10 @@ namespace umouse {
                 UMouse& m = UMouse::getInstance();
                 WallSensor& ws = WallSensor::getInstance();
                 m.maze.writeMazeData2Flash();
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.1f, a, a);
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.05f, a, a);
                 auto traj1 = StopTrajectory::create(0.5f);
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));
-
-                if (ws.isAhead() == true) {
-                    std::function< void(void) > update_func = [&m, &ws]() {
-                        if(m.posEsti.getV() > 0.05) {
-                            PowerTransmission::getInstance().setDuty(0.35, 0.35);
-                        } else {
-                            PowerTransmission::getInstance().setDuty(0.45, 0.45);
-                        }
-
-
-                        m.posEsti.setX(m.trajCommander.x);
-                        m.posEsti.setY(m.trajCommander.y);
-                        m.ctrlMixer.reset();
-                    };
-
-                    auto traj2 = UpdateInjectionTrajectory::create(0.35f, update_func);
-                    m.trajCommander.push(std::move(traj2));
-                    SEG();
-                }
-
 
                 if(mode == ESearchMode::SLALOM_SERCH_BOTHWAYS || mode == ESearchMode::SPIN_TURN_SERCH_BOTHWAYS) {
                     Intent* intent = new Intent();
@@ -614,28 +337,10 @@ namespace umouse {
                 UMouse& m = UMouse::getInstance();
                 WallSensor& ws = WallSensor::getInstance();
                 m.maze.writeMazeData2Flash();
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.1f, a, a);
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.05f, a, a);
                 auto traj1 = StopTrajectory::create(0.5f);
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));
-
-                if (ws.isAhead() == true) {
-                    std::function< void(void) > update_func = [&m, &ws]() {
-                        if(ws.getContactWallTime() > 0.1f) {
-                            PowerTransmission::getInstance().setDuty(0.4, 0.4);
-                        } else {
-                            PowerTransmission::getInstance().setDuty(0.5, 0.5);
-                        }
-                        m.posEsti.setX(m.trajCommander.x);
-                        m.posEsti.setY(m.trajCommander.y);
-                        m.ctrlMixer.reset();
-                    };
-
-                    auto traj2 = UpdateInjectionTrajectory::create(0.35f, update_func);
-                    m.trajCommander.push(std::move(traj2));
-                    SEG();
-                }
-
             }
 
 

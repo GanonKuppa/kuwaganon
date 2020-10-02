@@ -11,7 +11,7 @@
 
 
 void initWebAppConnection() {
-    initUdpClient("192.168.3.3", 2020);
+    initUdpClient("192.168.3.7", 2020);
 }
 
 void finalizeWebAppConnection() {
@@ -52,7 +52,7 @@ void sendTargetPos(float x, float y, float ang) {
 
 void sendMazeWall(uint32_t* walls_vertical, uint32_t* walls_horizontal) {
     picojson::object obj;
-    obj.emplace(std::make_pair("type", "maze_wall"));
+    obj.emplace(std::make_pair("cmd", "SET_WALLS_WITHOUT_OUTER_32"));
 
     std::stringstream vertical_ss;
     std::stringstream horizontal_ss;
@@ -71,8 +71,11 @@ void sendMazeWall(uint32_t* walls_vertical, uint32_t* walls_horizontal) {
                          ((walls_horizontal[i] & 0x000000FF) << (8*3));
         horizontal_ss << std::setw(8) << std::setfill('0') << std::hex << h_val;
     }
-    obj.emplace(std::make_pair("walls_vertical", vertical_ss.str()));
-    obj.emplace(std::make_pair("walls_horizontal", horizontal_ss.str()));
+    obj.emplace(std::make_pair("walls_v_hex", vertical_ss.str()));
+    std::cout << vertical_ss.str() << "\n";
+    std::cout << horizontal_ss.str()<<"\n";
+
+    obj.emplace(std::make_pair("walls_h_hex", horizontal_ss.str()));
     // 文字列にするためにvalueを使用
     picojson::value val(obj);
     // return std::string

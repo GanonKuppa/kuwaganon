@@ -29,10 +29,10 @@ namespace umouse {
                 limit = 0.2;
             } else limit = 0.1;
 
-            //float l_duty = constrain( (gamepad.R3D_y/128.0 + gamepad.R3D_x/128.0) * limit ,-limit, limit);
-            //float r_duty = constrain( (gamepad.R3D_y/128.0 - gamepad.R3D_x/128.0) * limit ,-limit, limit);
-            float l_duty = constrain( (gamepad.R3D_y/128.0 ) * limit ,-limit, limit);
-            float r_duty = constrain( (gamepad.R3D_y/128.0 ) * limit ,-limit, limit);
+            float l_duty = constrain( (gamepad.R3D_y/128.0 + gamepad.R3D_x/128.0) * limit ,-limit, limit);
+            float r_duty = constrain( (gamepad.R3D_y/128.0 - gamepad.R3D_x/128.0) * limit ,-limit, limit);
+            //float l_duty = constrain( (gamepad.R3D_y/128.0 ) * limit ,-limit, limit);
+            //float r_duty = constrain( (gamepad.R3D_y/128.0 ) * limit ,-limit, limit);
 
 
             if(m.trajCommander.empty() == true) {
@@ -51,8 +51,10 @@ namespace umouse {
             if(gamepad.cross_x == 1) {
                 m.direct_duty_set_enable = false;
                 SE_CONFIRM();
-                auto traj = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                m.trajCommander.push(std::move(traj));
+                auto traj0 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                m.trajCommander.push(std::move(traj0));
+                auto traj1 = StopTrajectory::create(0.5f);
+                m.trajCommander.push(std::move(traj1));
                 waitmsec(1000);
                 m.direct_duty_set_enable = true;
             }
@@ -60,8 +62,11 @@ namespace umouse {
             if(gamepad.cross_x == -1) {
                 m.direct_duty_set_enable = false;
                 SE_CONFIRM();
-                auto traj = SpinTurnTrajectory::create(-90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                m.trajCommander.push(std::move(traj));
+                auto traj0 = SpinTurnTrajectory::create(-90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                m.trajCommander.push(std::move(traj0));
+                auto traj1 = StopTrajectory::create(0.2f);
+                m.trajCommander.push(std::move(traj1));
+
                 waitmsec(1000);
                 m.direct_duty_set_enable = true;
             }
@@ -79,8 +84,12 @@ namespace umouse {
                 SE_CONFIRM();
                 float v_slalom = pm.v_search_run;
                 float a = pm.a_search_run;
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.09f*block, 0.0f, v_slalom, 0.0f, a, a);
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.09f*block-0.01f, 0.0f, v_slalom, 0.05f, a, a);
+                auto traj1 = StraightTrajectory::createAsWallCenter(0.01f            , 0.05f, 0.05f,  0.05f, a, a);
+                auto traj2 = StopTrajectory::create(0.5f);
                 m.trajCommander.push(std::move(traj0));
+                //m.trajCommander.push(std::move(traj1));
+                m.trajCommander.push(std::move(traj2));
                 while(!m.trajCommander.empty()) waitmsec(100);
                 m.direct_duty_set_enable = true;
             }
@@ -88,8 +97,11 @@ namespace umouse {
             if(gamepad.cross_y == -1) {
                 m.direct_duty_set_enable = false;
                 SE_CONFIRM();
-                auto traj = SpinTurnTrajectory::create(180.0f, pm.spin_ang_v, pm.spin_ang_a);
-                m.trajCommander.push(std::move(traj));
+                auto traj0 = SpinTurnTrajectory::create(180.0f, pm.spin_ang_v, pm.spin_ang_a);
+                m.trajCommander.push(std::move(traj0));
+                auto traj1 = StopTrajectory::create(0.5f);
+                m.trajCommander.push(std::move(traj1));
+
                 waitmsec(1000);
                 m.direct_duty_set_enable = true;
             }
@@ -103,7 +115,7 @@ namespace umouse {
                 icm.calibAccOffset(800);
                 //adis.calibOmegaOffset(1600);
                 float x = 0.09f/2.0f;
-                float y = 0.09f/2.0f - m.WALL2MOUSE_CENTER_DIST;
+                float y = 0.09f/2.0f;
                 float ang = 90.0;
                 m.posEsti.reset(x,y,ang);
                 m.trajCommander.reset(x,y,ang);
