@@ -119,6 +119,9 @@ namespace umouse {
 
                     auto s = trajQueue.front()->getMotionTypeString().c_str();
                     uint16_t hash = trajQueue.front()->hash;
+                                    printfAsync("●te (x_e, y_e, ang_e)=(%f, %f, %f)", esti.getX(), esti.getY(), esti.getAng());
+                                    printfAsync("(x_t, y_t, ang_t)=(%f, %f, %f)\n", x, y, ang );
+
 #if DEBUG                    
                                     printfAsync(">    ------- traj end --------\n");
                                     printfAsync(">    motion_type: %s %04x\n", s, hash);

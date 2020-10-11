@@ -87,7 +87,7 @@ namespace umouse {
 
                 UMouse& m = UMouse::getInstance();
                 float x = 0.09f/2.0f;
-                float y = 0.09f/2.0f - m.WALL2MOUSE_CENTER_DIST;
+                float y = 0.09f/2.0f;// - m.WALL2MOUSE_CENTER_DIST;
                 a = pm.a_search_run;
                 v = pm.v_search_run;
                 v_max = 0.6;
@@ -102,7 +102,7 @@ namespace umouse {
                 m.maze.updateStartSectionWall();
                 desti_coor = m.goal;
 
-                float dist = 0.09f/2.0f + m.WALL2MOUSE_CENTER_DIST;
+                float dist = 0.09f/2.0f;// + m.WALL2MOUSE_CENTER_DIST;
                 auto traj = StraightTrajectory::createAsWallCenter(dist, 0.0f, v, v, a, a);
                 m.trajCommander.push(std::move(traj));
                 pre_read_wall_coor.set(255, 255);

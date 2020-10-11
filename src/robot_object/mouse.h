@@ -113,7 +113,8 @@ namespace umouse {
             else{
                 if(!trajCommander.empty() && trajCommander.getMotionType() == EMotionType::DIRECT_DUTY_SET) {
                     direct_duty_set_enable = true;
-                } else {
+                } 
+                else {
                     direct_duty_set_enable = false;
                 }
 

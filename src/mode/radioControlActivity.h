@@ -9,6 +9,7 @@
 #include "sound.h"
 #include "parameterManager.h"
 #include "ICM20602.h"
+#include "mouse.h"
 //#include "adis16470.h"
 //#include "activityFactory.h"
 
@@ -24,18 +25,26 @@ namespace umouse {
             PowerTransmission& pt = PowerTransmission::getInstance();
             ParameterManager& pm = ParameterManager::getInstance();
             UMouse& m = UMouse::getInstance();
+
             float limit = 0.0;
             if(gamepad.LB > 1) {
-                limit = 0.2;
-            } else limit = 0.1;
+                limit = 0.05;
+            } else limit = 0.025;
 
-            float l_duty = constrain( (gamepad.R3D_y/128.0 + gamepad.R3D_x/128.0) * limit ,-limit, limit);
-            float r_duty = constrain( (gamepad.R3D_y/128.0 - gamepad.R3D_x/128.0) * limit ,-limit, limit);
-            //float l_duty = constrain( (gamepad.R3D_y/128.0 ) * limit ,-limit, limit);
-            //float r_duty = constrain( (gamepad.R3D_y/128.0 ) * limit ,-limit, limit);
+            //float v_target = constrain( (gamepad.R3D_y/128.0) * 0.2f ,0.0f, 0.2f); 
+            //float ang_v_target = constrain( (gamepad.L3D_x/128.0 ) * 100.0f ,-100.0f, 100.0f); 
+            //m.ctrlMixer.update(v_target, ang_v_target, m.posEsti);
+            //auto duty = m.ctrlMixer.getDuty();
+            //pt.setDuty(duty(0), duty(1));
+
+            //float l_duty = constrain( (gamepad.R3D_y/128.0 + gamepad.R3D_x/128.0) * limit ,-limit, limit);
+            //float r_duty = constrain( (gamepad.R3D_y/128.0 - gamepad.R3D_x/128.0) * limit ,-limit, limit);
+            float l_duty = constrain( (gamepad.L3D_y/128.0 ) * limit ,-limit, limit);
+            float r_duty = constrain( (gamepad.R3D_y/128.0 ) * limit ,-limit, limit);
 
 
-            if(m.trajCommander.empty() == true) {
+            if(m.trajCommander.empty()) {
+                //pt.setDuty(duty(0), duty(1));
                 pt.setDuty(l_duty, r_duty);
             }
 
@@ -88,7 +97,7 @@ namespace umouse {
                 auto traj1 = StraightTrajectory::createAsWallCenter(0.01f            , 0.05f, 0.05f,  0.05f, a, a);
                 auto traj2 = StopTrajectory::create(0.5f);
                 m.trajCommander.push(std::move(traj0));
-                //m.trajCommander.push(std::move(traj1));
+                m.trajCommander.push(std::move(traj1));
                 m.trajCommander.push(std::move(traj2));
                 while(!m.trajCommander.empty()) waitmsec(100);
                 m.direct_duty_set_enable = true;

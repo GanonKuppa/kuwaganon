@@ -88,7 +88,7 @@ namespace umouse {
             } else if(mode == 2) {
                 float v = pm.v_search_run;
                 float a = pm.a_search_run;
-                auto traj = StraightTrajectory::createAsWallCenter(0.09 * 15 + m.WALL2MOUSE_CENTER_DIST, 0.0, v, 0.1f, a, a);
+                auto traj = StraightTrajectory::createAsWallCenter(0.09 * 8, 0.0, v, 0.1f, a, a);
                 m.trajCommander.push(std::move(traj));
             } else if(mode == 3) {
                 float v_slalom = pm.v_search_run;

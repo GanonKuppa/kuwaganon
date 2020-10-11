@@ -86,14 +86,14 @@ namespace umouse {
             float left_err = ABS(left() - center_l());
             
             if(isLeft() && isRight()){
-                if(right_err < 40 && left_err < 40) in_wall_center_time += DELTA_T;
+                if(right_err < 30 && left_err < 30) in_wall_center_time += DELTA_T;
             }
-            else if(isLeft()){
-                if(left_err < 40) in_wall_center_time += DELTA_T;
+/*            else if(isLeft()){
+                if(left_err < 10) in_wall_center_time += DELTA_T;
             }
             else if(isRight()){
-                if(right_err < 40) in_wall_center_time += DELTA_T;
-            }
+                if(right_err < 10) in_wall_center_time += DELTA_T;
+            }*/
             else {
                 in_wall_center_time = 0.0f;
             }
@@ -217,7 +217,7 @@ namespace umouse {
         }
 
         bool isOnWallCenter() {
-            if(in_wall_center_time > 0.1) {
+            if(in_wall_center_time > 0.15) {
                 return true;
             } else return false;
 
@@ -285,7 +285,7 @@ namespace umouse {
 
       private:
         const uint8_t BUFF_SIZE = 30;
-        const uint16_t LED_ON_USEC = 20;
+        const uint16_t LED_ON_USEC = 70;
         bool enable;
         float in_wall_center_time;
         float contact_wall_time;
@@ -384,10 +384,10 @@ namespace umouse {
             int16_t l_mod = left_on - left_off;
             int16_t r_mod = right_on - right_off;
 
-            ahead_l_q.push_front(ahl_mod);//0.5 * (ahl_mod + ahead_l_q.at(0)) );
-            ahead_r_q.push_front(ahr_mod);//0.5 * (ahr_mod + ahead_r_q.at(0)));
-            left_q.push_front(l_mod);//0.5 * (l_mod + left_q.at(0)));
-            right_q.push_front(r_mod);//0.5 * (r_mod + right_q.at(0)));
+            ahead_l_q.push_front(0.2 * ahl_mod + 0.8*ahead_l_q.at(0));
+            ahead_r_q.push_front(0.2 * ahr_mod + 0.8*ahead_r_q.at(0));
+            left_q.push_front(0.2 * l_mod + 0.8*left_q.at(0));
+            right_q.push_front(0.2 * r_mod + 0.8*right_q.at(0));
 
             ahead_l_q.pop_back();
             ahead_r_q.pop_back();

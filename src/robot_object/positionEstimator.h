@@ -201,7 +201,7 @@ namespace umouse {
             y_d_2 = y_d_1;
             y_d_1 = y_d;
 
-            onWallCenterCorrection(ws);
+            onWallCenterCorrection(ws, motion_type);
             //cornerLCorrection(ws);
             //cornerRCorrection(ws);
             //diagCornerRCorrection(ws);
@@ -394,8 +394,8 @@ namespace umouse {
         double x_d_2;
         double y_d_2;
 
-        void onWallCenterCorrection(WallSensor& ws) {
-            if(ws.isOnWallCenter() == true && ws.isAhead() == false && v > 0.1f && fabsf(ang_v) < 50.0f) {
+        void onWallCenterCorrection(WallSensor& ws, EMotionType motion_type) {
+            if(motion_type == EMotionType::STRAIGHT_WALL_CENTER && ws.isOnWallCenter() && ws.isAhead() == false && v > 0.1f && fabsf(ang_v) < 50.0f) {
                 if(ang >= 315.0 || ang < 45.0) {
                     if(ws.getOnWallCenterTime() > 0.175) ang = 0.0f;
                     y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;

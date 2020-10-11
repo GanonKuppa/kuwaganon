@@ -131,48 +131,24 @@ void timeInterrupt(void) {
     //スロット0
     if (int_tick_count % 4 == 0) {
         if (getElapsedMsec() > 5000) {
-#if 0            
-            std::function< void(void) > w1 = [&wallSen]() {wallSen.update();};
-            std::function< void(void) > w2 = [&icm]() {icm.update();};
-            std::function< void(void) > w3 = [&mouse]() {mouse.update();};
-            std::function< void(void) > w4 = []() {waitusec_sub(20);};
-#endif            
-            wallSen.update();
             icm.update();
             mouse.update();
-#if 0     
-            adis.update(w1, w2, w3, w4);
-#endif 
             sendDataSCIFA9();
-        } else {
-            wallSen.update();
         }
     }
     //スロット1
     if (int_tick_count % 4 == 0) {
         wheelOdometry.update();
         gamepad.update();
+        wallSen.update();
 
     }
     //スロット2
     if (int_tick_count % 4 == 2) {
         if (getElapsedMsec() > 5000) {
-#if 0
-            std::function< void(void) > w1 = [&wallSen]() {wallSen.update();};
-            std::function< void(void) > w2 = [&icm]() {icm.update();};
-            std::function< void(void) > w3 = [&mouse]() {mouse.update();};
-            std::function< void(void) > w4 = []() {waitusec_sub(20);};
-#endif
-            wallSen.update();
             icm.update();
             mouse.update();
-
-#if 0            
-            adis.update(w1, w2, w3, w4);
-#endif
             sendDataSCIFA9();
-        } else {
-            wallSen.update();
         }
     }
     //スロット3
@@ -181,6 +157,8 @@ void timeInterrupt(void) {
         dialL.update();
         dialR.update();
         fcled.update();
+        //wallSen.update();
+
     }
 
     /////毎回行う処理/////
@@ -224,7 +202,7 @@ void periperalInit() {
 
     //割り込み関数
     initCMT0();
-    initCMT1();
+    //initCMT1();
 
     //SPI
     initRSPI0();

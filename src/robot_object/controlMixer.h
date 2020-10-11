@@ -120,6 +120,22 @@ namespace umouse {
 
         }
 
+        void update(float v, float ang_v, PositionEstimator& esti){
+            ParameterManager& pm = ParameterManager::getInstance();
+            ang_v_pidf.set(pm.rot_v_P, pm.rot_v_I, pm.rot_v_D, pm.rot_v_F);
+            v_pidf.set(pm.trans_v_P, pm.trans_v_I, pm.trans_v_D, pm.trans_v_F);
+
+            v_pidf.update(target_trans_v, esti.getV());
+            ang_v_pidf.update(target_rot_v, esti.getAngV());
+
+
+            duty(0) = (v_pidf.getControlVal() - ang_v_pidf.getControlVal());
+            duty(1) = (v_pidf.getControlVal() + ang_v_pidf.getControlVal());
+            return;
+        }
+
+
+
         void update(BaseTrajectory& traj, PositionEstimator& esti, bool isRWall, bool isLWall) {
             ParameterManager& pm = ParameterManager::getInstance();
 
