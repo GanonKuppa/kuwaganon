@@ -593,9 +593,9 @@ namespace umouse {
         set2ByteVal(buf, 36, (uint16_t)getTimeuCount_sub());
 
         set2ByteVal(buf, 38, getCountMTU1());
-
+        set2ByteVal(buf, 40, (uint16_t)wo.getAbsCount_R());
         set2ByteVal(buf, 42, getCountMTU2());
-
+        set2ByteVal(buf, 44, (uint16_t)wo.getAbsCount_L());
 
 
         set2ByteVal(buf, 46, icm.omega_raw[0]);
@@ -611,10 +611,10 @@ namespace umouse {
         set2ByteVal(buf, 66, (uint16_t)(fcled.R.getState()));
         set2ByteVal(buf, 68, (uint16_t)(fcled.G.getState()));
         set2ByteVal(buf, 70, (uint16_t)(fcled.B.getState()));
-        //set2ByteVal(buf, 72, adis.omega_raw[2]);
-        set2ByteVal(buf, 74, (uint16_t)0);
-        //set2ByteVal(buf, 76, adis.acc_raw[0]);
-        //set2ByteVal(buf, 78, adis.acc_raw[1]);
+        set2ByteVal(buf, 72, ws.ahead_dist_l(), 100000);
+        set2ByteVal(buf, 74, ws.dist_r(), 100000);
+        set2ByteVal(buf, 76, ws.dist_l(), 100000);
+        set2ByteVal(buf, 78, ws.ahead_dist_r(), 100000);
 
 
         set2ByteVal(buf, 80, (uint16_t)m.trajCommander.getMotionType());

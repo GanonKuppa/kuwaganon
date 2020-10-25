@@ -10,11 +10,12 @@
 #include "myUtil.h"
 #include "fcled.h"
 #include "wheelOdometry.h"
+#include "phaseCounting.h"
 
 #include <Eigen/Core>
 
 namespace umouse {
-
+    
     class PowerTransmission {
       public:
         static PowerTransmission& getInstance() {
@@ -279,19 +280,40 @@ namespace umouse {
             return duty_rot_v + duty_rot_a;
         }
 
-        void debug_duty_l() {
+        void debug_duty_l(int8_t dir) {
             WheelOdometry &wodo = WheelOdometry::getInstance();
             printfSync("-----duty l------\n");
-            for(int i=0;i<100;i++){
+            for(int i=0;i<200;i++){
                 LED_R_PIN = 1;
                 LED_G_PIN = 0;
                 LED_B_PIN = 0;
-                float duty = (float)i*0.01;
+                float duty = (float)i*0.001 * dir;
                 setRawDuty_L(duty);
                 
                 waitmsec(2000);
                 float vol = getVoltage() * getDuty_L();
-                printfSync("%d,%f, %f, %f, %f, %f\n",i,duty,getDuty_L(),getVoltage() , vol, wodo.v_L);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_L, (float)wodo.getAveV_L());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_L, (float)wodo.getAveV_L());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_L, (float)wodo.getAveV_L());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_L, (float)wodo.getAveV_L());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_L, (float)wodo.getAveV_L());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_L, (float)wodo.getAveV_L());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_L, (float)wodo.getAveV_L());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_L, (float)wodo.getAveV_L());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_L, (float)wodo.getAveV_L());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_L, (float)wodo.getAveV_L());
+                waitmsec(10);
+
+
                 LED_R_PIN = 0;
                 LED_G_PIN = 0;
                 LED_B_PIN = 0;
@@ -300,18 +322,39 @@ namespace umouse {
             }
         }
 
-        void debug_duty_r() {
+        void debug_duty_r(int8_t dir) {
             printfSync("-----duty r------\n");
             WheelOdometry &wodo = WheelOdometry::getInstance();
             
-            for(int i=0;i<100;i++){
+            for(int i=0;i<200;i++){
                 LED_R_PIN = 1;
                 LED_G_PIN = 0;
                 LED_B_PIN = 0;
-                setRawDuty_R(i*0.01);
+                float duty = i*0.001 * dir;
+                setRawDuty_R(duty);
                 waitmsec(2000);
                 float vol = getVoltage() * getDuty_R();
-                printfSync("%d, %f, %f\n",i , vol, wodo.v_R);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_R, (float)wodo.getAveV_R());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_R, (float)wodo.getAveV_R());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_R, (float)wodo.getAveV_R());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_R, (float)wodo.getAveV_R());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_R, (float)wodo.getAveV_R());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_R, (float)wodo.getAveV_R());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_R, (float)wodo.getAveV_R());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_R, (float)wodo.getAveV_R());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_R, (float)wodo.getAveV_R());
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(), vol, wodo.v_R, (float)wodo.getAveV_R());
+                waitmsec(10);
+
                 LED_R_PIN = 0;
                 LED_G_PIN = 0;
                 LED_B_PIN = 0;
@@ -319,6 +362,123 @@ namespace umouse {
                 waitmsec(1000);
             }
         }
+
+        void debug_calib_enc_l() {            
+            uint32_t elapsed_time_list[5000];
+
+            WheelOdometry &wodo = WheelOdometry::getInstance();
+            
+            while(1){               
+                printfSync("-----L start --------\n");
+                setDuty(0.05f, 0.0f);
+                waitmsec(3000);
+                
+                while(1){
+                    LED_R_PIN = 1;
+                    LED_G_PIN = 1;
+                    LED_B_PIN = 0;
+
+                    if(PORTB.PIDR.BIT.B3 == 1){
+                        MTU2.TCNT = 0; //左ホイール
+                        break;
+                    } 
+                }                
+                
+                uint32_t loop_count = 0;
+                
+                startTimeuCount();
+                while(1){
+                    elapsed_time_list[loop_count] = getTimeuCount();
+                    uint32_t count_now = MTU2.TCNT;
+                    while(1){
+                        if(count_now +50 < MTU2.TCNT) break;
+                    }
+
+                    if(count_now > 4200) break;
+                    loop_count ++;
+                    LED_R_PIN = 1;
+                    LED_G_PIN = 0;
+                    LED_B_PIN = 1;
+                } 
+                endTimeuCount();
+                printfSync("-----print start %d --------\n", loop_count);
+                if(loop_count * 50 > 8000){
+                    printfSync("error\n");
+                }
+                else {
+                    for(int j=0;j<loop_count;j++){
+                        setDuty(0.0f, 0.0f);
+                        printfSync("%d, %d, %f\n",j*50 , elapsed_time_list[j], wodo.enc_l_lerp(j*50));
+                        waitmsec(5);
+                        LED_R_PIN = 1;
+                        LED_G_PIN = 0;
+                        LED_B_PIN = 0;
+                    }
+                }
+                
+                waitmsec(3000);
+                printfSync("-----L end --------\n");
+            }
+        }
+
+        void debug_calib_enc_r() {            
+            uint32_t elapsed_time_list[5000];
+
+            WheelOdometry &wodo = WheelOdometry::getInstance();
+            
+            while(true){               
+                printfSync("-----R start --------\n");
+                setDuty(0.0f, -0.05f);
+                waitmsec(3000);
+                
+                while(1){
+                    LED_R_PIN = 1;
+                    LED_G_PIN = 1;
+                    LED_B_PIN = 0;
+                    if(PORTA.PIDR.BIT.B2 == 1){
+                        MTU1.TCNT = 0; //右ホイール
+                        break;
+                    } 
+                }                
+                
+                uint32_t loop_count = 0;
+
+                startTimeuCount();
+                while(1){
+                    elapsed_time_list[loop_count] = getTimeuCount();
+                    uint32_t count_now = MTU1.TCNT;
+                    while(1){
+                        if(count_now +50 < MTU1.TCNT) break;
+                    }
+
+                    if(count_now>4200) break;
+                    loop_count++;
+                    LED_R_PIN = 1;
+                    LED_G_PIN = 0;
+                    LED_B_PIN = 1;
+                } 
+                endTimeuCount();
+                printfSync("-----print start %d --------\n",loop_count);
+                
+                if(loop_count * 50 > 8000){
+                    printfSync("error\n");
+                }
+                else {
+                    for(int j=0;j<loop_count;j++){
+                        setDuty(0.0f, 0.0f);
+                        printfSync("%d, %d, %f\n",j*50 , elapsed_time_list[j], wodo.enc_r_lerp(j*50));
+                        waitmsec(5);
+                        LED_R_PIN = 1;
+                        LED_G_PIN = 0;
+                        LED_B_PIN = 0;
+                    }
+                }
+                
+                waitmsec(3000);
+                printfSync("-----R end --------\n");
+            }
+        }
+
 
 
 
@@ -433,15 +593,14 @@ namespace umouse {
         const float PINION_GEAR_NUM = 9.0;
         const float GEAR_RATIO = TIRE_GEAR_NUM / PINION_GEAR_NUM;
 
-        const float OFFSET_VOLTAGE_L_M = -0.08036225;
-        const float OFFSET_VOLTAGE_L_P = 0.088720018;
-        const float OFFSET_VOLTAGE_R_M = -0.07486831;
-        const float OFFSET_VOLTAGE_R_P = 0.093748036;
-
-        const float CORRECTION_FACTOR_L_M = 1.0;
-        const float CORRECTION_FACTOR_L_P = 0.984144854;
-        const float CORRECTION_FACTOR_R_M = 0.980893308;
-        const float CORRECTION_FACTOR_R_P = 0.988689915;
+        const float OFFSET_VOLTAGE_L_M = -0.074403031f;
+        const float OFFSET_VOLTAGE_L_P = 0.080148194f;
+        const float OFFSET_VOLTAGE_R_M = -0.077630765f;
+        const float OFFSET_VOLTAGE_R_P = 0.092075988f;
+        const float CORRECTION_FACTOR_L_M = 1.0f;
+        const float CORRECTION_FACTOR_L_P = 0.976231779f;
+        const float CORRECTION_FACTOR_R_M = 1.060092987f;
+        const float CORRECTION_FACTOR_L_P = 1.083913854f;
 
 
         float getVoltage() {

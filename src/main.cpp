@@ -153,7 +153,7 @@ void timeInterrupt(void) {
     }
     //スロット3
     if (int_tick_count % 4 == 3) {
-        wheelOdometry.update();
+        //wheelOdometry.update();
         dialL.update();
         dialR.update();
         fcled.update();
@@ -181,7 +181,16 @@ void timeInterrupt(void) {
 int main() {
     periperalInit();
     startUpInit();
+    
+    // モーターのキャリブレーション用
+    umouse::PseudoDialL::getInstance().setEnable(0);
+    umouse::PseudoDialR::getInstance().setEnable(0);
 
+    umouse::UMouse::getInstance().direct_duty_set_enable = true;
+    //umouse::PowerTransmission::getInstance().debug_duty_l(-1);
+    umouse::PowerTransmission::getInstance().debug_duty_r(-1);
+    umouse::UMouse::getInstance().direct_duty_set_enable = false;
+    
     while (1) {
         auto activity = umouse::ActivityFactory::cteateModeSelect();
         activity->start();
@@ -202,7 +211,7 @@ void periperalInit() {
 
     //割り込み関数
     initCMT0();
-    //initCMT1();
+    initCMT1();
 
     //SPI
     initRSPI0();
@@ -239,6 +248,11 @@ void periperalInit() {
     //ウォッチドックタイマー
     //initWdt();
     //startWdt();
+
+    // エンコーダのキャリブレーション
+    //umouse::PowerTransmission::getInstance().debug_calib_enc_r();
+    //umouse::PowerTransmission::getInstance().debug_calib_enc_l();
+
 }
 
 
@@ -300,8 +314,8 @@ void object_init() {
     umouse::adis16470::getInstance();
     umouse::UMouse::getInstance();
     umouse::PowerTransmission::getInstance();
-    umouse::PseudoDialL::getInstance();
-    umouse::PseudoDialR::getInstance();
+    //umouse::PseudoDialL::getInstance();
+    //umouse::PseudoDialR::getInstance();
 
     //umouse_object
 

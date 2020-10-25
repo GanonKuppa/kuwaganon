@@ -49,11 +49,11 @@ namespace umouse {
             }
 
             if(gamepad.BACK == 1) {
-                pt.debug_duty_l();
+                pt.debug_duty_l(1);
             }
 
             if(gamepad.BACK == 1) {
-                pt.debug_duty_r();
+                pt.debug_duty_r(1);
             }
 
 

@@ -72,12 +72,15 @@ namespace umouse {
             int16_t e_fr = 0;
             int16_t e_fl = 0;
             float error = 0.0f;
+#if 0            
             if(ws.isRight_for_ctrl() == true && isRWall == true) e_fr = +(ws.right() - ws.center_r() );
             if(ws.isLeft_for_ctrl() == true && isLWall == true) e_fl = -(ws.left() - ws.center_l() );
 
             e_fr = constrain(e_fr, -ws.center_r()*1.5f, ws.center_r()*1.5f);
             e_fl = constrain(e_fl, -ws.center_l()*1.5f, ws.center_l()*1.5f);
-
+#endif
+            e_fr =   10000 * ws.center_dist_r();
+            e_fl = - 10000 * ws.center_dist_l();
             //if(ABS(e_fr) > ABS(e_fl)) error = (float) e_fr;
             //else error = (float) e_fl;
 

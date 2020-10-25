@@ -206,7 +206,7 @@ namespace umouse {
             //cornerRCorrection(ws);
             //diagCornerRCorrection(ws);
             //diagCornerLCorrection(ws);
-            nearWallCorrection(motion_type, ws);
+            //nearWallCorrection(motion_type, ws);
             //aheadWallCorrection(ws, motion_type);
             //contactWallCorrection(motion_type, ws);
         }

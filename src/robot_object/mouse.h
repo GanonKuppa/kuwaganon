@@ -115,7 +115,7 @@ namespace umouse {
                     direct_duty_set_enable = true;
                 } 
                 else {
-                    direct_duty_set_enable = false;
+                    //direct_duty_set_enable = false;
                 }
 
                 if(direct_duty_set_enable == false) {

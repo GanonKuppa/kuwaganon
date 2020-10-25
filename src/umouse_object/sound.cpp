@@ -17,7 +17,7 @@
 #include <array>
 
 #include "parameterManager.h"
-
+#include "wheelOdometry.h"
 
 
 
@@ -213,6 +213,10 @@ extern "C" void timeInterrupt_sub(void);
 
 void timeInterrupt_sub() {
     static uint64_t num_count = 0;
+
+    // エンコーダ処理Z相読み取り時処理
+    umouse::WheelOdometry &wodo = umouse::WheelOdometry::getInstance();
+    wodo.updateZ();
 
     uint16_t SEM_wave_val = SEM.calcWaveVal(num_count);
     uint16_t BGMM_wave_val = BGMM.calcWaveVal(num_count);

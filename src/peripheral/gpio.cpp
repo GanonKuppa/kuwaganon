@@ -56,5 +56,8 @@ void initGPIO() {
     PORTD.PODR.BIT.B0 = 0; //SLED_OUT3
     PORT0.PODR.BIT.B7 = 0; //SLED_OUT4
 
+    // エンコーダZ相
+    PORTB.PDR.BIT.B3 = 0; //57ピンENC_1_Z
+    PORTA.PDR.BIT.B2 = 0; //68ピンENC_2_Z
 }
 

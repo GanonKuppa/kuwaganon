@@ -2,7 +2,7 @@
 #include "iodefine.h"
 #include "da.h"
 
-#define SOUND_ENABLE 0
+#define SOUND_ENABLE 1
 /**************DA変換の初期設定*****************/
 void initDA(void) {
 #if SOUND_ENABLE
