@@ -363,6 +363,47 @@ namespace umouse {
             }
         }
 
+
+        void debug_duty() {
+            WheelOdometry &wodo = WheelOdometry::getInstance();
+            printfSync("-----duty l r------\n");
+            for(int i=-50;i<50;i++){
+                LED_R_PIN = 1;
+                LED_G_PIN = 0;
+                LED_B_PIN = 0;
+                float duty = (float)i*0.001;
+                setDuty_R(duty);
+                setDuty_L(duty);
+                
+                waitmsec(1000);
+                float vol_l = getVoltage() * getDuty_L();
+                float vol_r = getVoltage() * getDuty_R();
+                printfSync("%d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d\n",i ,duty, getVoltage(), vol_l, wodo.v_L, (float)wodo.getAveV_L()
+                                                                                       , vol_r, wodo.v_R, (float)wodo.getAveV_R(), wodo.z_l_updated, wodo.z_r_updated );
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d\n",i ,duty, getVoltage(), vol_l, wodo.v_L, (float)wodo.getAveV_L()
+                                                                                       , vol_r, wodo.v_R, (float)wodo.getAveV_R(), wodo.z_l_updated, wodo.z_r_updated );
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d\n",i ,duty, getVoltage(), vol_l, wodo.v_L, (float)wodo.getAveV_L()
+                                                                                       , vol_r, wodo.v_R, (float)wodo.getAveV_R(), wodo.z_l_updated, wodo.z_r_updated );
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d\n",i ,duty, getVoltage(), vol_l, wodo.v_L, (float)wodo.getAveV_L()
+                                                                                       , vol_r, wodo.v_R, (float)wodo.getAveV_R(), wodo.z_l_updated, wodo.z_r_updated );
+                waitmsec(10);
+                printfSync("%d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d\n",i ,duty, getVoltage(), vol_l, wodo.v_L, (float)wodo.getAveV_L()
+                                                                                       , vol_r, wodo.v_R, (float)wodo.getAveV_R(), wodo.z_l_updated, wodo.z_r_updated );
+
+                LED_R_PIN = 0;
+                LED_G_PIN = 0;
+                LED_B_PIN = 0;
+                setDuty(0.0, 0.0);
+                waitmsec(1000);
+            }
+        }
+
+
+
+
         void debug_calib_enc_l() {            
             uint32_t elapsed_time_list[5000];
 
@@ -593,14 +634,14 @@ namespace umouse {
         const float PINION_GEAR_NUM = 9.0;
         const float GEAR_RATIO = TIRE_GEAR_NUM / PINION_GEAR_NUM;
 
-        const float OFFSET_VOLTAGE_L_M = -0.074403031f;
-        const float OFFSET_VOLTAGE_L_P = 0.080148194f;
-        const float OFFSET_VOLTAGE_R_M = -0.077630765f;
-        const float OFFSET_VOLTAGE_R_P = 0.092075988f;
+        const float OFFSET_VOLTAGE_L_M = -0.114403031f;
+        const float OFFSET_VOLTAGE_L_P = 0.110148194f;
+        const float OFFSET_VOLTAGE_R_M = -0.097630765f;
+        const float OFFSET_VOLTAGE_R_P = 0.122075988f;
         const float CORRECTION_FACTOR_L_M = 1.0f;
-        const float CORRECTION_FACTOR_L_P = 0.976231779f;
-        const float CORRECTION_FACTOR_R_M = 1.060092987f;
-        const float CORRECTION_FACTOR_L_P = 1.083913854f;
+        const float CORRECTION_FACTOR_L_P = 1.0f;
+        const float CORRECTION_FACTOR_R_M = 1.0f;
+        const float CORRECTION_FACTOR_R_P = 1.0f;
 
 
         float getVoltage() {

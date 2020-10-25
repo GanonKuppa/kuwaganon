@@ -170,6 +170,13 @@ unsigned int getElapsedMsec() {
     return CMTW0.CMWCNT / 375;
 }
 
+unsigned int getElapsedUsec() {
+    //48MHz,128分周 -> 375カウントで1msec
+    //190分くらいまでしか計れない
+    return CMTW0.CMWCNT / 375 * 1000;
+}
+
+
 
 unsigned int getElapsedSec() {
     return getElapsedMsec() / 1000;

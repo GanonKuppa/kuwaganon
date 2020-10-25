@@ -10,6 +10,9 @@
 #include "timer.h"
 #include <deque>
 
+#include "communication.h"
+
+
 
 
 const uint16_t ENC_L_OUT_TABLE_SIZE = 83;
@@ -103,6 +106,10 @@ namespace umouse {
             tire_ang_L = 0.0;
             v_ave = 0.0;
 
+            z_l_updated = 0;
+            z_r_updated = 0;
+
+
 
             for (uint8_t i = 0; i < AVERAGE_NUM; i++) {
                 v_R_list.push_front(0);
@@ -138,11 +145,30 @@ namespace umouse {
         std::deque<float> v_R_list;
         std::deque<float> v_L_list;
 
+        bool z_l_updated;
+        bool z_r_updated;
+
         void updateZ() {
-            if(PORTB.PIDR.BIT.B3 == 1) MTU2.TCNT = 0;
-            if(PORTA.PIDR.BIT.B2 == 1)  MTU1.TCNT = 0;
+
+            if(PORTB.PIDR.BIT.B3 == 1){
+                printfSync("l:%d, %d, %d\n",getElapsedUsec() ,MTU2.TCNT, z_l_updated);
+                MTU2.TCNT = 0;
+                z_l_updated = 1;
+            } 
+            else{
+                z_l_updated = 0;
+            }
+            
+            if(PORTA.PIDR.BIT.B2 == 1){
+                MTU1.TCNT = 0;
+                z_r_updated = 1;
+            }
+            else{
+                z_r_updated = 0;
+            }  
             MTU2.TCNT = (MTU2.TCNT + 4096) % 4096;
             MTU1.TCNT = (MTU1.TCNT + 4096) % 4096;
+
         }
 
 
@@ -154,27 +180,19 @@ namespace umouse {
             L_ENC_now = (getCountMTU2() + 4096) % 4096;
             int32_t count_diff_R = (int32_t) (R_ENC_now - R_ENC_pre);
             int32_t count_diff_L = (int32_t) (L_ENC_now - L_ENC_pre);
-            float count_diff_R_f = enc_r_lerp(R_ENC_now) - enc_r_lerp(R_ENC_pre);
-            float count_diff_L_f = enc_l_lerp(L_ENC_now) - enc_l_lerp(L_ENC_pre);
+            float count_diff_R_f = count_diff_R;//enc_r_lerp(R_ENC_now) - enc_r_lerp(R_ENC_pre);
+            float count_diff_L_f = count_diff_L;//enc_l_lerp(L_ENC_now) - enc_l_lerp(L_ENC_pre);
 
             //オーバーフロー対策
-            if (count_diff_R > 2048)
-                count_diff_R -= 4096;
-            if (count_diff_R < -2048)
-                count_diff_R += 4096;
-            if (count_diff_L > 2048)
-                count_diff_L -= 4096;
-            if (count_diff_L < -2048)
-                count_diff_L += 4096;
+            if (count_diff_R > 2048){ count_diff_R -= 4096;}
+            if (count_diff_R < -2048){ count_diff_R += 4096;}
+            if (count_diff_L > 2048){ count_diff_L -= 4096;}
+            if (count_diff_L < -2048){ count_diff_L += 4096;}
 
-            if (count_diff_R_f > 2048)
-                count_diff_R_f -= 4096;
-            if (count_diff_R_f < -2048)
-                count_diff_R_f += 4096;
-            if (count_diff_L_f > 2048)
-                count_diff_L_f -= 4096;
-            if (count_diff_L_f < -2048)
-                count_diff_L_f += 4096;
+            if (count_diff_R_f > 2048.0f){ count_diff_R_f -= 4096.0f;}
+            if (count_diff_R_f < -2048.0f){ count_diff_R_f += 4096.0f;}
+            if (count_diff_L_f > 2048.0f){ count_diff_L_f -= 4096.0f;}
+            if (count_diff_L_f < -2048.0f){ count_diff_L_f += 4096.0f;}
 
 
             ParameterManager& pm = ParameterManager::getInstance();

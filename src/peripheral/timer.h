@@ -20,6 +20,7 @@ void startTimeuCount_sub(void);
 unsigned int getTimeuCount_sub(void);
 unsigned int endTimeuCount_sub(void);
 
+unsigned int getElapsedUsec(void);
 unsigned int getElapsedMsec(void);
 unsigned int getElapsedSec(void);
 

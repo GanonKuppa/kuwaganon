@@ -188,7 +188,9 @@ int main() {
 
     umouse::UMouse::getInstance().direct_duty_set_enable = true;
     //umouse::PowerTransmission::getInstance().debug_duty_l(-1);
-    umouse::PowerTransmission::getInstance().debug_duty_r(-1);
+    //umouse::PowerTransmission::getInstance().debug_duty_r(-1);
+    //umouse::PowerTransmission::getInstance().debug_duty();
+
     umouse::UMouse::getInstance().direct_duty_set_enable = false;
     
     while (1) {
@@ -251,7 +253,7 @@ void periperalInit() {
 
     // エンコーダのキャリブレーション
     //umouse::PowerTransmission::getInstance().debug_calib_enc_r();
-    //umouse::PowerTransmission::getInstance().debug_calib_enc_l();
+    //umouse::PowerTransmission::getInstance().debug_calib_enc_l();    
 
 }
 
