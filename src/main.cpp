@@ -42,6 +42,7 @@ extern "C" void __main() {
 #include <memory>
 #include <myUtil.h>
 #include <functional>
+#include <math.h>
 
 //peripheral_RX71M
 #include "clock.h"
@@ -100,8 +101,7 @@ void timeInterrupt(void) {
     static uint64_t int_tick_count = 0;
 
     //--------------------------------------//
-    umouse::ICM20602& icm = umouse::ICM20602::getInstance();
-    //umouse::adis16470& adis = umouse::adis16470::getInstance();
+    umouse::ICM20602& icm = umouse::ICM20602::getInstance();    
     umouse::FcLed& fcled = umouse::FcLed::getInstance();
     umouse::WallSensor& wallSen = umouse::WallSensor::getInstance();
     umouse::Gamepad& gamepad = umouse::Gamepad::getInstance();
@@ -193,6 +193,8 @@ int main() {
 
     umouse::UMouse::getInstance().direct_duty_set_enable = false;
     
+
+
     while (1) {
         auto activity = umouse::ActivityFactory::cteateModeSelect();
         activity->start();
@@ -252,6 +254,8 @@ void periperalInit() {
     //startWdt();
 
     // エンコーダのキャリブレーション
+    umouse::PowerTransmission::getInstance().calib_z();
+    //umouse::PowerTransmission::getInstance().test_z_to_z_enc_l();
     //umouse::PowerTransmission::getInstance().debug_calib_enc_r();
     //umouse::PowerTransmission::getInstance().debug_calib_enc_l();    
 
@@ -316,8 +320,8 @@ void object_init() {
     umouse::adis16470::getInstance();
     umouse::UMouse::getInstance();
     umouse::PowerTransmission::getInstance();
-    //umouse::PseudoDialL::getInstance();
-    //umouse::PseudoDialR::getInstance();
+    umouse::PseudoDialL::getInstance();
+    umouse::PseudoDialR::getInstance();
 
     //umouse_object
 

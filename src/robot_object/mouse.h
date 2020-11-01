@@ -103,7 +103,7 @@ namespace umouse {
 
 
             posEsti.update(wo.getAveV(), (double)icm.omega_f[2], (double)icm.acc_f[1], (double)icm.acc_f[0], trajCommander.getMotionType(), ws);
-            trajCommander.update(posEsti);
+            trajCommander.update(posEsti.getX(), posEsti.getY(), posEsti.getAng());
 
             if(pdl.getEnable() || pdr.getEnable()){
                 float duty_l = pdl.getDuty();

@@ -1,6 +1,7 @@
 #pragma once
 #include <math.h>
 #include "ICM20602.h"
+#include <cmath>
 //#include "adis16470.h"
 #include "sound.h"
 #include "trajectory.h"
@@ -18,6 +19,8 @@ namespace umouse {
         PositionEstimator() {
             x = 0.09 / 2.0;
             y = 0.09 / 2.0;
+            x_pre = x;
+            y_pre = y;
             ang = 90.0;
             ang_v = 0.0;
             v = 0.0;
@@ -64,10 +67,41 @@ namespace umouse {
             on_wall_center_pre = false;
         }
 
+        bool __isfinite(float x){
+            union { float f; int i; } a;
+            a.f = x;
+            if( ((a.i >> 23) & 0xff) == 255) return false;
+            else return true;
+        }
+
+        bool __isfinite(double x){
+            union { double f; long i; } a;
+            a.f = x;
+            if( ((a.i >> 52) & 0x007ff) == 2047) return false;
+            else return true;
+        }
+
 
         void update(double v_, double ang_v_, double a_y, double a_x, EMotionType motion_type, WallSensor& ws) {
-            ICM20602& icm = ICM20602::getInstance();
-            //umouse::adis16470& adis = umouse::adis16470::getInstance();
+            
+            
+            
+            if(!__isfinite(x)){
+                printfAsync("x nan! %f %f \n", x, x_pre);
+                x = x_pre;
+            }
+
+            if(!__isfinite(y)){
+                printfAsync("y NAN? %f %f \n", y, y_pre);
+                y = y_pre;
+            }
+
+            if(!__isfinite(v_)){
+                printfAsync("v nan %f \n", v_);                
+            }
+
+
+            ICM20602& icm = ICM20602::getInstance();            
             ParameterManager& pm = ParameterManager::getInstance();
 
             double ang_v_rad = deg2rad(ang_v);
@@ -82,18 +116,25 @@ namespace umouse {
             ang = fmod(ang + 360.0, 360.0);
 
             double ang_rad = deg2rad(ang);
-            sincos(ang_rad, &sin_val, &cos_val);
+            sin_val = sin(ang_rad);
+            cos_val = cos(ang_rad);
 
             if(motion_type == EMotionType::STRAIGHT ||
                     motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
                     motion_type == EMotionType::DIAGONAL ||
                     motion_type == EMotionType::DIAGONAL_CENTER ||
-                    motion_type == EMotionType::CURVE) {
+                    motion_type == EMotionType::CURVE ||
+                    motion_type == EMotionType::STOP ||
+                    motion_type == EMotionType::SPINTURN ||
+                    motion_type == EMotionType::DIRECT_DUTY_SET
+                    
+                    ) {
                 // 並進速度算出
                 double gain = (double)pm.v_comp_gain;
                 //a_y = (double)adis.acc_f[2];
                 //if(fabs(a_y) < 0.5) gain = 0.0;
-                v = (gain)*(v + a_y * DELTA_T) + (1.0 - gain)*(v_);
+                //v = (gain)*(v + a_y * DELTA_T) + (1.0 - gain)*(v_);
+                v = v_;
 
                 // 加速度積分速度算出
                 v_acc += a_y * DELTA_T;
@@ -102,6 +143,10 @@ namespace umouse {
                 // グローバル座標系速度算出
                 x_d = v * cos_val;
                 y_d = v * sin_val;
+                
+                if(!__isfinite(v) || !__isfinite(cos_val) || !__isfinite(sin_val) || !__isfinite(ang_v_rad)){
+                    printfAsync("%f,%f,%f, %f \n", v, cos_val, sin_val, ang_v_rad);                
+                }
 
                 // グローバル座標系位置算出
                 if(fabs(ang_v) > 10.0) {
@@ -143,11 +188,9 @@ namespace umouse {
                     y += y_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
 
                 } else {
-                    x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);
-                    y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
+                    x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);                    y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
+
                 }
-
-
             } else if(motion_type == EMotionType::STOP ||
                       motion_type == EMotionType::SPINTURN ||
                       motion_type == EMotionType::DIRECT_DUTY_SET) {
@@ -201,7 +244,17 @@ namespace umouse {
             y_d_2 = y_d_1;
             y_d_1 = y_d;
 
-            onWallCenterCorrection(ws, motion_type);
+            if(__isfinite(x)){
+                x_pre = x;
+            }
+
+            if(__isfinite(x)){
+                y_pre = y;
+            }
+
+
+
+            //onWallCenterCorrection(ws, motion_type);
             //cornerLCorrection(ws);
             //cornerRCorrection(ws);
             //diagCornerRCorrection(ws);
@@ -248,22 +301,7 @@ namespace umouse {
             }
         }
 
-        float calcAheadWallDist(WallSensor& ws) {
-            int16_t ahead_l = ws.ahead_l();
-            int16_t ahead_r = ws.ahead_r();
-            float dist = 0.0;
-            if(ws.isAhead() && !ws.isLeft()) {
-                dist = hornerMethod(ahead_l, WALL_LA_POLY6_CONSTANT, 7);
-            } else if(ws.isAhead() && !ws.isRight()) {
-                dist = hornerMethod(ahead_r, WALL_RA_POLY6_CONSTANT, 7);
-            } else {
-                dist = (hornerMethod(ahead_l, WALL_LA_POLY6_CONSTANT, 7) +
-                        hornerMethod(ahead_r, WALL_RA_POLY6_CONSTANT, 7)) * 0.5;
-            }
-            return constrainL(dist, 0.045);
-        }
-
-
+/*
         void aheadWallCorrection(WallSensor& ws, uint8_t x_next, uint8_t y_next) {
             float ang_ = getAng();
             float x_ = getX();
@@ -296,7 +334,7 @@ namespace umouse {
                 y = nearest_wall_y + wall_dist;
             }
         }
-
+*/
 
         float calcWallCenterOffset() {
             float ang_ = getAng();
@@ -367,6 +405,8 @@ namespace umouse {
         double beta;
         double x;
         double y;
+        double x_pre;
+        double y_pre;
         double x_d_;
         double y_d_;
 
@@ -634,38 +674,6 @@ namespace umouse {
         double deg2rad(double deg) {
             return PI * deg/180.0;
         }
-
-        //y = 2E-21x6 - 3E-17x5 + 2E-13x4 - 4E-10x3 + 5E-07x2 - 0.0003x + 0.1612
-        const float WALL_LA_POLY6_CONSTANT[7] = {
-            0.000000000000000000002496979705f,
-            -0.000000000000000031343123812308f,
-            0.000000000000152350727274190000f,
-            -0.000000000364670883847464000000f,
-            0.000000455240592245447000000000f,
-            -0.000300062017225004000000000000f,
-            0.161200042128944000000000000000f
-        };
-
-
-        // ra
-        //y = 3E-21x6 - 4E-17x5 + 2E-13x4 - 4E-10x3 + 5E-07x2 - 0.0003x + 0.1679
-        const float WALL_RA_POLY6_CONSTANT[7] = {
-            0.000000000000000000003120871021f,
-            -0.000000000000000037347282693124f,
-            0.000000000000173869092712112000f,
-            -0.000000000401311698062999000000f,
-            0.000000488601588712184000000000f,
-            -0.000320169565262498000000000000f,
-            0.167931370815903000000000000000f
-        };
-
-        float hornerMethod(float x, const float a[], int n) {
-            float f = a[0];
-            for (int i = 1; i < n; i++)
-                f = f*x + a[i];
-            return f;
-        }
-
 
     };
 

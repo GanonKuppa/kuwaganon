@@ -315,8 +315,8 @@ namespace umouse {
                 return;
             }
 
-            float x_bre = 0.0;
-            if (a_dec != 0.0)
+            float x_bre = 0.0f;
+            if (a_dec != 0.0f)
                 x_bre = (v * v - v_end * v_end) / (2.0f * a_dec);
 
             if (x_bre > (target_dist - cumulative_dist))
@@ -598,6 +598,9 @@ namespace umouse {
         StopTrajectory(float stop_time_, float x_, float y_, float ang_) {
             init(x_, y_, 0.0f, 0.0f, ang_, 0.0f, 0.0f);
             motion_type = EMotionType::STOP;
+            turn_type = turn_type_e::STOP;
+            turn_dir = turn_dir_e::NO_TURN;
+
             stop_time = stop_time_;
         }
 

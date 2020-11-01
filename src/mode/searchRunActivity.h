@@ -246,13 +246,13 @@ namespace umouse {
                      return;
                 }
 
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.04f, v, v, 0.05f, a, a);
-                auto traj1 = StraightTrajectory::create(0.005f, 0.05f, 0.05f, 0.05f, 0.0f, 0.0f);
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.05f, a, a);
+                //auto traj1 = StraightTrajectory::create(0.005f, 0.05f, 0.05f, 0.05f, 0.0f, 0.0f);
                 auto traj2 = StopTrajectory::create(0.2f);
                 auto traj3 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
                 auto traj4 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
                 m.trajCommander.push(std::move(traj0));
-                m.trajCommander.push(std::move(traj1));
+                //m.trajCommander.push(std::move(traj1));
                 m.trajCommander.push(std::move(traj2));
                 m.trajCommander.push(std::move(traj3));
                 m.trajCommander.push(std::move(traj4));
