@@ -59,32 +59,41 @@ namespace umouse {
       public:
 
         virtual void update(WallSensor& ws, bool isRWall, bool isLWall) {
-            if((ws.isRight_for_ctrl() == false &&
-                    ws.isLeft_for_ctrl() == false ) ||
-                    ws.isAhead_l() == true ||
-                    ws.isAhead_r() == true ||
-                    (isRWall == false &&
-                     isLWall == false ) ) {
+            if( ws.calcAheadWallDist() < 0.08 ||                
+                (isRWall == false &&
+                 isLWall == false ) ) {
                 reset();
                 return;
             }
 
-            int16_t e_fr = 0;
-            int16_t e_fl = 0;
             float error = 0.0f;
-#if 0            
-            if(ws.isRight_for_ctrl() == true && isRWall == true) e_fr = +(ws.right() - ws.center_r() );
-            if(ws.isLeft_for_ctrl() == true && isLWall == true) e_fl = -(ws.left() - ws.center_l() );
+            float dist = 0.045f;
+            if( (isLWall && ws.isLeft()) && (isRWall && ws.isRight()) ) dist = (0.09f - ws.dist_l() + ws.dist_r()) * 0.5;
+            else if((isLWall && ws.isLeft())) dist = 0.09f - ws.dist_l();
+            else if(isRWall && ws.isRight()) dist = ws.dist_r();
 
-            e_fr = constrain(e_fr, -ws.center_r()*1.5f, ws.center_r()*1.5f);
-            e_fl = constrain(e_fl, -ws.center_l()*1.5f, ws.center_l()*1.5f);
-#endif
-            e_fr =   10000 * ws.center_dist_r();
-            e_fl = - 10000 * ws.center_dist_l();
-            //if(ABS(e_fr) > ABS(e_fl)) error = (float) e_fr;
-            //else error = (float) e_fl;
+            float target_line = 0.045f;
+            
+            if     (ABS(dist - 0.055f) <  0.005f ) target_line = 0.055f;
+            else if(ABS(dist - 0.045f) <= 0.005f ) target_line = 0.045f;
+            else if(ABS(dist - 0.035f) <  0.005f ) target_line = 0.035f;
+            else                                   target_line = 0.045f;
+            
 
-            error = (float)(e_fr + e_fl) / 2.0f;
+            e_r0 =   10000 * ws.center_dist_r(target_line);
+            e_l0 = - 10000 * ws.center_dist_l(0.09f - target_line);
+            
+
+            bool is_r_high_volatility = (ABS(e_r0 - e_r1) > 10);
+            bool is_l_high_volatility = (ABS(e_l0 - e_l1) > 10);            
+
+            bool is_right = ws.isRight() && isRWall && !is_r_high_volatility;
+            bool is_left =  ws.isLeft() && isLWall && !is_l_high_volatility;
+
+            if(is_right && is_left) error = (float)(e_r0 + e_l0) / 2.0f;
+            else if(is_right) error = (float)(e_r0);
+            else if(is_left) error = (float)(e_l0);
+            else error = 0.0f;
 
             e_k0 = error;
 
@@ -95,8 +104,27 @@ namespace umouse {
             u_k1 = u_k0;
             e_k1 = e_k0;
             ud_k1 = ud_k0;
+            
+            e_r1 = e_r0;
+            e_l1 = e_l0;
         };
+      
+      WallPidfController(){
+        e_r0 = 0;
+        e_l0 = 0;
+        
+        e_r1 = 0;
+        e_l1 = 0;
 
+      }
+      
+      private:
+        int16_t e_r0;
+        int16_t e_l0;
+
+        int16_t e_r1;
+        int16_t e_l1;
+        
 
     };
 

@@ -69,7 +69,7 @@ namespace umouse {
     class UMouse {
       public:
         static constexpr float WALL2MOUSE_CENTER_DIST = 0.0183;
-        static constexpr float READ_WALL_OFFSET = 0.01;
+        static constexpr float READ_WALL_OFFSET = 0.002;
         static constexpr float DELTA_T = 0.0005;
 
         // -32768 から 32767
@@ -93,7 +93,7 @@ namespace umouse {
             return instance;
         }
 
-        void update() {
+        void update_1m() {
             ICM20602& icm = ICM20602::getInstance();
             WheelOdometry& wo = WheelOdometry::getInstance();
             PowerTransmission& pt = PowerTransmission::getInstance();
@@ -101,8 +101,18 @@ namespace umouse {
             PseudoDialL& pdl = PseudoDialL::getInstance();
             PseudoDialR& pdr = PseudoDialR::getInstance();
 
-
             posEsti.update(wo.getAveV(), (double)icm.omega_f[2], (double)icm.acc_f[1], (double)icm.acc_f[0], trajCommander.getMotionType(), ws);
+
+        }
+
+        void update_500u() {
+            ICM20602& icm = ICM20602::getInstance();
+            WheelOdometry& wo = WheelOdometry::getInstance();
+            PowerTransmission& pt = PowerTransmission::getInstance();
+            WallSensor& ws = WallSensor::getInstance();
+            PseudoDialL& pdl = PseudoDialL::getInstance();
+            PseudoDialR& pdr = PseudoDialR::getInstance();
+
             trajCommander.update(posEsti.getX(), posEsti.getY(), posEsti.getAng());
 
             if(pdl.getEnable() || pdr.getEnable()){

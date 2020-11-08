@@ -156,13 +156,9 @@ namespace umouse {
             }
 
             if( (isRWall || isLWall) &&
-                    (WallSensor::getInstance().isRight_for_ctrl() ||
-                     WallSensor::getInstance().isLeft_for_ctrl()) &&
-                    motion_type == EMotionType::STRAIGHT_WALL_CENTER &&
-                    pm.wall_PIDF_enable == true
-                    //fabs(esti.calcWallCenterOffset()) > 0.001
+                 motion_type == EMotionType::STRAIGHT_WALL_CENTER &&
+                 pm.wall_PIDF_enable == true
               ) {
-
                 wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall);
                 target_rot_x += wall_pidf.getControlVal();
                 pos_pidf.reset();

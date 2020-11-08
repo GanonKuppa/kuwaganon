@@ -130,35 +130,31 @@ void timeInterrupt(void) {
     }
     //スロット0
     if (int_tick_count % 4 == 0) {
-        if (getElapsedMsec() > 5000) {
-            icm.update();
-            mouse.update();
+        if (getElapsedMsec() > 5000) {                        
+            wheelOdometry.update();
+            wallSen.update();
             sendDataSCIFA9();
         }
     }
     //スロット1
     if (int_tick_count % 4 == 0) {
-        wheelOdometry.update();
-        gamepad.update();
-        wallSen.update();
-
+        icm.update();
+        mouse.update_1m();
+        mouse.update_500u();
+        gamepad.update();        
     }
     //スロット2
     if (int_tick_count % 4 == 2) {
-        if (getElapsedMsec() > 5000) {
-            icm.update();
-            mouse.update();
+        if (getElapsedMsec() > 5000) {            
             sendDataSCIFA9();
         }
     }
     //スロット3
-    if (int_tick_count % 4 == 3) {
-        //wheelOdometry.update();
+    if (int_tick_count % 4 == 3) {        
+        mouse.update_500u();
         dialL.update();
         dialR.update();
-        fcled.update();
-        //wallSen.update();
-
+        fcled.update();        
     }
 
     /////毎回行う処理/////
@@ -221,17 +217,6 @@ void periperalInit() {
     initRSPI0();
     initRSPI1();
 
-    //時間測定
-    initTPU0();
-    initCMTW0();
-    initCMTW1();
-
-    //AD
-    initAD();
-
-    //位相係数
-    initMTU1();
-    initMTU2();
 
     //PWM
 
@@ -258,6 +243,19 @@ void periperalInit() {
     //umouse::PowerTransmission::getInstance().test_z_to_z_enc_l();
     //umouse::PowerTransmission::getInstance().debug_calib_enc_r();
     //umouse::PowerTransmission::getInstance().debug_calib_enc_l();    
+
+    //時間測定
+    initTPU0();
+    initCMTW0();
+    initCMTW1();
+
+    //AD
+    initAD();
+
+    //位相係数
+    initMTU1();
+    initMTU2();
+
 
 }
 

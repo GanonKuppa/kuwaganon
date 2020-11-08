@@ -64,9 +64,9 @@ constexpr float R_WALL_DIST_TABLE_OUT[R_WALL_DIST_TABLE_SIZE] = {
 };
 
 
-constexpr int LA_WALL_DIST_TABLE_SIZE = 31;
+constexpr int LA_WALL_DIST_TABLE_SIZE = 32;
 constexpr float LA_WALL_DIST_TABLE_IN[LA_WALL_DIST_TABLE_SIZE] = {
-    25.0f,50.0f,100.0f,150.0f,200.0f,
+    10.0f,25.0f,50.0f,100.0f,150.0f,200.0f,
     250.0f,300.0f,350.0f,400.0f,450.0f,
     500.0f,550.0f,600.0f,650.0f,700.0f,
     750.0f,800.0f,850.0f,900.0f,950.0f,
@@ -76,18 +76,43 @@ constexpr float LA_WALL_DIST_TABLE_IN[LA_WALL_DIST_TABLE_SIZE] = {
 };
 
 constexpr float LA_WALL_DIST_TABLE_OUT[LA_WALL_DIST_TABLE_SIZE] = {
-    0.119702211f,0.097235147f,0.078984956f,0.069941447f,0.064160167f,
-    0.060007036f,0.056814046f,0.054247331f,0.052117862f,0.05030903f,
-    0.048744237f,0.047370679f,0.046150544f,0.0450559f,0.044065579f,
-    0.043163187f,0.042335793f,0.041573027f,0.040866463f,0.040209167f,
-    0.039595368f,0.03902022f,0.038479615f,0.037970044f,0.037488488f,
-    0.037032333f,0.036599299f,0.036187392f,0.035794853f,0.035420127f,
-    0.035061833f
+    0.134621273f,
+    0.105212619f,
+    0.087315382f,
+    0.072462563f,
+    0.064974829f,
+    0.060136289f,
+    0.056632773f,
+    0.053922259f,
+    0.051732014f,
+    0.04990678f,
+    0.048350339f,
+    0.046999232f,
+    0.045809561f,
+    0.04474979f,
+    0.04379656f,
+    0.042932118f,
+    0.042142686f,
+    0.041417367f,
+    0.040747409f,
+    0.040125685f,
+    0.039546317f,
+    0.039004408f,
+    0.038495837f,
+    0.038017106f,
+    0.037565223f,
+    0.037137609f,
+    0.036732027f,
+    0.036346528f,
+    0.035979399f,
+    0.035629133f,
+    0.035294392f,
+    0.034973987f
 };
 
-constexpr int RA_WALL_DIST_TABLE_SIZE = 31;
+constexpr int RA_WALL_DIST_TABLE_SIZE = 32;
 constexpr float RA_WALL_DIST_TABLE_IN[RA_WALL_DIST_TABLE_SIZE]{
-    25.0f,50.0f,100.0f,150.0f,200.0f,
+    10.0f,25.0f,50.0f,100.0f,150.0f,200.0f,
     250.0f,300.0f,350.0f,400.0f,450.0f,
     500.0f,550.0f,600.0f,650.0f,700.0f,
     750.0f,800.0f,850.0f,900.0f,950.0f,
@@ -97,13 +122,38 @@ constexpr float RA_WALL_DIST_TABLE_IN[RA_WALL_DIST_TABLE_SIZE]{
 };
 
 constexpr float RA_WALL_DIST_TABLE_OUT[RA_WALL_DIST_TABLE_SIZE] = {
-    0.134209416,0.108409102,0.087568621,0.077288059,0.070734497,
-    0.066036339,0.062430263,0.059535438,0.057136552,0.055100946,
-    0.053341564,0.051798454,0.050428718,0.04920069,0.048090391,
-    0.047079261,0.046152666,0.045298882,0.044508383,0.043773335,
-    0.043087223,0.042444576,0.04184076,0.041271816,0.04073434,
-    0.040225386,0.039742388,0.039283096,0.038845532,0.038427945,
-    0.038028781
+    0.174400027f,
+    0.131155711f,
+    0.105722367f,
+    0.085220985f,
+    0.075124599f,
+    0.068695173f,
+    0.064089547f,
+    0.060556649f,
+    0.057722002f,
+    0.055373999f,
+    0.053382321f,
+    0.051661484f,
+    0.050152635f,
+    0.048813675f,
+    0.047613542f,
+    0.046528715f,
+    0.045540993f,
+    0.04463603f,
+    0.043802335f,
+    0.043030573f,
+    0.042313067f,
+    0.041643435f,
+    0.041016318f,
+    0.040427178f,
+    0.039872138f,
+    0.039347866f,
+    0.038851477f,
+    0.038380459f,
+    0.037932612f,
+    0.037505998f,
+    0.037098906f,
+    0.036709813f
 };
 
 
@@ -221,13 +271,13 @@ namespace umouse {
         }
 
         bool isAhead_l() {
-            if(ahead_dist_l() < 0.115) return true;
+            if(ahead_dist_l() < 0.13) return true;
             else return false;
 
         }
 
         bool isAhead_r() {
-            if(ahead_dist_r() < 0.115) return true;
+            if(ahead_dist_r() < 0.13) return true;
             else return false;
         }
 
@@ -349,8 +399,8 @@ namespace umouse {
         float calcAheadWallDist() {
             float ahead_dist_l = linearInterpolation( ahead_l(), LA_WALL_DIST_TABLE_IN, LA_WALL_DIST_TABLE_OUT, LA_WALL_DIST_TABLE_SIZE);
             float ahead_dist_r = linearInterpolation( ahead_r(), RA_WALL_DIST_TABLE_IN, RA_WALL_DIST_TABLE_OUT, RA_WALL_DIST_TABLE_SIZE);
-            if (ahead_dist_l > 0.0115 && ahead_dist_r > 0.0115) return -1.0f;
-            else return ahead_dist_l + ahead_dist_r;
+            if (ahead_dist_l > 0.13 || ahead_dist_r > 0.13) return 100.0f;
+            else return (ahead_dist_l + ahead_dist_r)/2.0f;
         }
 
 
@@ -382,14 +432,14 @@ namespace umouse {
             return dist;            
         }
 
-        float center_dist_l() {
+        float center_dist_l(float center_line = 0.045f) {
             float dist = linearInterpolation( left(), L_WALL_DIST_TABLE_IN, L_WALL_DIST_TABLE_OUT, L_WALL_DIST_TABLE_SIZE);
-            return 0.045f - dist;
+            return center_line - dist;
         }
         
-        float center_dist_r() {
+        float center_dist_r(float center_line = 0.045f) {
             float dist = linearInterpolation( right(), R_WALL_DIST_TABLE_IN, R_WALL_DIST_TABLE_OUT, R_WALL_DIST_TABLE_SIZE);
-            return 0.045f -dist;            
+            return center_line - dist;            
         }
 
 

@@ -79,7 +79,7 @@ namespace umouse {
         //waitmsec(10);
 
         //lpf gyro
-        writeReg(0x1A, 0x02); //
+        writeReg(0x1A, 0x00); //
         waitmsec(10);
 
         //range gyro

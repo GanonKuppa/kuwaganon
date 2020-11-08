@@ -27,7 +27,7 @@ namespace umouse {
             count = 0;
 
             for (uint8_t i = 0; i < BUFF_SIZE; i++) {
-                buff.push_front(0);
+                buff.push_front(4.2);
             }
 
         }

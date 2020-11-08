@@ -133,7 +133,8 @@ namespace umouse {
                     
                     if (m.maze.existAWall(x_next, y_next, m.direction)){
                         printfAsync("pre:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
-                        //m.posEsti.aheadWallCorrection(ws, x_next, y_next);
+                        m.posEsti.aheadWallCorrection(ws, x_next, y_next);
+                        m.posEsti.sideWallCorrection(ws, x_next, y_next);
                         printfAsync("fol:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
                         SE_I7();
                     }
@@ -267,13 +268,13 @@ namespace umouse {
                 ParameterManager& pm = ParameterManager::getInstance();
                 rot_times *= SIGN(m.posEsti.calcWallCenterOffset());
 
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.04f, v, v, 0.05f, a, a);
-                auto traj1 = StraightTrajectory::create(0.005f, 0.05f, 0.05f, 0.05f, 0.0, 0.0);
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.02f, v, v, 0.05f, a, a);
+                //auto traj1 = StraightTrajectory::create(0.005f, 0.05f, 0.05f, 0.05f, 0.0, 0.0);
                 auto traj2 = StopTrajectory::create(0.4f);
                 auto traj3 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                auto traj4 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
+                auto traj4 = StraightTrajectory::createAsWallCenter(0.02f, 0.0f, v, v, a, a);
                 m.trajCommander.push(std::move(traj0));
-                m.trajCommander.push(std::move(traj1));
+                //m.trajCommander.push(std::move(traj1));
                 m.trajCommander.push(std::move(traj2));
                 m.trajCommander.push(std::move(traj3));
                 m.trajCommander.push(std::move(traj4));

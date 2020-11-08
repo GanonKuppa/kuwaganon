@@ -67,19 +67,6 @@ namespace umouse {
             on_wall_center_pre = false;
         }
 
-        bool __isfinite(float x){
-            union { float f; int i; } a;
-            a.f = x;
-            if( ((a.i >> 23) & 0xff) == 255) return false;
-            else return true;
-        }
-
-        bool __isfinite(double x){
-            union { double f; long i; } a;
-            a.f = x;
-            if( ((a.i >> 52) & 0x007ff) == 2047) return false;
-            else return true;
-        }
 
 
         void update(double v_, double ang_v_, double a_y, double a_x, EMotionType motion_type, WallSensor& ws) {
@@ -96,9 +83,6 @@ namespace umouse {
                 y = y_pre;
             }
 
-            if(!__isfinite(v_)){
-                printfAsync("v nan %f \n", v_);                
-            }
 
 
             ICM20602& icm = ICM20602::getInstance();            
@@ -112,7 +96,7 @@ namespace umouse {
             // 角度算出
             alpha = (ang_v_ - ang_v) / DELTA_T;
             ang_v = ang_v_;
-            ang += calcAdamsBashforthDelta(ang_v, ang_v_1, ang_v_2);
+            ang += calcEulerDelta(ang_v);
             ang = fmod(ang + 360.0, 360.0);
 
             double ang_rad = deg2rad(ang);
@@ -143,20 +127,10 @@ namespace umouse {
                 // グローバル座標系速度算出
                 x_d = v * cos_val;
                 y_d = v * sin_val;
-                
-                if(!__isfinite(v) || !__isfinite(cos_val) || !__isfinite(sin_val) || !__isfinite(ang_v_rad)){
-                    printfAsync("%f,%f,%f, %f \n", v, cos_val, sin_val, ang_v_rad);                
-                }
+                                
+                x += calcEulerDelta(x_d);
+                y += calcEulerDelta(y_d);
 
-                // グローバル座標系位置算出
-                if(fabs(ang_v) > 10.0) {
-                    x += x_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
-                    y += y_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
-
-                } else {
-                    x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);
-                    y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
-                }
             } else if(motion_type == EMotionType::CURVE) {
                 // 並進速度算出
                 v = v_;
@@ -188,8 +162,8 @@ namespace umouse {
                     y += y_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
 
                 } else {
-                    x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);                    y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
-
+                    x += calcEulerDelta(x_d);
+                    y += calcEulerDelta(y_d);
                 }
             } else if(motion_type == EMotionType::STOP ||
                       motion_type == EMotionType::SPINTURN ||
@@ -218,8 +192,8 @@ namespace umouse {
                 }
 
                 // グローバル座標系位置算出
-                x += calcAdamsBashforthDelta(x_d, x_d_1, x_d_2);
-                y += calcAdamsBashforthDelta(y_d, y_d_1, y_d_2);
+                x += calcEulerDelta(x_d);
+                y += calcEulerDelta(y_d);
 
             }
 
@@ -248,7 +222,7 @@ namespace umouse {
                 x_pre = x;
             }
 
-            if(__isfinite(x)){
+            if(__isfinite(y)){
                 y_pre = y;
             }
 
@@ -259,8 +233,7 @@ namespace umouse {
             //cornerRCorrection(ws);
             //diagCornerRCorrection(ws);
             //diagCornerLCorrection(ws);
-            //nearWallCorrection(motion_type, ws);
-            //aheadWallCorrection(ws, motion_type);
+            //nearWallCorrection(motion_type, ws);            
             //contactWallCorrection(motion_type, ws);
         }
 
@@ -301,22 +274,78 @@ namespace umouse {
             }
         }
 
-/*
+        void sideWallCorrection(WallSensor& ws, uint8_t x_next, uint8_t y_next) {
+            float ang_ = getAng();
+            float x_ = getX();
+            float y_ = getY();
+            float wall_dist_r = ws.dist_r();
+            float wall_dist_l = ws.dist_l();
+            float ok_ang = 3.0f;
+            bool good_posture = (ang >= 360.0 - ok_ang || ang < ok_ang)  ||
+                                (ang_ >= 90.0f - ok_ang && ang_ < 90.0f + ok_ang) ||
+                                (ang_ >= 180.0f - ok_ang && ang_ < 180.0f + ok_ang) ||
+                                (ang_ >= 270.0f - ok_ang && ang_ < 270.0f + ok_ang);
+
+            bool is_right = ws.isRight();
+            bool is_left = ws.isLeft();
+            
+            if( !good_posture || (!is_right && !is_left) ){
+                return;
+            }
+
+            if(ang_ >= 315.0 || ang_ < 45.0) {
+                float right_wall_y = y_next * 0.09f;
+                float left_wall_y =  (y_next + 1) * 0.09f;
+                float y_r = right_wall_y + wall_dist_r;
+                float y_l = left_wall_y - wall_dist_l;                                
+                if(is_left && is_right) y = (y_r + y_l) * 0.5;
+                else if(is_left) y = y_l;
+                else if(is_right) y = y_r;
+
+            } else if(ang_ >= 45.0 && ang_ < 135.0) {
+                float right_wall_x = (x_next + 1) * 0.09f;
+                float left_wall_x = x_next * 0.09f;
+                float x_r = right_wall_x - wall_dist_r;
+                float x_l = left_wall_x + wall_dist_l;
+                if(is_left && is_right) x = (x_r + x_l) * 0.5;
+                else if(is_left) x = x_l;
+                else if(is_right) x = x_r;
+
+            } else if(ang_ >= 135.0 && ang_ < 225.0) {
+                float right_wall_y = (y_next + 1) * 0.09f;
+                float left_wall_y = y_next * 0.09f;
+                float y_r = right_wall_y - wall_dist_r;
+                float y_l = left_wall_y + wall_dist_l;                                
+                if(is_left && is_right) y = (y_r + y_l) * 0.5;
+                else if(is_left) y = y_l;
+                else if(is_right) y = y_r;
+
+            } else if(ang_ >= 225.0 && ang_ < 315.0) {
+                float right_wall_x = x_next * 0.09f;
+                float left_wall_x = (x_next + 1) * 0.09f;
+                float x_r = right_wall_x + wall_dist_r;
+                float x_l = left_wall_x - wall_dist_l;
+                if(is_left && is_right) x = (x_r + x_l) * 0.5;
+                else if(is_left) x = x_l;
+                else if(is_right) x = x_r;
+            }
+        }
+
+
+
+
         void aheadWallCorrection(WallSensor& ws, uint8_t x_next, uint8_t y_next) {
             float ang_ = getAng();
             float x_ = getX();
             float y_ = getY();
-            float wall_dist = calcAheadWallDist(ws);
-            bool good_posture = (ang >= 355.0 || ang < 5.0)  ||
-                                (ang_ >= 85.0 && ang_ < 95.0) ||
-                                (ang_ >= 175.0 && ang_ < 185.0) ||
-                                (ang_ >= 265.0 && ang_ < 275.0);
+            float wall_dist = ws.calcAheadWallDist();
+            float ok_ang = 3.0f;
+            bool good_posture = (ang >= 360.0 - ok_ang || ang < ok_ang)  ||
+                                (ang_ >= 90.0f - ok_ang && ang_ < 90.0f + ok_ang) ||
+                                (ang_ >= 180.0f - ok_ang && ang_ < 180.0f + ok_ang) ||
+                                (ang_ >= 270.0f - ok_ang && ang_ < 270.0f + ok_ang);
 
-            if( !good_posture ||
-                    !(ws.isAhead()) ||
-                    (wall_dist > 0.135) ||
-                    (ws.isLeft() && ws.isRight())
-              ) {
+            if( !good_posture || !ws.isAhead() ) {
                 return;
             }
 
@@ -334,7 +363,7 @@ namespace umouse {
                 y = nearest_wall_y + wall_dist;
             }
         }
-*/
+
 
         float calcWallCenterOffset() {
             float ang_ = getAng();
@@ -417,7 +446,7 @@ namespace umouse {
         float diag_corner_r_cool_down_time;
         float diag_corner_l_cool_down_time;
 
-        const double DELTA_T = 0.0005;
+        const double DELTA_T = 0.001;
         const float SQRT_2 = 1.4142356f;
         const double PI = 3.14159265358979323846264338327950288;
 
@@ -433,6 +462,22 @@ namespace umouse {
 
         double x_d_2;
         double y_d_2;
+
+        bool __isfinite(float x){
+            union { float f; uint32_t i; } a;
+            a.f = x;
+            if( ((a.i >> 23) & 0xff) == 255) return false;
+            else return true;
+        }
+
+        bool __isfinite(double x){
+            union { double f; uint64_t i; } a;
+            a.f = x;
+            if( ((a.i >> 52) & 0x007ff) == 2047) return false;
+            else return true;
+        }
+
+
 
         void onWallCenterCorrection(WallSensor& ws, EMotionType motion_type) {
             if(motion_type == EMotionType::STRAIGHT_WALL_CENTER && ws.isOnWallCenter() && ws.isAhead() == false && v > 0.1f && fabsf(ang_v) < 50.0f) {
@@ -591,15 +636,17 @@ namespace umouse {
         }
 
 
+        double calcCircularArcDelta(double ang_v_rad, double x_d, double y_d){
+            return x_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
+        }
 
-
-
-
+        double calcEulerDelta(double s_0){
+            return s_0 * DELTA_T;
+        }
 
         double calcAdamsBashforthDelta(double s_0, double s_1, double s_2 ) {
-            return s_0 * DELTA_T; // 単純なオイラー法
-
             if(s_1 == 0.0 && s_2 == 0.0) return s_0 * DELTA_T;
+            else if(s_2 == 0.0) return s_0 * DELTA_T;
             else return (23.0 * s_0 - 16.0 * s_1 + 5.0 * s_2) / 12.0 * DELTA_T;
         }
 
