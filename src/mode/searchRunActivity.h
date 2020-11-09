@@ -159,8 +159,7 @@ namespace umouse {
                             spin180(rot_times);
                         }
 
-                        else if (ABS(m.posEsti.calcDiffAngle()) > 7.5f ||
-                                 ABS(m.posEsti.calcWallCenterOffset()) > 0.01f ||
+                        else if (ABS(m.posEsti.calcDiffAngle()) > 7.5f ||                                 
                                  mode == ESearchMode::SPIN_TURN_SERCH ||
                                  mode == ESearchMode::SPIN_TURN_SERCH_BOTHWAYS
                                 ) {
