@@ -112,7 +112,16 @@ void timeInterrupt(void) {
     umouse::PseudoDialR& dialR = umouse::PseudoDialR::getInstance();
 
     //--------------------------------------//
+    //スロット0 センサデータの更新
+    if (int_tick_count % 4 == 0) {
+        if (getElapsedMsec() > 5000) {                        
+            wheelOdometry.update();
+            wallSen.update();
+            icm.update();
+        }
+    }
 
+    //-------------------------------------//
     //UARTの送受信処理
     sendDataSCIFA9();
     recieveDataSCIFA9();
@@ -131,14 +140,11 @@ void timeInterrupt(void) {
     //スロット0
     if (int_tick_count % 4 == 0) {
         if (getElapsedMsec() > 5000) {                        
-            wheelOdometry.update();
-            wallSen.update();
-            sendDataSCIFA9();
+            sendDataSCIFA9();        
         }
     }
     //スロット1
     if (int_tick_count % 4 == 0) {
-        icm.update();
         mouse.update_1m();
         mouse.update_500u();
         gamepad.update();        
@@ -185,7 +191,7 @@ int main() {
     umouse::UMouse::getInstance().direct_duty_set_enable = true;
     //umouse::PowerTransmission::getInstance().debug_duty_l(-1);
     //umouse::PowerTransmission::getInstance().debug_duty_r(-1);
-    //umouse::PowerTransmission::getInstance().debug_duty();
+    umouse::PowerTransmission::getInstance().debug_duty();
 
     umouse::UMouse::getInstance().direct_duty_set_enable = false;
     
@@ -238,11 +244,8 @@ void periperalInit() {
     //initWdt();
     //startWdt();
 
-    // エンコーダのキャリブレーション
+    //エンコーダのZ位置キャリブレーション
     umouse::PowerTransmission::getInstance().calib_z();
-    //umouse::PowerTransmission::getInstance().test_z_to_z_enc_l();
-    //umouse::PowerTransmission::getInstance().debug_calib_enc_r();
-    //umouse::PowerTransmission::getInstance().debug_calib_enc_l();    
 
     //時間測定
     initTPU0();
@@ -255,6 +258,23 @@ void periperalInit() {
     //位相係数
     initMTU1();
     initMTU2();
+
+    //エンコーダの補正テーブル作成用処理 
+    //umouse::PowerTransmission::getInstance().test_z_to_z_enc_l();
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.05);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.1);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.15);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.2);
+
+
+    //umouse::PowerTransmission::getInstance().debug_calib_enc_r(true);
+
+    umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.05);    
+    umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.1);    
+    umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.15);    
+    umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.2);    
+    //umouse::PowerTransmission::getInstance().debug_calib_enc_l(true);
+
 
 
 }
