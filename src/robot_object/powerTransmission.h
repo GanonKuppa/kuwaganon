@@ -363,25 +363,38 @@ namespace umouse {
             }
         }
 
-
-        void debug_duty() {
+        void make_table() {
             WheelOdometry &wodo = WheelOdometry::getInstance();
             printfSync("-----duty l r------\n");
-            for(int i=-20;i<20;i++){
+            for(int i=-60;i<60;i++){
                 LED_R_PIN = 1;
                 LED_G_PIN = 0;
                 LED_B_PIN = 0;
-                float duty = (float)i*0.01;
+                float duty = (float)i*0.005;
                 setDuty_R(duty);
                 setDuty_L(duty);
                 
                 waitmsec(500);
                 float vol_l = getVoltage() * getDuty_L();
                 float vol_r = getVoltage() * getDuty_R();
-                for(int j=0;j<100;j++){
-                    printfSync("%d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n",i ,duty, getVoltage(),(float)MTU2.TCNT  , (float)wodo.getV_L_COR(), (float)wodo.v_L_no_lerp, (float)wodo.getAveV_L()
-                                                                                                , (float)MTU1.TCNT, (float)wodo.v_R, (float)wodo.v_R_no_lerp, (float)wodo.getAveV_R(), wodo.getV(), wodo.getAveV(), 0);                    
+                startTimeuCount();
+                for(int j=0;j<400;j++){
+
+
+                    printfSync("%d, %d, %f, %f,"
+                               "%d, %d," 
+                               "%d, %d,"
+                               "%f,%f" 
+                               "\n",
+                               i ,getTimeuCount() ,duty, getVoltage(),
+                    wodo.getAbsCount_L(), wodo.getCountDiffL(), 
+                    wodo.getAbsCount_R(), wodo.getCountDiffR(),
+                    wodo.getAveV_L(), wodo.getAveV_R()
+                    );                    
+
+
                 }
+                endTimeuCount();
                 LED_R_PIN = 0;
                 LED_G_PIN = 0;
                 LED_B_PIN = 0;
@@ -416,6 +429,56 @@ namespace umouse {
             LED_B_PIN = 1;
 
         }
+
+
+
+
+        void debug_duty() {
+            WheelOdometry &wodo = WheelOdometry::getInstance();
+            printfSync("-----duty l r------\n");
+            for(int i=-20;i<20;i++){
+                LED_R_PIN = 1;
+                LED_G_PIN = 0;
+                LED_B_PIN = 0;
+                float duty = (float)i*0.01;
+                setDuty_R(duty);
+                setDuty_L(duty);
+                
+                waitmsec(500);
+                float vol_l = getVoltage() * getDuty_L();
+                float vol_r = getVoltage() * getDuty_R();
+                startTimeuCount();
+                for(int j=0;j<200;j++){
+
+                    printfSync("%d, %d, %f, %f,"
+                               "%f, %f, %f, %f, %f," 
+                               "%f, %f, %f, %f, %f," 
+                               "%f, %f, %f\n",
+                               i ,getTimeuCount() ,duty, getVoltage(),
+                    (float)wodo.getAbsCount_L(), (float)wodo.enc_l_lerp(MTU2.TCNT), (float)wodo.v_L_no_lerp, (float)wodo.v_L, (float)wodo.getAveV_L(), 
+                    (float)wodo.getAbsCount_R(), (float)wodo.enc_r_lerp(MTU1.TCNT), (float)wodo.v_R_no_lerp, (float)wodo.v_R, (float)wodo.getAveV_R(), 
+                    wodo.getV(), wodo.getAveV(), 0);                    
+
+/*
+                    printfSync("%d, %d, %f, %f,"
+                               "%d, %d," 
+                               "%d, %d" 
+                               "\n",
+                               i ,getTimeuCount() ,duty, getVoltage(),
+                    wodo.getAbsCount_L(), wodo.getCountDiffL(), 
+                    wodo.getAbsCount_R(), wodo.getCountDiffR());                    
+*/
+
+                }
+                endTimeuCount();
+                LED_R_PIN = 0;
+                LED_G_PIN = 0;
+                LED_B_PIN = 0;
+                setDuty(0.0, 0.0);
+                waitmsec(500);
+            }
+        }
+
 
 
         
@@ -480,6 +543,9 @@ namespace umouse {
 
 
 
+
+
+
         void debug_calib_enc_r(float duty, bool lerp=false) {
             uint32_t elapsed_time_list[83];
             float elapsed_time_ave_list[83];
@@ -538,7 +604,7 @@ namespace umouse {
                 
                 for(int j=0;j<loop_count;j++){
                     setDuty(0.0f, 0.0f);
-                    printfSync("%d, %d, %f\n",j*50 , elapsed_time_list[j], wodo.enc_r_lerp(j*50));
+                    //printfSync("%d, %d, %f\n",j*50 , elapsed_time_list[j], wodo.enc_r_lerp(j*50));
                     elapsed_time_ave_list[j] += ((float)elapsed_time_list[j] / (float)elapsed_time_list[82]);                    
                     LED_R_PIN = 1;
                     LED_G_PIN = 0;

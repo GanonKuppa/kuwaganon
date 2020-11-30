@@ -121,6 +121,7 @@ void timeInterrupt(void) {
         }
     }
 
+
     //-------------------------------------//
     //UARTの送受信処理
     sendDataSCIFA9();
@@ -192,6 +193,7 @@ int main() {
     //umouse::PowerTransmission::getInstance().debug_duty_l(-1);
     //umouse::PowerTransmission::getInstance().debug_duty_r(-1);
     umouse::PowerTransmission::getInstance().debug_duty();
+    //umouse::PowerTransmission::getInstance().make_table();
 
     umouse::UMouse::getInstance().direct_duty_set_enable = false;
     
@@ -261,18 +263,35 @@ void periperalInit() {
 
     //エンコーダの補正テーブル作成用処理 
     //umouse::PowerTransmission::getInstance().test_z_to_z_enc_l();
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.05);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.1);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.15);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.2);
+    //umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.05);    
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r411(0.05);
+/*
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.06);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.07);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.08);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.09);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.10);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.11);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.12);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.13);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.14);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.15);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.16);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.17);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.18);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.19);
+    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.20);
+    */
+    //umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.15);
+    //umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.2);
 
 
     //umouse::PowerTransmission::getInstance().debug_calib_enc_r(true);
 
-    umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.05);    
+    //umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.05);    
     umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.1);    
-    umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.15);    
-    umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.2);    
+    //umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.15);    
+    //umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.2);    
     //umouse::PowerTransmission::getInstance().debug_calib_enc_l(true);
 
 
