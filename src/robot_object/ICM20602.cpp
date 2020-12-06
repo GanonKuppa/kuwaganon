@@ -11,8 +11,8 @@
 #include "parameterManager.h"
 #include "communication.h"
 #include "timer.h"
-
-
+#include <deque>
+#include <stdlib.h>
 
 namespace umouse {
 
@@ -39,30 +39,6 @@ namespace umouse {
     }
 
     void ICM20602::init() {
-        //writeReg(107, 0x81);
-        //waitmsec(10);
-        /*    writeReg(17, 0xc9);
-            waitmsec(10);
-            writeReg(26, 0x00);
-            waitmsec(10);
-            writeReg(27, 0x18);
-            waitmsec(10);
-            writeReg(28, 0x18);
-            waitmsec(10);
-            writeReg(29, 0x04);
-            waitmsec(10);
-            writeReg(107, 0x01);*/
-        /*
-            writeReg(0x6B,0x80);
-            waitmsec(10);
-            writeReg(0x6B,0x00);
-            waitmsec(10);
-            writeReg(0x1A,0x00);
-            waitmsec(10);
-            writeReg(0x1B,0x18);
-            waitmsec(10);
-        */
-
         writeReg(0x6B, 0x80);
         waitmsec(10);
         writeReg(0x6B, 0x00);
@@ -70,16 +46,8 @@ namespace umouse {
         writeReg(0x6C, 0x00);
         waitmsec(10);
 
-        //55 INT Pin / Bypass Enable Configuration
-        //writeReg(0x37, 0x02);
-        //waitmsec(10);
-
-        //Register 26 – Configuration
-        //communicateNbyteRSPI1(0x1A, 0x01);
-        //waitmsec(10);
-
         //lpf gyro
-        writeReg(0x1A, 0x00); //
+        writeReg(0x1A, 0x00); // DLPF_CFG = 0 and FCHOICE_B=0 のとき 3-db BW = 250Hz
         waitmsec(10);
 
         //range gyro
@@ -91,7 +59,7 @@ namespace umouse {
         waitmsec(10);
 
         //lpf acc
-        writeReg(0x1D, 0x04); //0b0000 0100
+        writeReg(0x1D, 0x08); //0b0000 0001 ACCEL_FCHOICE_Bを1にしないと加速度の内部レートが4kHzにならない
         waitmsec(10);
 
         useSSLA0RSPI0();
@@ -115,11 +83,20 @@ namespace umouse {
         acc_ref[1] = pm.acc_y_ref;
         acc_ref[2] = pm.acc_z_ref;
 
+        for (uint8_t i = 0; i < OVER_SAMPLING_NUM; i++) {
+            gyro_x_list.push_front(0.0f);
+            gyro_y_list.push_front(0.0f);
+            gyro_z_list.push_front(0.0f);
+
+            acc_x_list.push_front(0.0f);
+            acc_y_list.push_front(0.0f);
+            acc_z_list.push_front(0.0f);
+        }
 
 
     }
 
-    void ICM20602::update() {
+    void ICM20602::update_over_sampling() {
         ParameterManager& pm = ParameterManager::getInstance();
 
         uint8_t accel_xout_h = readReg(0x3b);
@@ -130,9 +107,6 @@ namespace umouse {
 
         uint8_t accel_zout_h = readReg(0x3f);
         uint8_t accel_zout_l = readReg(0x40);
-
-        uint8_t temp_out_h = readReg(0x41);
-        uint8_t temp_out_l = readReg(0x42);
 
         uint8_t gyro_xout_h = readReg(0x43);
         uint8_t gyro_xout_l = readReg(0x44);
@@ -157,27 +131,79 @@ namespace umouse {
         acc_ref[1] = pm.acc_y_ref;
         acc_ref[2] = pm.acc_z_ref;
 
+        float omega_f_now[3];
+
+
         for (int i = 0; i < 3; i++) {
             omega_c[i] = (omega_raw[i] * 100 - omega_ref[i]) / 100;
-            omega_f[i] = omega_c[i] * GYRO_2000dps;
+            omega_f_now[i] = omega_c[i] * GYRO_2000dps;
         }
 
 
         if(omega_c[2] >= 0) omega_f[2] *= pm.gyro_scaler_left;
         else omega_f[2] *= pm.gyro_scaler_right;
 
-
+        float acc_f_now[3];
 
         acc_c[0] = acc_raw[0] - acc_ref[0];
-        acc_f[0] = 0.1 * (acc_c[0] * ACC_2g * G * pm.acc_x_scaler) + 0.9 * acc_f[0];
-        acc_c[0] = acc_raw[0] - acc_ref[0];
-        acc_f[0] = 0.1 * (acc_c[0] * ACC_2g * G * pm.acc_y_scaler) + 0.9 * acc_f[0];
-        acc_c[0] = acc_raw[0] - acc_ref[0];
-        acc_f[0] = 0.1 * (acc_c[0] * ACC_2g * G) + 0.9 * acc_f[0];
+        acc_f_now[0] = acc_c[0] * ACC_2g * G * pm.acc_x_scaler;
+        acc_c[1] = acc_raw[1] - acc_ref[1];
+        acc_f_now[1] = acc_c[1] * ACC_2g * G * pm.acc_y_scaler;
+        acc_c[2] = acc_raw[2] - acc_ref[2];
+        acc_f_now[2] = acc_c[2] * ACC_2g * G;
 
+        gyro_x_list.push_front(omega_f_now[0]);
+        gyro_x_list.pop_back();
+        gyro_y_list.push_front(omega_f_now[1]);
+        gyro_y_list.pop_back();
+        gyro_z_list.push_front(omega_f_now[2]);
+        gyro_z_list.pop_back();
+
+        acc_x_list.push_front(acc_f_now[0]);
+        acc_x_list.pop_back();
+        acc_y_list.push_front(acc_f_now[1]);
+        acc_y_list.pop_back();
+        acc_z_list.push_front(acc_f_now[2]);
+        acc_z_list.pop_back();
+
+
+    }
+
+    float ICM20602::getMedianAve(std::deque<float>& d) {
+        uint8_t size = d.size();
+        
+        float d_copy[OVER_SAMPLING_NUM];
+        for(int i=0;i<size;i++){
+            d_copy[i] = d[i];
+        }
+        quickSort_float(d_copy, 0, OVER_SAMPLING_NUM - 1);
+        float sum = 0.0f;
+        sum = (d_copy[1] + d_copy[2]);
+
+        return  sum /2.0f;
+    }
+
+
+    void ICM20602::update() {
+        uint8_t temp_out_h = readReg(0x41);
+        uint8_t temp_out_l = readReg(0x42);
+
+        omega_f[0] = gyro_x_list[0];
+        omega_f[1] = gyro_y_list[0];
+        omega_f[2] = getMedianAve(gyro_z_list);
+
+        acc_f[0] = getMedianAve(acc_x_list);
+        acc_f[1] = getMedianAve(acc_y_list);
+        acc_f[2] = acc_z_list[0];
+
+        float omega_f2_rad = DEG2RAD(omega_f[2]);
+
+        acc_f_cor[0] = acc_f[0];
+        acc_f_cor[1] = acc_f[1] - 0.005f * omega_f2_rad * omega_f2_rad;
 
         temp_raw = concatenate2Byte_int(temp_out_h, temp_out_l);
         temp_f =  temp_raw * T_25degC + RoomTemp_Offset;
+
 
         if(ABS(omega_f[0]) < 5.0 && ABS(omega_f[1]) < 5.0 && ABS(omega_f[2]) < 5.0 &&
                 ABS(acc_f[0]) < 0.2 && ABS(acc_f[1]) < 0.2) {
@@ -187,6 +213,7 @@ namespace umouse {
         if(acc_f[2]> G * 0.85) upsideDown_count++;
         else upsideDown_count = 0;
     }
+
 
     bool ICM20602::isStop() {
         if( stop_count > 25) return true;
@@ -205,9 +232,6 @@ namespace umouse {
      *
      */
     void ICM20602::calibOmegaOffset(uint32_t ref_num) {
-        uint32_t i = 0;
-
-
         int16_t omega_x[ref_num];
         int16_t omega_y[ref_num];
         int16_t omega_z[ref_num];
@@ -238,7 +262,7 @@ namespace umouse {
         quickSort_int16(omega_y, 0, ref_num - 1);
         quickSort_int16(omega_z, 0, ref_num - 1);
 
-        for (i = ref_num / 4; i < (ref_num * 3 / 4 + 1); i++) {
+        for (uint32_t i = ref_num / 4; i < (ref_num * 3 / 4 + 1); i++) {
             omega_x_sum += (float) (omega_x[i]);
             omega_y_sum += (float) (omega_y[i]);
             omega_z_sum += (float) (omega_z[i]);
@@ -290,28 +314,31 @@ namespace umouse {
             //printfAsync("%d\n",i);
         }
 
-        for (i = 0; i < ref_num; i++) {
+        quickSort_int16(acc_x, 0, ref_num - 1);
+        quickSort_int16(acc_y, 0, ref_num - 1);
+        quickSort_int16(acc_z, 0, ref_num - 1);
+
+        for (uint32_t i = ref_num / 4; i < (ref_num * 3 / 4 + 1); i++) {
             acc_x_sum += (float) (acc_x[i]);
             acc_y_sum += (float) (acc_y[i]);
             acc_z_sum += (float) (acc_z[i]);
         }
-        acc_ref[0] = (int16_t) (acc_x_sum / (float) ref_num);
-        acc_ref[1] = (int16_t) (acc_y_sum / (float) ref_num);
-        acc_ref[2] = (int16_t) (acc_z_sum / (float) ref_num);
-        int16_t ref_y_ = (int16_t) (acc_y_sum / (float) ref_num);
-        //writeEEPROMOffsetaccInt(&acc_offset_vec[0]);
-        printfAsync("=====ICM20602=====\n acc offset %d, %d, %d\n", acc_ref[0],
-                    acc_ref[1], acc_ref[2]);
+
+        acc_ref[0] = (int16_t) (2.0 * acc_x_sum / ((float) ref_num));
+        acc_ref[1] = (int16_t) (2.0 * acc_y_sum / ((float) ref_num));
+        acc_ref[2] = (int16_t) (2.0 * acc_z_sum / ((float) ref_num));
+        int16_t acc_y_ref__ = acc_ref[1];
+        printfAsync("=====ICM20602=====\n acc offset %d, %d, %d\n", acc_ref[0], acc_ref[1], acc_ref[2]);
 
         ParameterManager& pm = ParameterManager::getInstance();
         pm.write<int16_t>(153, (int16_t)acc_ref[0]);
-        pm.write<int16_t>(154, ref_y_);
+        pm.write<int16_t>(154, acc_y_ref__);
         pm.write<int16_t>(155, (int16_t)0);
         pm.acc_x_ref = acc_ref[0];
-        pm.acc_y_ref = acc_ref[1];
+        pm.acc_y_ref = acc_y_ref__;
         pm.acc_z_ref = 0;
-
-
+        printfAsync("icm %d, %d, %d\n", acc_ref[0], acc_ref[1], acc_ref[2]);
+        printfAsync("pm %d, %d, %d\n", pm.acc_x_ref, pm.acc_y_ref, pm.acc_z_ref);
     }
 
 

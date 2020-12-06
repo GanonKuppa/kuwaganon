@@ -11,6 +11,8 @@
 #include "powerTransmission.h"
 #include "wheelOdometry.h"
 #include "batVoltageMonitor.h"
+#include "logger.h"
+#include "wallsensor.h"
 //#include "adis16470.h"
 
 
@@ -54,7 +56,7 @@ namespace umouse {
             SEF();
 
             float x = 0.09f/2.0f;
-            float y = 0.09f/2.0f - m.WALL2MOUSE_CENTER_DIST;
+            float y = 0.09f/2.0f;
             float ang = 90.0;
 
             int8_t rot_times = -2;
@@ -67,23 +69,31 @@ namespace umouse {
 
 
             if(mode == 1) {
-                PowerTransmission& pt = PowerTransmission::getInstance();
+                Logger& logger = umouse::Logger::getInstance();
+                WallSensor& ws = WallSensor::getInstance();
                 FcLed& fcled = FcLed::getInstance();
-                WheelOdometry &wodo = WheelOdometry::getInstance();
-                auto traj = StopTrajectory::createAsDirectDutySet(500.0);
-                m.trajCommander.push(std::move(traj));
-                for(int i=-50;i<50;i++){
-                    fcled.turn(0,0,0);
-                    pt.setDuty(i*0.01, i*0.01);
-                    waitmsec(3000);
-                    for(int j=0;j<50;j++){
-                        float vol =  BatVoltageMonitor::getInstance().bat_vol * pt.getDuty_R();
-                        printfSync("%d, %f, %f, %f\n",i , vol, wodo.getAveV_L(), wodo.getAveV_R());
-                        waitmsec(1);
-                    }
-                    pt.setDuty(0.0, 0.0);
-                    waitmsec(500);
+
+                float v_ = 0.5;
+                float a_ = 3.0;
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f * 10.0f, 0.0f, v_, 0.05f, a_, a_);
+                auto traj1 = StopTrajectory::create(0.5);
+                m.trajCommander.push(std::move(traj0));
+                m.trajCommander.push(std::move(traj1));
+                
+                fcled.turn(0,0,1);
+                logger.start();
+                while(!m.trajCommander.empty()) {
+                    waitmsec(1);                    
                 }
+                logger.end();
+                
+                fcled.turn(0,1,0);
+                while( ws.getAheadOnTime() < 0.5) {
+                    waitmsec(200);                    
+                    SEB();                
+                }
+                fcled.turn(0,1,1);
+                logger.print();
 
             } else if(mode == 2) {
                 float v = pm.v_search_run;

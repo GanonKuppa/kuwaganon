@@ -72,10 +72,6 @@ namespace umouse {
                 duty_L = 0.0;
             } else duty_L = SIGN(duty) * abs_duty;
 
-            // voltage_in = 4.2 * duty_in;
-            // voltage_real * duty_real = offset_v + voltage_in 
-            // voltage_real * duty_real = offset_v + 4.2 * duty_in
-
             if (duty_L == 0.0) {
                 setDutyMTU0(1.0);
                 setDutyMTU4(1.0);
@@ -363,45 +359,6 @@ namespace umouse {
             }
         }
 
-        void make_table() {
-            WheelOdometry &wodo = WheelOdometry::getInstance();
-            printfSync("-----duty l r------\n");
-            for(int i=-60;i<60;i++){
-                LED_R_PIN = 1;
-                LED_G_PIN = 0;
-                LED_B_PIN = 0;
-                float duty = (float)i*0.005;
-                setDuty_R(duty);
-                setDuty_L(duty);
-                
-                waitmsec(500);
-                float vol_l = getVoltage() * getDuty_L();
-                float vol_r = getVoltage() * getDuty_R();
-                startTimeuCount();
-                for(int j=0;j<400;j++){
-
-
-                    printfSync("%d, %d, %f, %f,"
-                               "%d, %d," 
-                               "%d, %d,"
-                               "%f,%f" 
-                               "\n",
-                               i ,getTimeuCount() ,duty, getVoltage(),
-                    wodo.getAbsCount_L(), wodo.getCountDiffL(), 
-                    wodo.getAbsCount_R(), wodo.getCountDiffR(),
-                    wodo.getAveV_L(), wodo.getAveV_R()
-                    );                    
-
-
-                }
-                endTimeuCount();
-                LED_R_PIN = 0;
-                LED_G_PIN = 0;
-                LED_B_PIN = 0;
-                setDuty(0.0, 0.0);
-                waitmsec(500);
-            }
-        }
 
         void calib_z() {
             while(1){
@@ -451,24 +408,13 @@ namespace umouse {
                 for(int j=0;j<200;j++){
 
                     printfSync("%d, %d, %f, %f,"
-                               "%f, %f, %f, %f, %f," 
-                               "%f, %f, %f, %f, %f," 
-                               "%f, %f, %f\n",
+                               "%d, %d, %f, %f," 
+                               "%d, %d, %f, %f," 
+                               "%f, %f\n",
                                i ,getTimeuCount() ,duty, getVoltage(),
-                    (float)wodo.getAbsCount_L(), (float)wodo.enc_l_lerp(MTU2.TCNT), (float)wodo.v_L_no_lerp, (float)wodo.v_L, (float)wodo.getAveV_L(), 
-                    (float)wodo.getAbsCount_R(), (float)wodo.enc_r_lerp(MTU1.TCNT), (float)wodo.v_R_no_lerp, (float)wodo.v_R, (float)wodo.getAveV_R(), 
-                    wodo.getV(), wodo.getAveV(), 0);                    
-
-/*
-                    printfSync("%d, %d, %f, %f,"
-                               "%d, %d," 
-                               "%d, %d" 
-                               "\n",
-                               i ,getTimeuCount() ,duty, getVoltage(),
-                    wodo.getAbsCount_L(), wodo.getCountDiffL(), 
-                    wodo.getAbsCount_R(), wodo.getCountDiffR());                    
-*/
-
+                    wodo.getAbsCount_L(),  wodo.getCountDiffL(), (float)wodo.v_L, (float)wodo.getAveV_L(),
+                    wodo.getAbsCount_R(),  wodo.getCountDiffR(), (float)wodo.v_R, (float)wodo.getAveV_R(), 
+                    wodo.getV(), wodo.getAveV());                    
                 }
                 endTimeuCount();
                 LED_R_PIN = 0;
@@ -478,10 +424,6 @@ namespace umouse {
                 waitmsec(500);
             }
         }
-
-
-
-        
 
 
         void test_z_to_z_enc_l() {                        
@@ -538,173 +480,6 @@ namespace umouse {
             
             printfSync("-----L end --------\n");
         }
-
-
-
-
-
-
-
-
-        void debug_calib_enc_r(float duty, bool lerp=false) {
-            uint32_t elapsed_time_list[83];
-            float elapsed_time_ave_list[83];
-            float enc_lerp_list[83];
-            uint8_t ave_num = 1;            
-
-            for(int i=0;i<83;i++){
-                elapsed_time_ave_list[i] = 0.0f;
-                enc_lerp_list[i] = 0.0f;
-            }
-
-
-            WheelOdometry &wodo = WheelOdometry::getInstance();
-            
-            for(int round=0; round< ave_num; round++){               
-                printfSync("-----%d %f R start --------\n", round, duty);
-                setDuty(0.0f, -duty);
-                waitmsec(1000);
-                
-                while(1){
-                    LED_R_PIN = 1;
-                    LED_G_PIN = 1;
-                    LED_B_PIN = 0;
-                    if(PORTA.PIDR.BIT.B2 == 1){
-                        MTU1.TCNT = 0; //右ホイール
-                        break;
-                    } 
-                }                
-                
-                uint32_t loop_count = 0;
-
-                startTimeuCount();
-                while(1){
-                    elapsed_time_list[loop_count] = getTimeuCount();
-                    uint32_t count_now;
-                    if(lerp) count_now = wodo.enc_r_lerp( (MTU1.TCNT+4096)%4096 );
-                    else count_now = MTU1.TCNT;
-
-                    while(1){
-                        uint32_t count_target;
-                        if(lerp) count_target = wodo.enc_r_lerp( (MTU1.TCNT + 4096) %4096);
-                        else count_target = MTU1.TCNT;
-                        if(lerp && MTU1.TCNT > 4100 ) break;
-                        if(count_now +50 < count_target) break;
-                    }
-
-                    if(loop_count == 83) break;
-                    loop_count++;
-                    LED_R_PIN = 1;
-                    LED_G_PIN = 0;
-                    LED_B_PIN = 1;
-
-                } 
-                endTimeuCount();
-                //printfSync("-----print start %d --------\n",loop_count);
-                
-                for(int j=0;j<loop_count;j++){
-                    setDuty(0.0f, 0.0f);
-                    //printfSync("%d, %d, %f\n",j*50 , elapsed_time_list[j], wodo.enc_r_lerp(j*50));
-                    elapsed_time_ave_list[j] += ((float)elapsed_time_list[j] / (float)elapsed_time_list[82]);                    
-                    LED_R_PIN = 1;
-                    LED_G_PIN = 0;
-                    LED_B_PIN = 0;
-                }
-                
-                waitmsec(200);
-                printfSync("-----R end --------\n");                                
-            }
-            
-            printfSync("-----enc_lerp_list --------\n");
-            for(int j=0;j<83;j++){                
-                enc_lerp_list[j] = 4100.0f * (elapsed_time_ave_list[j] / elapsed_time_ave_list[82]);
-                if(!lerp)wodo.ENC_R_OUT_COUNT_TABLE[j] = enc_lerp_list[j];
-                printfSync("%f,\n",enc_lerp_list[j]);
-            }
-            
-        }
-
-        void debug_calib_enc_l(float duty, bool lerp=false) {
-            uint32_t elapsed_time_list[83];
-            float elapsed_time_ave_list[83];
-            float enc_lerp_list[83];
-            uint8_t ave_num = 1;
-
-            for(int i=0;i<83;i++){
-                elapsed_time_ave_list[i] = 0.0f;
-                enc_lerp_list[i] = 0.0f;
-            }
-
-
-            WheelOdometry &wodo = WheelOdometry::getInstance();
-            uint32_t round = 0;
-            while(round < ave_num){               
-                printfSync("-----%d  %f L start --------\n", round, duty);
-                setDuty(duty, 0.0f);
-                waitmsec(1000);
-                
-                while(1){
-                    LED_R_PIN = 1;
-                    LED_G_PIN = 1;
-                    LED_B_PIN = 0;
-
-                    if(PORTB.PIDR.BIT.B3 == 1){
-                        MTU2.TCNT = 0; //左ホイール
-                        break;
-                    } 
-                }                
-                
-                uint32_t loop_count = 0;
-
-                startTimeuCount();
-                while(1){
-                    elapsed_time_list[loop_count] = getTimeuCount();
-                    uint32_t count_now;
-                    if(lerp) count_now = wodo.enc_l_lerp(MTU2.TCNT);
-                    else count_now = MTU2.TCNT;
-
-                    while(1){
-                        uint32_t count_target;
-                        if(lerp) count_target = wodo.enc_l_lerp(MTU2.TCNT);
-                        else count_target = MTU2.TCNT;
-                        if(lerp && MTU2.TCNT > 4100) break;
-                        if(count_now +50 < count_target) break;
-                    }
-
-                    if(loop_count == 83) break;
-                    loop_count++;
-                    LED_R_PIN = 1;
-                    LED_G_PIN = 0;
-                    LED_B_PIN = 1;
-                } 
-                endTimeuCount();
-                //printfSync("-----print start %d --------\n",loop_count);
-                
-                for(int j=0;j<loop_count;j++){
-                    setDuty(0.0f, 0.0f);
-                    printfSync("%d, %d, %f\n",j*50 , elapsed_time_list[j], wodo.enc_l_lerp(j*50));
-                    elapsed_time_ave_list[j] += ((float)elapsed_time_list[j] / (float)elapsed_time_list[82]);                    
-                    LED_R_PIN = 1;
-                    LED_G_PIN = 0;
-                    LED_B_PIN = 0;
-                }
-                
-                waitmsec(200);
-                printfSync("-----L end --------\n");
-
-                round++;
-                printfSync("%d\n",round);
-            }
-            
-            printfSync("-----enc_lerp_list --------\n");
-            for(int j=0;j<83;j++){
-                enc_lerp_list[j] = 4100.0f * (elapsed_time_ave_list[j] / elapsed_time_ave_list[82]);
-                if(!lerp)wodo.ENC_L_OUT_COUNT_TABLE[j] = enc_lerp_list[j];
-                printfSync("%f,\n",enc_lerp_list[j]);
-            }
-            
-        }
-
 
 
         void debug() {

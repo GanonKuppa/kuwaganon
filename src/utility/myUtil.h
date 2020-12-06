@@ -8,6 +8,7 @@ uint16_t concatenate2Byte_uint(uint8_t H_byte, uint8_t L_byte);
 uint32_t concatenate4Byte_uint(uint8_t byte3, uint8_t byte2, uint8_t byte1, uint8_t byte0);
 
 void quickSort_int16(int16_t numbers[], uint32_t left, uint32_t right);
+void quickSort_float(float numbers[], uint32_t left, uint32_t right);
 
 float constrain(float amt, float low, float high);
 float constrainH(float amt, float high);

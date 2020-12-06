@@ -101,7 +101,7 @@ namespace umouse {
             PseudoDialL& pdl = PseudoDialL::getInstance();
             PseudoDialR& pdr = PseudoDialR::getInstance();
 
-            posEsti.update(wo.getAveV(), (double)icm.omega_f[2], (double)icm.acc_f[1], (double)icm.acc_f[0], trajCommander.getMotionType(), ws);
+            posEsti.update(wo.getAveV(), (double)icm.omega_f[2], (double)icm.acc_f_cor[1], (double)icm.acc_f_cor[0], trajCommander.getMotionType(), ws);
 
         }
 

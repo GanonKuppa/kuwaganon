@@ -46,9 +46,9 @@ extern "C" void __main() {
 
 //peripheral_RX71M
 #include "clock.h"
-#include <uart.h>
+#include "uart.h"
 #include "gpio.h"
-#include <timeInterrupt.h>
+#include "timeInterrupt.h"
 #include "spi.h"
 #include "timer.h"
 #include "ad.h"
@@ -72,6 +72,7 @@ extern "C" void __main() {
 #include "batVoltageMonitor.h"
 #include "wheelOdometry.h"
 #include "ICM20602.h"
+#include "logger.h"
 //#include "adis16470.h"
 
 #include "powerTransmission.h"
@@ -110,8 +111,13 @@ void timeInterrupt(void) {
     umouse::WheelOdometry& wheelOdometry = umouse::WheelOdometry::getInstance();
     umouse::PseudoDialL& dialL = umouse::PseudoDialL::getInstance();
     umouse::PseudoDialR& dialR = umouse::PseudoDialR::getInstance();
+    umouse::Logger& logger = umouse::Logger::getInstance();
 
     //--------------------------------------//
+    if (getElapsedMsec() > 5000) {                        
+        icm.update_over_sampling();
+    }
+    
     //スロット0 センサデータの更新
     if (int_tick_count % 4 == 0) {
         if (getElapsedMsec() > 5000) {                        
@@ -161,7 +167,8 @@ void timeInterrupt(void) {
         mouse.update_500u();
         dialL.update();
         dialR.update();
-        fcled.update();        
+        fcled.update();
+        logger.update();      
     }
 
     /////毎回行う処理/////
@@ -190,10 +197,10 @@ int main() {
     umouse::PseudoDialR::getInstance().setEnable(0);
 
     umouse::UMouse::getInstance().direct_duty_set_enable = true;
-    //umouse::PowerTransmission::getInstance().debug_duty_l(-1);
-    //umouse::PowerTransmission::getInstance().debug_duty_r(-1);
-    umouse::PowerTransmission::getInstance().debug_duty();
-    //umouse::PowerTransmission::getInstance().make_table();
+    //umouse::Logger::getInstance().start();
+    //umouse::PowerTransmission::getInstance().debug_duty();
+    //waitmsec(5000);
+    //umouse::Logger::getInstance().print();
 
     umouse::UMouse::getInstance().direct_duty_set_enable = false;
     
@@ -260,40 +267,6 @@ void periperalInit() {
     //位相係数
     initMTU1();
     initMTU2();
-
-    //エンコーダの補正テーブル作成用処理 
-    //umouse::PowerTransmission::getInstance().test_z_to_z_enc_l();
-    //umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.05);    
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r411(0.05);
-/*
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.06);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.07);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.08);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.09);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.10);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.11);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.12);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.13);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.14);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.15);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.16);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.17);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.18);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.19);
-    umouse::PowerTransmission::getInstance().debug_calib_enc_r410(0.20);
-    */
-    //umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.15);
-    //umouse::PowerTransmission::getInstance().debug_calib_enc_r(0.2);
-
-
-    //umouse::PowerTransmission::getInstance().debug_calib_enc_r(true);
-
-    //umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.05);    
-    umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.1);    
-    //umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.15);    
-    //umouse::PowerTransmission::getInstance().debug_calib_enc_l(0.2);    
-    //umouse::PowerTransmission::getInstance().debug_calib_enc_l(true);
-
 
 
 }

@@ -63,6 +63,38 @@ void quickSort_int16(int16_t numbers[], uint32_t left, uint32_t right) {
         quickSort_int16(numbers, pivot+1, right);
 }
 
+void quickSort_float(float numbers[], uint32_t left, uint32_t right) {
+    float pivot, l_hold, r_hold;
+
+    l_hold = left;
+    r_hold = right;
+    pivot = numbers[left];
+    while (left < right) {
+        while ((numbers[right] >= pivot) && (left < right))
+            right--;
+        if (left != right) {
+            numbers[left] = numbers[right];
+            left++;
+        }
+        while ((numbers[left] <= pivot) && (left < right))
+            left++;
+        if (left != right) {
+            numbers[right] = numbers[left];
+            right--;
+        }
+    }
+    numbers[left] = pivot;
+    pivot = left;
+    left = l_hold;
+    right = r_hold;
+    if (left < pivot)
+        quickSort_float(numbers, left, pivot-1);
+    if (right > pivot)
+        quickSort_float(numbers, pivot+1, right);
+}
+
+
+
 float constrain(float amt, float low, float high) {
     if(amt > high) return high;
     else if(amt < low) return low;

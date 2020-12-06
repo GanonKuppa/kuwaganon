@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdint.h"
+#include <deque>
 
 namespace umouse {
 
@@ -19,10 +20,17 @@ namespace umouse {
 
         float omega_f[3];
         float acc_f[3];
+        float acc_f_cor[3];
         float temp_f;
         uint16_t stop_count;
         uint16_t upsideDown_count;
-
+        std::deque<float> gyro_x_list;
+        std::deque<float> gyro_y_list;
+        std::deque<float> gyro_z_list;
+        std::deque<float> acc_x_list;
+        std::deque<float> acc_y_list;
+        std::deque<float> acc_z_list;
+        uint8_t OVER_SAMPLING_NUM = 4;
 
         static ICM20602& getInstance() {
             static ICM20602 instance;
@@ -31,6 +39,7 @@ namespace umouse {
 
         uint8_t whoAmI(void);
         void init();
+        void update_over_sampling();
         void update();
         void calibOmegaOffset(uint32_t ref_num);
         void calibAccOffset(uint32_t ref_num);
@@ -64,6 +73,7 @@ namespace umouse {
         void writeReg(uint8_t adress, uint8_t data);
         uint8_t readReg(uint8_t adress);
 
+        float getMedianAve(std::deque<float>& d);
 
     };
 

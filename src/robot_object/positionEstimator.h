@@ -9,6 +9,7 @@
 #include "parameterManager.h"
 #include "wallSensor.h"
 #include "fcled.h"
+#include <deque>
 
 namespace umouse {
 
@@ -27,14 +28,19 @@ namespace umouse {
             x_d = 0.0;
             y_d = 0.0;
 
+            for (uint8_t i = 0; i < ACC_Y_AVERAGE_NUM; i++) {
+                acc_y_list.push_front(0.0f);
+            }
+
+
             contact_wall_cool_down_time = 0.0f;
             on_wall_center_pre = false;
         }
 
         PositionEstimator(float x_, float y_, float ang_) {
-            x = (double)x_;
-            y = (double)y_;
-            ang = (double)ang_;
+            x = (float)x_;
+            y = (float)y_;
+            ang = (float)ang_;
             ang_v = 0.0;
             v = 0.0;
             x_d = 0.0;
@@ -45,9 +51,9 @@ namespace umouse {
         }
 
         void reset(float x_, float y_, float ang_) {
-            x = (double)x_;
-            y = (double)y_;
-            ang = (double)ang_;
+            x = (float)x_;
+            y = (float)y_;
+            ang = (float)ang_;
 
             ang_v = 0.0;
             v = 0.0;
@@ -69,9 +75,9 @@ namespace umouse {
 
 
 
-        void update(double v_, double ang_v_, double a_y, double a_x, EMotionType motion_type, WallSensor& ws) {
-            
-            
+        void update(float v_, float ang_v_, float a_y, float a_x, EMotionType motion_type, WallSensor& ws) {
+            acc_y_list.push_front(a_y);
+            acc_y_list.pop_back();
             
             if(!__isfinite(x)){
                 printfAsync("x nan! %f %f \n", x, x_pre);
@@ -88,115 +94,40 @@ namespace umouse {
             ICM20602& icm = ICM20602::getInstance();            
             ParameterManager& pm = ParameterManager::getInstance();
 
-            double ang_v_rad = deg2rad(ang_v);
-            double sin_val;
-            double cos_val;
-            double beta_dot;
+            float ang_v_rad = deg2rad(ang_v);
+            float sin_val;
+            float cos_val;
+            float beta_dot;
 
             // 角度算出
             alpha = (ang_v_ - ang_v) / DELTA_T;
             ang_v = ang_v_;
             ang += calcEulerDelta(ang_v);
-            ang = fmod(ang + 360.0, 360.0);
+            ang = fmodf(ang + 360.0, 360.0);
 
-            double ang_rad = deg2rad(ang);
-            sin_val = sin(ang_rad);
-            cos_val = cos(ang_rad);
+            float ang_rad = deg2rad(ang);
+            sin_val = sinf(ang_rad);
+            cos_val = cosf(ang_rad);
 
-            if(motion_type == EMotionType::STRAIGHT ||
-                    motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
-                    motion_type == EMotionType::DIAGONAL ||
-                    motion_type == EMotionType::DIAGONAL_CENTER ||
-                    motion_type == EMotionType::CURVE ||
-                    motion_type == EMotionType::STOP ||
-                    motion_type == EMotionType::SPINTURN ||
-                    motion_type == EMotionType::DIRECT_DUTY_SET
-                    
-                    ) {
-                // 並進速度算出
-                double gain = (double)pm.v_comp_gain;
-                //a_y = (double)adis.acc_f[2];
-                //if(fabs(a_y) < 0.5) gain = 0.0;
-                //v = (gain)*(v + a_y * DELTA_T) + (1.0 - gain)*(v_);
-                v = v_;
-
-                // 加速度積分速度算出
-                v_acc += a_y * DELTA_T;
-                if(fabs(v_) < 0.05 || fabs(a_y) < 0.25) v_acc = v_;
-
-                // グローバル座標系速度算出
-                x_d = v * cos_val;
-                y_d = v * sin_val;
-                                
-                x += calcEulerDelta(x_d);
-                y += calcEulerDelta(y_d);
-
-            } else if(motion_type == EMotionType::CURVE) {
-                // 並進速度算出
-                v = v_;
-
-                // 加速度積分速度算出
-                v_acc += a_y * DELTA_T;
-                if(fabs(v_) < 0.005 || fabs(a_y) < 0.25) v_acc = v_;
-
-                // グローバル座標系速度算出
-
-                double x_dd =   a_x * sin_val + a_y * cos_val;
-                double y_dd = - a_x * cos_val + a_y * sin_val;
-
-                if (ABS(v_) < 0.005) {
-                    x_d = 0.0;
-                    y_d = 0.0;
-                } else if(fabs(v_acc - v_) > 0.3) {
-                    x_d += x_dd * DELTA_T;
-                    y_d += y_dd * DELTA_T;
-                    v_acc = sqrt(x_d * x_d + y_d * y_d);
-                } else {
-                    x_d = v * cos_val;
-                    y_d = v * sin_val;
-                }
-
-                // グローバル座標系位置算出
-                if(fabs(ang_v) > 10.0 && fabs(v_acc - v_) <= 0.1) {
-                    x += x_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
-                    y += y_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
-
-                } else {
-                    x += calcEulerDelta(x_d);
-                    y += calcEulerDelta(y_d);
-                }
-            } else if(motion_type == EMotionType::STOP ||
-                      motion_type == EMotionType::SPINTURN ||
-                      motion_type == EMotionType::DIRECT_DUTY_SET) {
-                // 並進速度算出
-                v = v_;
-                // 加速度積分速度算出 グローバル座標系速度算出
-
-                double x_dd =   a_x * sin_val + a_y * cos_val;
-                double y_dd = - a_x * cos_val + a_y * sin_val;
-
-                if (ABS(v_) < 0.001) {
-                    v_acc = 0.0;
-                    x_d = 0.0;
-                    y_d = 0.0;
-                } else if(motion_type == EMotionType::SPINTURN) {
-                    x_d += x_dd * DELTA_T;
-                    y_d += y_dd * DELTA_T;
-                    v_acc = sqrt(x_d * x_d + y_d * y_d);
-                } else if(motion_type == EMotionType::STOP) {
-                    x_d = v * cos_val;
-                    y_d = v * sin_val;
-
-                    v_acc += a_y * DELTA_T;
-                    if(fabs(v_) < 0.05 || fabs(a_y) < 0.25) v_acc = v_;
-                }
-
-                // グローバル座標系位置算出
-                x += calcEulerDelta(x_d);
-                y += calcEulerDelta(y_d);
-
+            // 並進速度算出                
+            float acc_y_int = 0.0f;
+            for (uint8_t i=0; i< ACC_Y_AVERAGE_NUM; i++){
+                acc_y_int += acc_y_list[i];
             }
+            
+            v = v_ + acc_y_int * DELTA_T;
 
+            // 加速度積分速度算出
+            v_acc += a_y * DELTA_T;
+            if(ABS(v) < 0.01f) v_acc = v;
+
+            // グローバル座標系速度算出
+            x_d = v_ * cos_val;
+            y_d = v_ * sin_val;
+                            
+            x += calcEulerDelta(x_d);
+            y += calcEulerDelta(y_d);
+                
             // スリップ角算出
             if(v > 0.2) beta_dot =  -a_x / v - ang_v_rad;
             else beta_dot = 0.0;
@@ -404,41 +335,43 @@ namespace umouse {
         float getY() {return (float)y;}
         float getBeta() {return (float)RAD2DEG(beta);}
 
-        void setV(double v_) {
+        void setV(float v_) {
             v = v_;
         }
 
-        void setAng(double ang_) {
+        void setAng(float ang_) {
             ang = ang_;
         }
 
-        void setX(double x_) {
+        void setX(float x_) {
             x = x_;
         }
 
-        void setY(double y_) {
+        void setY(float y_) {
             y = y_;
         }
 
-        void setAngV(double ang_v_) {
+        void setAngV(float ang_v_) {
             ang_v = ang_v_;
         }
 
       private:
         bool on_wall_center_pre;
 
-        double v;
-        double v_acc;
-        double alpha;
-        double ang;
-        double beta;
-        double x;
-        double y;
-        double x_pre;
-        double y_pre;
-        double x_d_;
-        double y_d_;
+        float v;
+        float v_acc;
+        float alpha;
+        float ang;
+        float beta;
+        float x;
+        float y;
+        float x_pre;
+        float y_pre;
+        float x_d_;
+        float y_d_;
 
+        std::deque<float> acc_y_list;
+        const uint8_t ACC_Y_AVERAGE_NUM = 50;
 
         float contact_wall_cool_down_time;
         float corner_r_cool_down_time;
@@ -446,22 +379,22 @@ namespace umouse {
         float diag_corner_r_cool_down_time;
         float diag_corner_l_cool_down_time;
 
-        const double DELTA_T = 0.001;
+        const float DELTA_T = 0.001;
         const float SQRT_2 = 1.4142356f;
-        const double PI = 3.14159265358979323846264338327950288;
+        const float PI = 3.14159265358979323846264338327950288;
 
-        double ang_v;
-        double ang_v_1;
-        double ang_v_2;
+        float ang_v;
+        float ang_v_1;
+        float ang_v_2;
 
-        double x_d;
-        double y_d;
+        float x_d;
+        float y_d;
 
-        double x_d_1;
-        double y_d_1;
+        float x_d_1;
+        float y_d_1;
 
-        double x_d_2;
-        double y_d_2;
+        float x_d_2;
+        float y_d_2;
 
         bool __isfinite(float x){
             union { float f; uint32_t i; } a;
@@ -471,7 +404,7 @@ namespace umouse {
         }
 
         bool __isfinite(double x){
-            union { double f; uint64_t i; } a;
+            union { float f; uint64_t i; } a;
             a.f = x;
             if( ((a.i >> 52) & 0x007ff) == 2047) return false;
             else return true;
@@ -517,13 +450,13 @@ namespace umouse {
               ) {
                 bool done = true;
                 if(ang >= 350.0 || ang < 10.0) {
-                    x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (double)pm.wall_corner_read_offset_l;
+                    x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (float)pm.wall_corner_read_offset_l;
                 } else if(ang >= 80.0 && ang < 100.0) {
-                    y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (double)pm.wall_corner_read_offset_l;
+                    y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (float)pm.wall_corner_read_offset_l;
                 } else if(ang >= 170.0 && ang < 190.0) {
-                    x = (uint8_t)(x / 0.09) * 0.09 + (double)pm.wall_corner_read_offset_l;
+                    x = (uint8_t)(x / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_l;
                 } else if(ang >= 260.0 && ang < 280.0) {
-                    y = (uint8_t)(y / 0.09) * 0.09 + (double)pm.wall_corner_read_offset_l;
+                    y = (uint8_t)(y / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_l;
                 } else {
                     done = false;
                 }
@@ -552,13 +485,13 @@ namespace umouse {
                 bool done = true;
 
                 if(ang >= 350.0 || ang < 10.0) {
-                    x = (uint8_t)(x / 0.09f) * 0.09f + 0.09f - (double)pm.wall_corner_read_offset_r;
+                    x = (uint8_t)(x / 0.09f) * 0.09f + 0.09f - (float)pm.wall_corner_read_offset_r;
                 } else if(ang >= 80.0 && ang < 100.0) {
-                    y = (uint8_t)(y / 0.09f) * 0.09f + 0.09f - (double)pm.wall_corner_read_offset_r;
+                    y = (uint8_t)(y / 0.09f) * 0.09f + 0.09f - (float)pm.wall_corner_read_offset_r;
                 } else if(ang >= 170.0 && ang < 190.0) {
-                    x = (uint8_t)(x / 0.09) * 0.09 + (double)pm.wall_corner_read_offset_r;
+                    x = (uint8_t)(x / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_r;
                 } else if(ang >= 260.0 && ang < 280.0) {
-                    y = (uint8_t)(y / 0.09) * 0.09 + (double)pm.wall_corner_read_offset_r;
+                    y = (uint8_t)(y / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_r;
                 } else {
                     done = false;
                 }
@@ -586,16 +519,16 @@ namespace umouse {
 
                 if(ang >= 315.0 || ang < 45.0) {
                     ang = 0.0;
-                    x = (uint8_t)(x / 0.09) * 0.09 + (double)pm.wall_contact_offset;
+                    x = (uint8_t)(x / 0.09) * 0.09 + (float)pm.wall_contact_offset;
                 } else if(ang >= 45.0 && ang < 135.0) {
                     ang = 90.0;
-                    y = (uint8_t)(y / 0.09) * 0.09 + (double)pm.wall_contact_offset;
+                    y = (uint8_t)(y / 0.09) * 0.09 + (float)pm.wall_contact_offset;
                 } else if(ang >= 135.0 && ang < 225.0) {
                     ang = 180.0f;
-                    x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (double)pm.wall_contact_offset;
+                    x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (float)pm.wall_contact_offset;
                 } else if(ang >= 225.0 && ang < 315.0) {
                     ang = 270.0;
-                    y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (double)pm.wall_contact_offset;
+                    y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (float)pm.wall_contact_offset;
                 }
                 printfAsync(">>>>>contact wall (x_e, y_e, ang_e)=(%f, %f, %f)\n", getX(), getY(), getAng());
                 contact_wall_cool_down_time = 0.1f;
@@ -636,15 +569,15 @@ namespace umouse {
         }
 
 
-        double calcCircularArcDelta(double ang_v_rad, double x_d, double y_d){
+        float calcCircularArcDelta(float ang_v_rad, float x_d, float y_d){
             return x_d * sin(ang_v_rad * DELTA_T * 0.5) / (ang_v_rad * 0.5);
         }
 
-        double calcEulerDelta(double s_0){
+        float calcEulerDelta(float s_0){
             return s_0 * DELTA_T;
         }
 
-        double calcAdamsBashforthDelta(double s_0, double s_1, double s_2 ) {
+        float calcAdamsBashforthDelta(float s_0, float s_1, float s_2 ) {
             if(s_1 == 0.0 && s_2 == 0.0) return s_0 * DELTA_T;
             else if(s_2 == 0.0) return s_0 * DELTA_T;
             else return (23.0 * s_0 - 16.0 * s_1 + 5.0 * s_2) / 12.0 * DELTA_T;
@@ -662,13 +595,13 @@ namespace umouse {
 
 
                 if( ang >= 40.0  && ang < 50.0 ) {
-                    y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (double)pm.diag_r_corner_read_offset;
+                    y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (float)pm.diag_r_corner_read_offset;
                 } else if(ang >= 130.0 && ang < 140.0) {
-                    x = (uint8_t)(x / 0.09) * 0.09 +  (double)pm.diag_r_corner_read_offset;
+                    x = (uint8_t)(x / 0.09) * 0.09 +  (float)pm.diag_r_corner_read_offset;
                 } else if(ang >= 220.0 && ang < 230.0) {
-                    y = (uint8_t)(y / 0.09) * 0.09 + (double)pm.diag_r_corner_read_offset;
+                    y = (uint8_t)(y / 0.09) * 0.09 + (float)pm.diag_r_corner_read_offset;
                 } else if(ang >= 310.0 && ang < 320.0) {
-                    x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (double)pm.diag_r_corner_read_offset;
+                    x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (float)pm.diag_r_corner_read_offset;
                 } else {
                     done = false;
                 }
@@ -696,13 +629,13 @@ namespace umouse {
                 bool done = true;
 
                 if( ang >= 40.0  && ang < 50.0 ) {
-                    x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (double)pm.diag_l_corner_read_offset;
+                    x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (float)pm.diag_l_corner_read_offset;
                 } else if(ang >= 130.0 && ang < 140.0) {
-                    y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (double)pm.diag_l_corner_read_offset;
+                    y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (float)pm.diag_l_corner_read_offset;
                 } else if(ang >= 220.0 && ang < 230.0) {
-                    x = (uint8_t)(x / 0.09) * 0.09 + (double)pm.diag_l_corner_read_offset;
+                    x = (uint8_t)(x / 0.09) * 0.09 + (float)pm.diag_l_corner_read_offset;
                 } else if(ang >= 310.0 && ang < 320.0) {
-                    y = (uint8_t)(y / 0.09) * 0.09 + (double)pm.diag_l_corner_read_offset;
+                    y = (uint8_t)(y / 0.09) * 0.09 + (float)pm.diag_l_corner_read_offset;
                 } else {
                     done = false;
                 }
@@ -718,7 +651,7 @@ namespace umouse {
             if(diag_corner_l_cool_down_time < 0.0f) diag_corner_l_cool_down_time = 0.0f;
         }
 
-        double deg2rad(double deg) {
+        float deg2rad(float deg) {
             return PI * deg/180.0;
         }
 
