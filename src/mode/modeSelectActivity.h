@@ -58,7 +58,7 @@ namespace umouse {
         ELoopStatus loop() {
             Gamepad& gamepad = Gamepad::getInstance();
             ICM20602& icm = ICM20602::getInstance();
-            //adis16470& adis = adis16470::getInstance();
+            
             PseudoDialL& dial_L = PseudoDialL::getInstance();
             PseudoDialR& dial_R = PseudoDialR::getInstance();
             WallSensor& ws = WallSensor::getInstance();
@@ -70,6 +70,7 @@ namespace umouse {
 
 
             if(dial_position_L_now != dial_position_L_pre) {
+                mode = dial_position_L_now;
                 turnFcled();
                 SE_CURSOR_MOVE();
             }
@@ -145,7 +146,7 @@ namespace umouse {
             PseudoDialR& dial_R = PseudoDialR::getInstance();
             dial_L.setEnable(0);
             dial_R.setEnable(0);
-            uint8_t mode = dial_L.getDialPosition();
+            
             EActivityColor color = modeNum2Color(mode);
             printfAsync("color num = %d\n",int(color));
 
@@ -158,11 +159,12 @@ namespace umouse {
         uint8_t dial_position_L_now;
         uint8_t dial_position_L_pre;
         bool was_gamepad_input;
+        uint8_t mode;
 
         void turnFcled() {
             PseudoDialL& dial_L = PseudoDialL::getInstance();
             FcLed& fcled = FcLed::getInstance();
-            uint8_t mode = dial_L.getDialPosition();
+            
             UMouse& m = UMouse::getInstance();
             ParameterManager& pm = ParameterManager::getInstance();
             m.maze.makeFastestMap(0, 0);

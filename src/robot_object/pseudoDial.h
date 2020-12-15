@@ -13,7 +13,7 @@ namespace umouse {
     class PseudoDial {
       protected:
         bool enable;
-        VelocityTypePidController ang_ctrl;
+        PidfController ang_ctrl;
 
         float target_ang;
         float duty;
@@ -23,7 +23,7 @@ namespace umouse {
         PseudoDial() {
             enable = false;
             duty = 0.0f;
-            ang_ctrl.set(0.003, 1000000.0, 0.0);
+            ang_ctrl.set(0.005, 0.0, 0.0, 0.0);
             dial_position = 0;
             division_num = 8;
             target_ang = 0.0f;

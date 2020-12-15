@@ -340,7 +340,7 @@ namespace umouse {
             printfAsync("e|%f, %f, %f\n", posEsti.getX(), posEsti.getY(), posEsti.getAng());
             printfAsync("is upside down: %d\n", icm.isUpsideDown());
             printfAsync("is out of control: %d\n", ctrlMixer.isOutOfControl());
-            printfAsync("ang_pidf.e_k0: %f\n", ctrlMixer.ang_pidf.e_k0);
+            printfAsync("ang_pidf.e_p0: %f\n", ctrlMixer.ang_pidf.getError());
             printfAsync("motion_type: %d\n", trajCommander.getTraj().motion_type);
             printfAsync("(ang_v_t, wodo, gyro)=(%f, %f, %f)\n",trajCommander.ang_v, wo.ang_v, icm.omega_f[2]);
             printfAsync("-------------------------\n");

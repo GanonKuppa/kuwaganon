@@ -17,9 +17,9 @@ namespace umouse {
 
     class ControlMixer {
       public:
-        VelocityTypePidfController v_pidf;
-        VelocityTypePidfController ang_v_pidf;
-        VelocityTypePidfController pos_pidf;
+        PidfController v_pidf;
+        PidfController ang_v_pidf;
+        PidfController pos_pidf;
         AngPidfController ang_pidf;
         WallPidfController wall_pidf;
 
@@ -107,11 +107,11 @@ namespace umouse {
         bool isOutOfControl() {
             WheelOdometry& wodo = WheelOdometry::getInstance();
             ICM20602& icm = ICM20602::getInstance();
-            if( ABS(v_pidf.e_k0) > v_error_th ||
-                    ABS(ang_v_pidf.e_k0) > ang_v_error_th ||
+            if( ABS(v_pidf.getError()) > v_error_th ||
+                    ABS(ang_v_pidf.getError()) > ang_v_error_th ||
                     ABS(icm.omega_f[2] - wodo. getAng_v()) > ang_v_error_th ||
-                    ABS(ang_pidf.e_k0) > 5.0f ||
-                    ABS(v_pidf.e_k0) > ABS(v_error_th)
+                    ABS(ang_pidf.getError()) > 5.0f ||
+                    ABS(v_pidf.getError()) > ABS(v_error_th)
                     ) error_sec += DELTA_T;
             else error_sec = 0.0f;
             error_sec = 0.0f;
@@ -223,12 +223,12 @@ namespace umouse {
 
 
             ang_pidf.update(target_rot_x, esti.getAng());
-            target_rot_v += ang_pidf.getControlVal();
-            //target_rot_v += (target_rot_x - traj.ang)/0.05; // 1度を50msecで回る角速度を足す
+            target_rot_v += ang_pidf.getControlVal();            
 
 
             if( (motion_type != motion_type_pre &&
-                 motion_type_pre == EMotionType::STOP)
+                 (motion_type_pre == EMotionType::STOP || motion_type_pre == EMotionType::SPINTURN)
+                 )
                 || motion_type == EMotionType::DIRECT_DUTY_SET) {
                 ang_v_pidf.reset();
                 ang_pidf.reset();
@@ -256,7 +256,7 @@ namespace umouse {
                         duty_v_FF += pt.transFrictionCompensationDuty(target_trans_v);
             */
             duty_v_FF += pt.transFFWithParamDuty(target_trans_v, target_trans_a);
-            if(pm.trans_v_FF_enable == true) duty += duty_v_FF;
+            if(pm.trans_v_FF_enable) duty += duty_v_FF;
 
             Eigen::Vector2f duty_ang_v_FF(0.0f, 0.0f);
             ang_v_back_emf_FF = pt.rotBackEmfDuty(target_rot_v)(0);
@@ -268,14 +268,19 @@ namespace umouse {
                         duty_ang_v_FF += pt.rotFrictionCompensationDuty(target_rot_v);
             */
             duty_ang_v_FF += pt.rotFFWithParamDuty(target_rot_v, target_rot_a);
-            if(pm.rot_v_FF_enable == true) duty += duty_ang_v_FF;
+            if(pm.rot_v_FF_enable) duty += duty_ang_v_FF;
 
             float voltage = BatVoltageMonitor::getInstance().bat_vol;
             float duty_v_saturation = (pm.trans_v_saturation_FF_multiplier * ABS(duty_v_FF(0)) + pm.trans_v_saturation_offset_duty);
             float duty_ang_v_saturation = (pm.rot_v_saturation_FF_multiplier * ABS(duty_ang_v_FF(0)) + pm.rot_v_saturation_offset_duty);
 
-            if(pm.trans_v_PIDF_saturation_enable == true) v_pidf.setSaturation(duty_v_saturation);
-            if(pm.rot_v_PIDF_saturation_enable == true ) ang_v_pidf.setSaturation(duty_ang_v_saturation);
+
+            if(motion_type == EMotionType::STOP || motion_type == EMotionType::SPINTURN) {
+                // do nothing
+            } else {
+                v_pidf.setSaturation(duty_v_saturation);
+                ang_v_pidf.setSaturation(duty_ang_v_saturation);
+            }
 
             duty(0) += (v_pidf.getControlVal() - ang_v_pidf.getControlVal());
             duty(1) += (v_pidf.getControlVal() + ang_v_pidf.getControlVal());
@@ -337,44 +342,53 @@ namespace umouse {
                 ang_pidf.set(pm.rot_x_slalom_P, pm.rot_x_slalom_I, pm.rot_x_slalom_D, pm.rot_x_slalom_F);
             }
 
-            // 速度PIDFサチュレーション設定
+            // 位置PIDFゲイン設定
+            pos_pidf.set(pm.pos_P, pm.pos_I, pm.pos_D, pm.pos_F);
+            
+            // 壁PIDFゲイン設定
+            wall_pidf.set(pm.wall_P, pm.wall_I, pm.wall_D, pm.wall_F);
+
+
+            // ------------------------------------------------------------------------- //
+            // PIDFイネーブル設定
+            v_pidf.setEnable(pm.trans_v_PIDF_enable);
+            ang_v_pidf.setEnable(pm.rot_v_PIDF_enable);
+            pos_pidf.setEnable(pm.pos_PIDF_enable);
+            wall_pidf.setEnable(pm.wall_PIDF_enable);
+            ang_pidf.setEnable(pm.rot_v_PIDF_enable); // 角度制御と角速度制御のイネーブルは兼用
+
+            // サチュレーションenable設定
             if(motion_type == EMotionType::STOP || motion_type == EMotionType::SPINTURN) {
-                v_pidf.setSaturationEnable(false);                
+                v_pidf.setSaturationEnable(false);
             } else {
                 v_pidf.setSaturationEnable(pm.trans_v_PIDF_saturation_enable);
             }
 
-            // 速度PIDFイネーブル設定
-            v_pidf.setEnable(pm.trans_v_PIDF_enable);
-
-
-            // 角速度サチュレーション設定
             if(motion_type == EMotionType::STOP || motion_type == EMotionType::SPINTURN) {
-                ang_v_pidf.setSaturationEnable(false);                
+                ang_v_pidf.setSaturationEnable(false);
             } else {
                 ang_v_pidf.setSaturationEnable(pm.rot_v_PIDF_saturation_enable);
             }
 
-            // 角速度PIDFイネーブル設定
-            ang_v_pidf.setEnable(pm.rot_v_PIDF_enable);
-
-            // 位置PIDF設定
-            pos_pidf.setEnable(pm.pos_PIDF_enable);
             pos_pidf.setSaturationEnable(true);
-            pos_pidf.setSaturation(pm.target_rot_x_saturation);
-            pos_pidf.set(pm.pos_P, pm.pos_I, pm.pos_D, pm.pos_F);
-
-            // 角度PIDF設定
-            ang_pidf.setEnable(true);
             ang_pidf.setSaturationEnable(true);
+            wall_pidf.setSaturationEnable(true);
 
-            // 壁PIDF設定
-            wall_pidf.set(pm.wall_P, pm.wall_I, pm. wall_D, pm.wall_F);
-            wall_pidf.setEnable(pm.wall_PIDF_enable);
+            // サチュレーション値設定
+
+
+            pos_pidf.setSaturation(pm.target_rot_x_saturation);
             wall_pidf.setSaturation(pm.target_rot_x_saturation);
+            
+            // 積分サチュレーションイネーブル設定
+            v_pidf.setIntegralSaturationEnable(true);
+            ang_v_pidf.setIntegralSaturationEnable(true);
+            pos_pidf.setIntegralSaturationEnable(true);
+            wall_pidf.setIntegralSaturationEnable(true);
+            ang_pidf.setIntegralSaturationEnable(true); // 角度制御と角速度制御のイネーブルは兼用
 
-            // 積分サチュレーション設定
-            // 角速度サチュレーション設定
+
+            // 積分サチュレーション値設定
             if(motion_type == EMotionType::STOP || motion_type == EMotionType::SPINTURN) {
                 v_pidf.setIntegralSaturation(3.0);
                 ang_v_pidf.setIntegralSaturation(3600.0);
@@ -384,7 +398,6 @@ namespace umouse {
                 ang_v_pidf.setIntegralSaturation(pm.rot_v_PIDF_integral_saturation);
                 ang_pidf.setIntegralSaturation(pm.rot_x_PIDF_integral_saturation);
             }
-
 
             pos_pidf.setIntegralSaturation(pm.pos_PIDF_integral_saturation);
             wall_pidf.setIntegralSaturation(pm.wall_PIDF_integral_saturation);
