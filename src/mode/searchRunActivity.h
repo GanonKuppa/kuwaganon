@@ -39,7 +39,7 @@ namespace umouse {
 
             Intent* intent = new Intent();
             intent->uint8_t_param["SUB_MODE_NUM"] = 5;
-            auto activity = ActivityFactory::cteateSubModeSelect();
+            auto activity = ActivityFactory::createSubModeSelect();
             activity->start(intent);
             printfAsync("SUB MODE SELECT RESULT = %d", intent->uint8_t_param["SUB_MODE"]);
             if(intent->uint8_t_param["SUB_MODE"] == (uint8_t)ESearchMode::BACK_MODE_SELECT) return;
@@ -49,8 +49,7 @@ namespace umouse {
             ICM20602& icm = ICM20602::getInstance();
             adis16470& adis = adis16470::getInstance();
             icm.calibOmegaOffset(800);
-            icm.calibAccOffset(200);
-            //adis.calibOmegaOffset(800);
+            icm.calibAccOffset(200);            
 
             std::unique_ptr<BaseState> state = std::unique_ptr<BaseState>(new Start2GoalState(intent));
             m.ang_no_calib_sec = 0.0f;
@@ -86,8 +85,9 @@ namespace umouse {
                 ParameterManager& pm = ParameterManager::getInstance();
 
                 UMouse& m = UMouse::getInstance();
+                m.setMode(ERunMode::SEARCH_RUN);
                 float x = 0.09f/2.0f;
-                float y = 0.09f/2.0f;// - m.WALL2MOUSE_CENTER_DIST;
+                float y = 0.09f/2.0f - m.WALL2MOUSE_CENTER_DIST;
                 a = pm.a_search_run;
                 v = pm.v_search_run;
                 v_max = 0.6;
@@ -102,7 +102,7 @@ namespace umouse {
                 m.maze.updateStartSectionWall();
                 desti_coor = m.goal;
 
-                float dist = 0.09f/2.0f;// + m.WALL2MOUSE_CENTER_DIST;
+                float dist = 0.09f/2.0f + m.WALL2MOUSE_CENTER_DIST;
                 auto traj = StraightTrajectory::createAsWallCenter(dist, 0.0f, v, v, a, a);
                 m.trajCommander.push(std::move(traj));
                 pre_read_wall_coor.set(255, 255);

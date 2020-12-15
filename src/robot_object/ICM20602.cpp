@@ -140,8 +140,8 @@ namespace umouse {
         }
 
 
-        if(omega_c[2] >= 0) omega_f[2] *= pm.gyro_scaler_left;
-        else omega_f[2] *= pm.gyro_scaler_right;
+        if(omega_c[2] >= 0) omega_f_now[2] *= pm.gyro_scaler_left;
+        else omega_f_now[2] *= pm.gyro_scaler_right;
 
         float acc_f_now[3];
 

@@ -67,7 +67,7 @@ namespace umouse {
             error_sec = 0.0f;
             error_limit_sec = 0.2f; // 秒
             ang_v_error_th = 180.0f;
-            v_error_th = 0.3;
+            v_error_th = 1.0;
 
             duty = Eigen::Vector2f::Zero();
         }
@@ -120,7 +120,7 @@ namespace umouse {
 
         }
 
-        void update(float v, float ang_v, PositionEstimator& esti){
+        void update(float v, float ang_v, PositionEstimator& esti, bool wallCenter){
             ParameterManager& pm = ParameterManager::getInstance();
             ang_v_pidf.set(pm.rot_v_P, pm.rot_v_I, pm.rot_v_D, pm.rot_v_F);
             v_pidf.set(pm.trans_v_P, pm.trans_v_I, pm.trans_v_D, pm.trans_v_F);
@@ -136,7 +136,7 @@ namespace umouse {
 
 
 
-        void update(BaseTrajectory& traj, PositionEstimator& esti, bool isRWall, bool isLWall) {
+        void update(BaseTrajectory& traj, PositionEstimator& esti, bool isRWall, bool isLWall, bool wallCenter) {
             ParameterManager& pm = ParameterManager::getInstance();
             EMotionType motion_type = traj.motion_type;
             turn_type_e turn_type = traj.turn_type;
@@ -150,7 +150,7 @@ namespace umouse {
 
 
             if(motion_type == EMotionType::STRAIGHT_WALL_CENTER) {
-                wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall);
+                wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall, wallCenter);
             } else {
                 wall_pidf.reset();
             }
@@ -159,7 +159,7 @@ namespace umouse {
                  motion_type == EMotionType::STRAIGHT_WALL_CENTER &&
                  pm.wall_PIDF_enable == true
               ) {
-                wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall);
+                wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall, wallCenter);
                 target_rot_x += wall_pidf.getControlVal();
                 pos_pidf.reset();
             } else if( (motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
@@ -184,7 +184,7 @@ namespace umouse {
                     WallSensor::getInstance().ahead_r() < pm.wall_diagonal_ahead_r_threshold) {
                     target_rot_x -= pm.wall_diagonal_avoid_add_ang;
                 } else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold &&
-                           WallSensor::getInstance().ahead_r() < pm.wall_diagonal_ahead_l_threshold) {
+                           WallSensor::getInstance().ahead_l() < pm.wall_diagonal_ahead_l_threshold) {
                     target_rot_x += pm.wall_diagonal_avoid_add_ang;
                 }
             }
@@ -228,11 +228,11 @@ namespace umouse {
 
 
             if( (motion_type != motion_type_pre &&
-                    motion_type_pre == EMotionType::STOP)
-                    || motion_type == EMotionType::DIRECT_DUTY_SET) {
-                //ang_v_pidf.reset();
-                //ang_pidf.reset();
-                //v_pidf.reset();
+                 motion_type_pre == EMotionType::STOP)
+                || motion_type == EMotionType::DIRECT_DUTY_SET) {
+                ang_v_pidf.reset();
+                ang_pidf.reset();
+                v_pidf.reset();
                 wall_pidf.reset();
                 pos_pidf.reset();
             }
@@ -339,8 +339,7 @@ namespace umouse {
 
             // 速度PIDFサチュレーション設定
             if(motion_type == EMotionType::STOP || motion_type == EMotionType::SPINTURN) {
-                //v_pidf.setSaturationEnable(false);
-                v_pidf.setSaturationEnable(pm.trans_v_PIDF_saturation_enable);
+                v_pidf.setSaturationEnable(false);                
             } else {
                 v_pidf.setSaturationEnable(pm.trans_v_PIDF_saturation_enable);
             }
@@ -351,8 +350,7 @@ namespace umouse {
 
             // 角速度サチュレーション設定
             if(motion_type == EMotionType::STOP || motion_type == EMotionType::SPINTURN) {
-                //ang_v_pidf.setSaturationEnable(false);
-                ang_v_pidf.setSaturationEnable(pm.rot_v_PIDF_saturation_enable);
+                ang_v_pidf.setSaturationEnable(false);                
             } else {
                 ang_v_pidf.setSaturationEnable(pm.rot_v_PIDF_saturation_enable);
             }
@@ -376,9 +374,18 @@ namespace umouse {
             wall_pidf.setSaturation(pm.target_rot_x_saturation);
 
             // 積分サチュレーション設定
-            v_pidf.setIntegralSaturation(pm.trans_v_PIDF_integral_saturation);
-            ang_v_pidf.setIntegralSaturation(pm.rot_v_PIDF_integral_saturation);
-            ang_pidf.setIntegralSaturation(pm.rot_x_PIDF_integral_saturation);
+            // 角速度サチュレーション設定
+            if(motion_type == EMotionType::STOP || motion_type == EMotionType::SPINTURN) {
+                v_pidf.setIntegralSaturation(3.0);
+                ang_v_pidf.setIntegralSaturation(3600.0);
+                ang_pidf.setIntegralSaturation(360.0);
+            } else {
+                v_pidf.setIntegralSaturation(pm.trans_v_PIDF_integral_saturation);
+                ang_v_pidf.setIntegralSaturation(pm.rot_v_PIDF_integral_saturation);
+                ang_pidf.setIntegralSaturation(pm.rot_x_PIDF_integral_saturation);
+            }
+
+
             pos_pidf.setIntegralSaturation(pm.pos_PIDF_integral_saturation);
             wall_pidf.setIntegralSaturation(pm.wall_PIDF_integral_saturation);
         }

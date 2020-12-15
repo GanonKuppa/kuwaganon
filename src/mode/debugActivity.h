@@ -38,7 +38,7 @@ namespace umouse {
             uint8_t mode;
             Intent* intent = new Intent();
             intent->uint8_t_param["SUB_MODE_NUM"] = 8;
-            auto activity = ActivityFactory::cteateSubModeSelect();
+            auto activity = ActivityFactory::createSubModeSelect();
             activity->start(intent);
             printfAsync("SUB MODE SELECT RESULT = %d", intent->uint8_t_param["SUB_MODE"]);
             mode = intent->uint8_t_param["SUB_MODE"];
@@ -96,56 +96,133 @@ namespace umouse {
                 logger.print();
 
             } else if(mode == 2) {
-                float v = pm.v_search_run;
-                float a = pm.a_search_run;
-                auto traj = StraightTrajectory::createAsWallCenter(0.09 * 8, 0.0, v, 0.1f, a, a);
-                m.trajCommander.push(std::move(traj));
-            } else if(mode == 3) {
+                Logger& logger = umouse::Logger::getInstance();
+                WallSensor& ws = WallSensor::getInstance();
+                FcLed& fcled = FcLed::getInstance();
                 float v_slalom = pm.v_search_run;
                 float a = pm.a_search_run;
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f + m.WALL2MOUSE_CENTER_DIST, 0.0, v_slalom, v_slalom, a, a);
-                auto traj1 = StraightTrajectory::create(CurveFactory::getPreDistWithOffset(turn_type_e::TURN_90, v_slalom), v_slalom, v_slalom, v_slalom, a, a);
-                auto traj2 = CurveTrajectory::createAsNoStraght(v_slalom, turn_type_e::TURN_90, (turn_dir_e)SIGN(rot_times));
-                auto traj3 = StraightTrajectory::create(CurveFactory::getFolDist(turn_type_e::TURN_90), v_slalom, v_slalom, v_slalom, a, a);
-                auto traj4 = StraightTrajectory::createAsWallCenter(0.045f, v_slalom, v_slalom, 0.1f, a, a);
-                auto traj5 = StopTrajectory::create(1.0);
 
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v_slalom, v_slalom, a, a);
+                m.trajCommander.push(std::move(traj0));
+                slalom90(turn_dir_e::CW);
+                auto traj1 = StraightTrajectory::createAsWallCenter(0.045f, v_slalom, v_slalom, 0.05f, a, a);
+                m.trajCommander.push(std::move(traj1));
+
+                auto traj2 = StopTrajectory::create(1.0);
+                m.trajCommander.push(std::move(traj2));
+
+
+
+
+                fcled.turn(0,0,1);
+                logger.start();
+                while(!m.trajCommander.empty()) {
+                    waitmsec(1);                    
+                }
+                logger.end();
+                
+                fcled.turn(0,1,0);
+                while( ws.getAheadOnTime() < 0.5) {
+                    waitmsec(200);                    
+                    SEB();                
+                }
+                fcled.turn(0,1,1);
+                logger.print();
+
+
+
+
+            } else if(mode == 3) {
+                Logger& logger = umouse::Logger::getInstance();
+                WallSensor& ws = WallSensor::getInstance();
+                FcLed& fcled = FcLed::getInstance();
+
+                auto traj0 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
+                auto traj1 = StopTrajectory::create(0.3);
+                auto traj2 = SpinTurnTrajectory::create(180.0f, pm.spin_ang_v, pm.spin_ang_a);
+                auto traj3 = StopTrajectory::create(0.3);
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));
                 m.trajCommander.push(std::move(traj2));
                 m.trajCommander.push(std::move(traj3));
-                m.trajCommander.push(std::move(traj4));
-                m.trajCommander.push(std::move(traj5));
+
+
+                fcled.turn(0,0,1);
+                logger.start();
+                while(!m.trajCommander.empty()) {
+                    waitmsec(1);                    
+                }
+                logger.end();
+                
+                fcled.turn(0,1,0);
+                while( ws.getAheadOnTime() < 0.5) {
+                    waitmsec(200);                    
+                    SEB();                
+                }
+                fcled.turn(0,1,1);
+                logger.print();
+
+
             } else if(mode == 4) {
-                for(int i=0; i<20; i++) {
-                    auto traj1 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj2 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj3 = StopTrajectory::create(0.5);
-                    auto traj4 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj5 = SpinTurnTrajectory::create(90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj6 = StopTrajectory::create(0.5);
-                    m.trajCommander.push(std::move(traj1));
-                    m.trajCommander.push(std::move(traj2));
-                    m.trajCommander.push(std::move(traj3));
-                    m.trajCommander.push(std::move(traj4));
-                    m.trajCommander.push(std::move(traj5));
-                    m.trajCommander.push(std::move(traj6));
+                Logger& logger = umouse::Logger::getInstance();
+                WallSensor& ws = WallSensor::getInstance();
+                FcLed& fcled = FcLed::getInstance();
+                PowerTransmission& pt = PowerTransmission::getInstance();
+                UMouse& m = UMouse::getInstance();
+
+                m.direct_duty_set_enable = true;
+                pt.setDuty(0.1, 0.1);
+
+
+                fcled.turn(0,0,1);
+                logger.start();
+                waitmsec(300);
+                pt.setDuty(0.0, 0.0);
+                waitmsec(300);
+                m.direct_duty_set_enable = false;
+                logger.end();
+                
+                fcled.turn(0,1,0);
+                while( ws.getAheadOnTime() < 0.5) {
+                    waitmsec(200);                    
+                    SEB();                
                 }
+                fcled.turn(0,1,1);
+                logger.print();
+
+
+
             } else if(mode == 5) {
-                for(int i=0; i<20; i++) {
-                    auto traj1 = SpinTurnTrajectory::create(-90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj2 = SpinTurnTrajectory::create(-90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj3 = StopTrajectory::create(0.5);
-                    auto traj4 = SpinTurnTrajectory::create(-90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj5 = SpinTurnTrajectory::create(-90.0f, pm.spin_ang_v, pm.spin_ang_a);
-                    auto traj6 = StopTrajectory::create(0.5);
-                    m.trajCommander.push(std::move(traj1));
-                    m.trajCommander.push(std::move(traj2));
-                    m.trajCommander.push(std::move(traj3));
-                    m.trajCommander.push(std::move(traj4));
-                    m.trajCommander.push(std::move(traj5));
-                    m.trajCommander.push(std::move(traj6));
+                Logger& logger = umouse::Logger::getInstance();
+                WallSensor& ws = WallSensor::getInstance();
+                FcLed& fcled = FcLed::getInstance();
+
+                float v_ = pm.test_run_v;
+                float a_ = pm.test_run_a;
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.09f * 3.0f, 0.0f, v_, 0.3, a_, a_);
+                auto traj1 = StraightTrajectory::createAsWallCenter(0.045f, 0.3f, 0.3f, 0.3f, a_, a_);
+                auto traj2 = StraightTrajectory::createAsWallCenter(0.045f, 0.3f, 0.3f, 0.05f, a_, a_);
+                auto traj3 = StopTrajectory::create(0.5);
+                m.trajCommander.push(std::move(traj0));
+                m.trajCommander.push(std::move(traj1));
+                m.trajCommander.push(std::move(traj2));
+                m.trajCommander.push(std::move(traj3));
+
+                fcled.turn(0,0,1);
+                logger.start();
+                while(!m.trajCommander.empty()) {
+                    waitmsec(1);                    
                 }
+                logger.end();
+                
+                fcled.turn(0,1,0);
+                while( ws.getAheadOnTime() < 0.5) {
+                    waitmsec(200);                    
+                    SEB();                
+                }
+                fcled.turn(0,1,1);
+                logger.print();
+
 
 
 

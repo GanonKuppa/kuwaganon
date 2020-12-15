@@ -47,9 +47,11 @@ namespace umouse {
         float getDuty(){return duty;}
 
         void update() {
-            if(enable == true) {
+            if(enable) {
+                if(ABS(getVelocity()) > 0.02) {
+                    dial_position = (int)((getAngle() / 360.0) * (float)division_num);
+                }
                 WheelOdometry& wodo = WheelOdometry::getInstance();
-                dial_position = (int)((getAngle() / 360.0) * (float)division_num);
                 target_ang = fmod(360.0 * (float)dial_position / (float)division_num + 2.0, 360.0);
                 ang_ctrl.update(target_ang, getAngle());
 

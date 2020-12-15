@@ -257,12 +257,12 @@ namespace umouse {
         }
 
         bool isRight() {
-            if(dist_r() < 0.065) return true;
+            if(dist_r() < 0.072) return true;
             else return false;
         }
 
         bool isLeft() {
-            if(dist_l() < 0.065) return true;
+            if(dist_l() < 0.072) return true;
             else return false;
         }
 
@@ -399,7 +399,9 @@ namespace umouse {
         float calcAheadWallDist() {
             float ahead_dist_l = linearInterpolation( ahead_l(), LA_WALL_DIST_TABLE_IN, LA_WALL_DIST_TABLE_OUT, LA_WALL_DIST_TABLE_SIZE);
             float ahead_dist_r = linearInterpolation( ahead_r(), RA_WALL_DIST_TABLE_IN, RA_WALL_DIST_TABLE_OUT, RA_WALL_DIST_TABLE_SIZE);
-            if (ahead_dist_l > 0.13 || ahead_dist_r > 0.13) return 100.0f;
+            if (isAhead_l() && isAhead_r()) return (ahead_dist_l + ahead_dist_r)/2.0f;
+            else if(isAhead_l()) return ahead_dist_l;
+            else if(isAhead_r()) return ahead_dist_r;
             else return (ahead_dist_l + ahead_dist_r)/2.0f;
         }
 

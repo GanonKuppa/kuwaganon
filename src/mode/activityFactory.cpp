@@ -43,13 +43,14 @@ namespace umouse {
         }
     }
 
-    std::unique_ptr<BaseActivity> ActivityFactory::cteateSubModeSelect() {
+    std::unique_ptr<BaseActivity> ActivityFactory::createSubModeSelect() {
         return unique_ptr < BaseActivity > (new SubModeSelectActivity());
     }
 
 
-    std::unique_ptr<BaseActivity> ActivityFactory::cteateModeSelect() {
+    std::unique_ptr<BaseActivity> ActivityFactory::createModeSelect() {
         return unique_ptr < BaseActivity > (new ModeSelectActivity());
     }
+    
 
 }

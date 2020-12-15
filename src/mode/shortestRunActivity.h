@@ -60,7 +60,7 @@ namespace umouse {
             {
                 Intent* intent = new Intent();
                 intent->uint8_t_param["SUB_MODE_NUM"] = 6;
-                auto activity = ActivityFactory::cteateSubModeSelect();
+                auto activity = ActivityFactory::createSubModeSelect();
                 activity->start(intent);
                 printfAsync("SUB MODE SELECT RESULT = %d", intent->uint8_t_param["SUB_MODE"]);
                 run_mode = intent->uint8_t_param["SUB_MODE"];
@@ -74,7 +74,7 @@ namespace umouse {
                 intent->uint16_t_param["LED_ON_MSEC"] = 125;
                 intent->uint16_t_param["LED_OFF_MSEC"] = 125;
                 intent->int8_t_param["NOTE_PITCH_OFSET"] = 2;
-                auto activity = ActivityFactory::cteateSubModeSelect();
+                auto activity = ActivityFactory::createSubModeSelect();
                 activity->start(intent);
                 printfAsync("SUB MODE SELECT RESULT = %d", intent->uint8_t_param["SUB_MODE"]);
                 param_mode = intent->uint8_t_param["SUB_MODE"];
@@ -84,6 +84,7 @@ namespace umouse {
 
 
             UMouse& m = UMouse::getInstance();
+            m.setMode(ERunMode::SHORTEST_RUN);
             ParameterManager& pm = ParameterManager::getInstance();
 
             waitmsec(1000);
@@ -108,8 +109,8 @@ namespace umouse {
 
             if (param_mode == 0) return;
             //                                  v   turn_v a
-            else if(param_mode == 1) turn_p.set(0.2, 0.2, 4.0);
-            else if(param_mode == 2) turn_p.set(0.3, 0.3, 4.0);
+            else if(param_mode == 1) turn_p.set(0.2, 0.2, 2.0);
+            else if(param_mode == 2) turn_p.set(0.3, 0.3, 3.0);
             else {
                 if(param_mode == 3) setParamFromFlash(0, turn_p);
                 else if(param_mode == 4) setParamFromFlash(1, turn_p);

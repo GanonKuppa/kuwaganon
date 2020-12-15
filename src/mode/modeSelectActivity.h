@@ -24,6 +24,9 @@ namespace umouse {
       public:
         void onStart() {
             printfAsync("This is mode select activity.\n");
+            UMouse& m = UMouse::getInstance();
+            m.setMode(ERunMode::STANBY);
+
             RAMEN();
             //LEDをチカチカ
             FcLed& fcled = FcLed::getInstance();
@@ -62,6 +65,7 @@ namespace umouse {
             dial_position_L_now = dial_L.getDialPosition();
             dial_position_R_now = dial_R.getDialPosition();
             UMouse& m = UMouse::getInstance();
+            m.setMode(ERunMode::STANBY);
 
 
 

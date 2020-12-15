@@ -58,7 +58,7 @@ namespace umouse {
     class WallPidfController : public VelocityTypePidfController {
       public:
 
-        virtual void update(WallSensor& ws, bool isRWall, bool isLWall) {
+        virtual void update(WallSensor& ws, bool isRWall, bool isLWall, bool wallCenter) {
             if( ws.calcAheadWallDist() < 0.08 ||                
                 (isRWall == false &&
                  isLWall == false ) ) {
@@ -73,10 +73,13 @@ namespace umouse {
             else if(isRWall && ws.isRight()) dist = ws.dist_r();
 
             float target_line = 0.045f;
-            
-            if     (ABS(dist - 0.055f) <  0.005f ) target_line = 0.055f;
-            else if(ABS(dist - 0.045f) <= 0.005f ) target_line = 0.045f;
-            else if(ABS(dist - 0.035f) <  0.005f ) target_line = 0.035f;
+
+            if     (wallCenter                   ) target_line = 0.045f;
+            else if(    dist < 0.039f            ) target_line = 0.039f;
+            else if(ABS(dist - 0.041f) <= 0.002f ) target_line = 0.041f;
+            else if(ABS(dist - 0.045f) <= 0.002f ) target_line = 0.045f;
+            else if(ABS(dist - 0.049f) <= 0.002f ) target_line = 0.049f;
+            else if(    dist > 0.051f            ) target_line = 0.051f;
             else                                   target_line = 0.045f;
             
 
@@ -84,8 +87,8 @@ namespace umouse {
             e_l0 = - 10000 * ws.center_dist_l(0.09f - target_line);
             
 
-            bool is_r_high_volatility = (ABS(e_r0 - e_r1) > 10);
-            bool is_l_high_volatility = (ABS(e_l0 - e_l1) > 10);            
+            bool is_r_high_volatility = (ABS(e_r0 - e_r1) > 15);
+            bool is_l_high_volatility = (ABS(e_l0 - e_l1) > 15);            
 
             bool is_right = ws.isRight() && isRWall && !is_r_high_volatility;
             bool is_left =  ws.isLeft() && isLWall && !is_l_high_volatility;

@@ -207,7 +207,7 @@ int main() {
 
 
     while (1) {
-        auto activity = umouse::ActivityFactory::cteateModeSelect();
+        auto activity = umouse::ActivityFactory::createModeSelect();
         activity->start();
     };
 

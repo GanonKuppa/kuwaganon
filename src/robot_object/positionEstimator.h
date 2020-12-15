@@ -27,6 +27,7 @@ namespace umouse {
             v = 0.0;
             x_d = 0.0;
             y_d = 0.0;
+            v_for_int = 0.0;
 
             for (uint8_t i = 0; i < ACC_Y_AVERAGE_NUM; i++) {
                 acc_y_list.push_front(0.0f);
@@ -75,7 +76,7 @@ namespace umouse {
 
 
 
-        void update(float v_, float ang_v_, float a_y, float a_x, EMotionType motion_type, WallSensor& ws) {
+        void update(float v_enc, float v_ave, float ang_v_, float a_y, float a_x, EMotionType motion_type, WallSensor& ws, float a_setp) {
             acc_y_list.push_front(a_y);
             acc_y_list.pop_back();
             
@@ -115,15 +116,23 @@ namespace umouse {
                 acc_y_int += acc_y_list[i];
             }
             
-            v = v_ + acc_y_int * DELTA_T;
+            v = v_ave + acc_y_int * DELTA_T;
+
+
+            if(ABS(a_setp) < 4.0f){
+                v_for_int = v;
+            }
+            else {
+                v_for_int += a_y * DELTA_T;
+            }
 
             // 加速度積分速度算出
             v_acc += a_y * DELTA_T;
             if(ABS(v) < 0.01f) v_acc = v;
 
             // グローバル座標系速度算出
-            x_d = v_ * cos_val;
-            y_d = v_ * sin_val;
+            x_d = v_for_int * cos_val;
+            y_d = v_for_int * sin_val;
                             
             x += calcEulerDelta(x_d);
             y += calcEulerDelta(y_d);
@@ -395,6 +404,8 @@ namespace umouse {
 
         float x_d_2;
         float y_d_2;
+
+        float v_for_int;
 
         bool __isfinite(float x){
             union { float f; uint32_t i; } a;

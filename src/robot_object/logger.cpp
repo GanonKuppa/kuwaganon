@@ -5,9 +5,9 @@
 
 
 #if FULL_PARAM
-static float _log_data[1000][32];
+static float _log_data[1200][32];
 #else
-static float _log_data[2000][21];
+static float _log_data[1200][21];
 #endif
 
 namespace umouse{

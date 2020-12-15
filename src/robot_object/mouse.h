@@ -34,6 +34,14 @@
 
 namespace umouse {
 
+    enum class ERunMode : uint8_t {
+        STANBY = 0,
+        SEARCH_RUN = 1,
+        SHORTEST_RUN = 2
+    };
+
+
+
     template<typename T>
     class Coor2D {
       public:
@@ -68,7 +76,7 @@ namespace umouse {
 
     class UMouse {
       public:
-        static constexpr float WALL2MOUSE_CENTER_DIST = 0.0183;
+        static constexpr float WALL2MOUSE_CENTER_DIST = 0.01224;
         static constexpr float READ_WALL_OFFSET = 0.002;
         static constexpr float DELTA_T = 0.0005;
 
@@ -79,6 +87,7 @@ namespace umouse {
         Coor2D<uint16_t> goal;
 
         Maze maze;
+        ERunMode runMode;
         bool error_run_flag;
         bool direct_duty_set_enable;
 
@@ -101,7 +110,7 @@ namespace umouse {
             PseudoDialL& pdl = PseudoDialL::getInstance();
             PseudoDialR& pdr = PseudoDialR::getInstance();
 
-            posEsti.update(wo.getAveV(), (double)icm.omega_f[2], (double)icm.acc_f_cor[1], (double)icm.acc_f_cor[0], trajCommander.getMotionType(), ws);
+            posEsti.update(wo.getV(), wo.getAveV(), (double)icm.omega_f[2], (double)icm.acc_f_cor[1], (double)icm.acc_f_cor[0], trajCommander.getMotionType(), ws, trajCommander.a);
 
         }
 
@@ -131,7 +140,8 @@ namespace umouse {
                 if(direct_duty_set_enable == false) {
                     if(!trajCommander.empty()) {
                         auto traj = trajCommander.getTraj();
-                        ctrlMixer.update(traj, posEsti, isRWallControllable(), isLWallControllable());
+                        bool wall_center = (runMode == ERunMode::SHORTEST_RUN);
+                        ctrlMixer.update(traj, posEsti, isRWallControllable(), isLWallControllable(), wall_center);
                         auto duty = ctrlMixer.getDuty();
                         pt.setDuty(duty(0), duty(1));
                     } else {
@@ -149,7 +159,7 @@ namespace umouse {
 
                 if( !trajCommander.empty() &&
                     (icm.isUpsideDown()      ||
-                     esti_target_diff > 0.045 ||
+                     esti_target_diff > 0.045||
                     (ctrlMixer.isOutOfControl() && (ABS(pt.getDuty_R()) > 0.01f || ABS(pt.getDuty_L()) > 0.01f ))
                     )
                 ) {                    
@@ -289,6 +299,14 @@ namespace umouse {
 
             return maze.existLWall(x_, y_, direction);
         }
+    
+    ERunMode getMode(){
+        return runMode;
+    }
+
+    void setMode(ERunMode mode){
+        runMode = mode;
+    }
 
 
       private:
@@ -296,11 +314,12 @@ namespace umouse {
 
             direction = N;
             direct_duty_set_enable = false;
+            runMode = ERunMode::STANBY;
             maze.readMazeDataFromFlash();
             running_sec = 0.0f;
             ang_no_calib_sec = 0.0f;
         }
-        ;
+
         ~UMouse() {
         }
 
@@ -309,14 +328,21 @@ namespace umouse {
             WheelOdometry& wo = WheelOdometry::getInstance();
             WallSensor& ws = WallSensor::getInstance();
 
-            printfAsync("◇◇◇◇ OutOfControl!\n");
+            float x0 = trajCommander.x;
+            float x1 = posEsti.getX();
+            float y0 = trajCommander.y;
+            float y1 = posEsti.getY();
+
+            float esti_target_diff = sqrtf((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
+
+            printfAsync("◇◇◇◇ OutOfControl! %f \n",esti_target_diff);
+            printfAsync("t|%f, %f, %f\n", trajCommander.x, trajCommander.y, trajCommander.ang);
+            printfAsync("e|%f, %f, %f\n", posEsti.getX(), posEsti.getY(), posEsti.getAng());
             printfAsync("is upside down: %d\n", icm.isUpsideDown());
             printfAsync("is out of control: %d\n", ctrlMixer.isOutOfControl());
             printfAsync("ang_pidf.e_k0: %f\n", ctrlMixer.ang_pidf.e_k0);
             printfAsync("motion_type: %d\n", trajCommander.getTraj().motion_type);
             printfAsync("(ang_v_t, wodo, gyro)=(%f, %f, %f)\n",trajCommander.ang_v, wo.ang_v, icm.omega_f[2]);
-            printfAsync("(x_t, y_t, ang_t)=(%f, %f, %f)\n", trajCommander.x, trajCommander.y, trajCommander.ang);
-            printfAsync("(x_e, y_e  ang_e)=(%f, %f, %f)\n", posEsti.getX(), posEsti.getY(), posEsti.getAng());
             printfAsync("-------------------------\n");
         }
     };

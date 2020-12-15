@@ -21,7 +21,7 @@ namespace umouse {
     class RadioControlActivity : public BaseActivity {
       protected:
         ELoopStatus loop() {
-            //std::unique_ptr<BaseActivity> activity = ActivityFactory::cteateModeSelect();
+            //std::unique_ptr<BaseActivity> activity = ActivityFactory::createModeSelect();
             Gamepad& gamepad = Gamepad::getInstance();
             PowerTransmission& pt = PowerTransmission::getInstance();
             ParameterManager& pm = ParameterManager::getInstance();

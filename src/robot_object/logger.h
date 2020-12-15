@@ -20,9 +20,9 @@ namespace umouse{
         
         uint32_t _data_num;
         #if FULL_PARAM        
-        const uint32_t _max_data_num = 1000;
+        const uint32_t _max_data_num = 1200;
         #else
-        const uint32_t _max_data_num = 2000;
+        const uint32_t _max_data_num = 1200;
         #endif
 
         bool _logging;
