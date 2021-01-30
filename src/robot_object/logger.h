@@ -19,6 +19,7 @@ namespace umouse{
       private:
         
         uint32_t _data_num;
+        uint32_t _start_time_ms;
         #if FULL_PARAM        
         const uint32_t _max_data_num = 1200;
         #else
