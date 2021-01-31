@@ -121,6 +121,9 @@ namespace umouse {
 
                 if(in_read_wall_area && pre_in_read_wall_area == false && pre_read_wall_coor != m.coor) {
                     printfAsync("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝\n");
+//                    if(ws.right() && ws.left()){
+                        //m.posEsti.setAng(m.trajCommander.ang);
+//                    }
                     pre_read_wall_coor = m.coor;
                     uint8_t x_next = m.coor.x;
                     uint8_t y_next = m.coor.y;
@@ -266,7 +269,6 @@ namespace umouse {
                 WallSensor& ws = WallSensor::getInstance();
                 ParameterManager& pm = ParameterManager::getInstance();
                 rot_times *= SIGN(m.posEsti.calcWallCenterOffset());
-
                 auto traj0 = StraightTrajectory::createAsWallCenter(0.02f, v, v, 0.05f, a, a);
                 //auto traj1 = StraightTrajectory::create(0.005f, 0.05f, 0.05f, 0.05f, 0.0, 0.0);
                 auto traj2 = StopTrajectory::create(0.4f);

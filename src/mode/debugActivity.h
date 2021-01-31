@@ -73,9 +73,9 @@ namespace umouse {
                 WallSensor& ws = WallSensor::getInstance();
                 FcLed& fcled = FcLed::getInstance();
 
-                float v_ = 0.5;
+                float v_ = 0.3;
                 float a_ = 3.0;
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f * 10.0f, 0.0f, v_, 0.05f, a_, a_);
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f * 16.0f, 0.0f, v_, 0.05f, a_, a_);
                 auto traj1 = StopTrajectory::create(0.5);
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));

@@ -184,6 +184,53 @@ namespace umouse {
             }
 
 
+            if(gamepad.A > 50 && gamepad.A < 150 ) {
+                m.direct_duty_set_enable = false;
+                SEA();
+                auto traj0 = SpinTurnTrajectory::create(20.0f, pm.spin_ang_v, pm.spin_ang_a);                
+                auto traj1 = StopTrajectory::create(0.1f);
+                auto traj2 = SpinTurnTrajectory::create(-45.0f, pm.spin_ang_v, pm.spin_ang_a);
+                auto traj3 = StopTrajectory::create(0.2f);
+                m.trajCommander.push(std::move(traj0));
+                m.trajCommander.push(std::move(traj1));
+                m.trajCommander.push(std::move(traj2));
+                m.trajCommander.push(std::move(traj3));
+
+                float min_dist = 0.1f;
+                float ang_min_dist = 100.0f;
+
+                while(!m.trajCommander.empty()){
+                    if(ws.ahead_dist_l() < min_dist){
+                        ang_min_dist = m.posEsti.getAng();   
+                        min_dist = ws.ahead_dist_l();
+                    }
+                    waitmsec(1);
+                }
+                float end_ang = m.posEsti.getAng();
+                float diff_ang = ang_min_dist - end_ang;
+                auto traj4 = SpinTurnTrajectory::create(diff_ang, pm.spin_ang_v, pm.spin_ang_a);
+
+                auto traj5 = StopTrajectory::create(1.0f);
+                m.trajCommander.push(std::move(traj4));
+                m.trajCommander.push(std::move(traj5));
+                printfAsync("ahead wall ang reset!\n");
+                printfAsync("%f %f %f!\n",end_ang, ang_min_dist, min_dist);
+
+                while(!m.trajCommander.empty()){
+                    waitmsec(100);
+                }
+
+
+
+                m.direct_duty_set_enable = true;
+
+
+
+                SEF();
+                waitmsec(100);
+            }
+
+
 
 
             if(gamepad.B > 2800 ) {

@@ -257,12 +257,12 @@ namespace umouse {
         }
 
         bool isRight() {
-            if(dist_r() < 0.072) return true;
+            if(dist_r() < 0.085) return true;
             else return false;
         }
 
         bool isLeft() {
-            if(dist_l() < 0.072) return true;
+            if(dist_l() < 0.085) return true;
             else return false;
         }
 

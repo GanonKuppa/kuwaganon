@@ -42,8 +42,8 @@ namespace umouse {
             e_l0 = - 10000 * ws.center_dist_l(0.09f - target_line);
             
 
-            bool is_r_high_volatility = (ABS(e_r0 - e_r1) > 15);
-            bool is_l_high_volatility = (ABS(e_l0 - e_l1) > 15);            
+            bool is_r_high_volatility = false;//(ABS(e_r0 - e_r1) > 50);
+            bool is_l_high_volatility = false;//(ABS(e_l0 - e_l1) > 50);            
 
             bool is_right = ws.isRight() && isRWall && !is_r_high_volatility;
             bool is_left =  ws.isLeft() && isLWall && !is_l_high_volatility;

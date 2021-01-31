@@ -162,20 +162,7 @@ namespace umouse {
                 wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall, wallCenter);
                 target_rot_x += wall_pidf.getControlVal();
                 pos_pidf.reset();
-            } else if( (motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
-                        motion_type == EMotionType::STRAIGHT &&
-                        pm.pos_PIDF_enable == true) &&
-                       fabs(esti.calcWallCenterOffset()) > pm.rot_x_wall_abs_center_offset
-                     ) {
-                pos_pidf.update(0.0, - esti.calcWallCenterOffset());
-                target_rot_x += pos_pidf.getControlVal();
-                wall_pidf.reset();
-            } else if(motion_type == EMotionType::DIAGONAL_CENTER &&
-                      pm.pos_PIDF_enable == true
-                     ) {
-                pos_pidf.update(0.0, - esti.calcDiagWallCenterOffset());
-                target_rot_x += pos_pidf.getControlVal();
-            }
+            } 
 
             // 直進時の衝突回避
             if(motion_type == EMotionType::STRAIGHT_WALL_CENTER || 
@@ -378,6 +365,7 @@ namespace umouse {
 
 
             pos_pidf.setSaturation(pm.target_rot_x_saturation);
+            ang_pidf.setSaturation(360.0f);
             wall_pidf.setSaturation(pm.target_rot_x_saturation);
             
             // 積分サチュレーションイネーブル設定
