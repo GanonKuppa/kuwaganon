@@ -76,7 +76,7 @@ namespace umouse {
 
     class UMouse {
       public:
-        static constexpr float WALL2MOUSE_CENTER_DIST = 0.01224;
+        static constexpr float WALL2MOUSE_CENTER_DIST = 0.01;
         static constexpr float READ_WALL_OFFSET = 0.002;
         static constexpr float DELTA_T = 0.0005;
 
@@ -188,6 +188,14 @@ namespace umouse {
             if(posEsti.getAng() >= 135.0f && posEsti.getAng() < 225.0f) return direction_e::W;
             if(posEsti.getAng() >= 225.0f && posEsti.getAng() < 315.0f) return direction_e::S;
             return direction_e::E;
+        }
+
+        float getDirectionAngle(){
+            if(posEsti.getAng() >= 315.0f || posEsti.getAng() <  45.0f) return 0.0f;
+            if(posEsti.getAng() >=  45.0f && posEsti.getAng() < 135.0f) return 90.0f;
+            if(posEsti.getAng() >= 135.0f && posEsti.getAng() < 225.0f) return 180.0f;
+            if(posEsti.getAng() >= 225.0f && posEsti.getAng() < 315.0f) return 270.0f;
+            return 0.0f;
         }
 
 

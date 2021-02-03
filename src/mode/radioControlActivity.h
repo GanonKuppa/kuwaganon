@@ -95,8 +95,8 @@ namespace umouse {
                 SE_CONFIRM();
                 float v_slalom = pm.v_search_run;
                 float a = pm.a_search_run;
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.09f*block-0.01f, 0.0f, v_slalom, 0.05f, a, a);
-                auto traj1 = StraightTrajectory::createAsWallCenter(0.01f            , 0.05f, 0.05f,  0.05f, a, a);
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.09f*block-0.01f, 0.0f, v_slalom, 0.025f, a, a);
+                auto traj1 = StraightTrajectory::createAsWallCenter(0.01f            , 0.025f, 0.025f,  0.025f, a, a);
                 auto traj2 = StopTrajectory::create(0.5f);
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));
@@ -139,10 +139,11 @@ namespace umouse {
 
             if(gamepad.Y > 50 && gamepad.Y < 150 ) {
                 m.direct_duty_set_enable = false;
+                const float sen_wall_diff_ang = 1.5f;
                 SEA();
-                auto traj0 = SpinTurnTrajectory::create(20.0f, pm.spin_ang_v, pm.spin_ang_a);                
+                auto traj0 = SpinTurnTrajectory::create(20.0f, 500, 500);                
                 auto traj1 = StopTrajectory::create(0.1f);
-                auto traj2 = SpinTurnTrajectory::create(-45.0f, pm.spin_ang_v, pm.spin_ang_a);
+                auto traj2 = SpinTurnTrajectory::create(-45.0f, 500, 500);
                 auto traj3 = StopTrajectory::create(0.2f);
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));
@@ -161,7 +162,7 @@ namespace umouse {
                 }
                 float end_ang = m.posEsti.getAng();
                 float diff_ang = ang_min_dist - end_ang;
-                auto traj4 = SpinTurnTrajectory::create(1.0+diff_ang, pm.spin_ang_v, pm.spin_ang_a);
+                auto traj4 = SpinTurnTrajectory::create(sen_wall_diff_ang+diff_ang, 500, 500);
 
                 auto traj5 = StopTrajectory::create(1.0f);
                 m.trajCommander.push(std::move(traj4));
@@ -185,11 +186,12 @@ namespace umouse {
 
 
             if(gamepad.A > 50 && gamepad.A < 150 ) {
+                const float sen_wall_diff_ang = 1.5f;
                 m.direct_duty_set_enable = false;
                 SEA();
-                auto traj0 = SpinTurnTrajectory::create(20.0f, pm.spin_ang_v, pm.spin_ang_a);                
+                auto traj0 = SpinTurnTrajectory::create(20.0f, 500, 500);                
                 auto traj1 = StopTrajectory::create(0.1f);
-                auto traj2 = SpinTurnTrajectory::create(-45.0f, pm.spin_ang_v, pm.spin_ang_a);
+                auto traj2 = SpinTurnTrajectory::create(-45.0f, 500, 500);
                 auto traj3 = StopTrajectory::create(0.2f);
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));
@@ -208,7 +210,7 @@ namespace umouse {
                 }
                 float end_ang = m.posEsti.getAng();
                 float diff_ang = ang_min_dist - end_ang;
-                auto traj4 = SpinTurnTrajectory::create(diff_ang, pm.spin_ang_v, pm.spin_ang_a);
+                auto traj4 = SpinTurnTrajectory::create(sen_wall_diff_ang + diff_ang, pm.spin_ang_v, pm.spin_ang_a);
 
                 auto traj5 = StopTrajectory::create(1.0f);
                 m.trajCommander.push(std::move(traj4));

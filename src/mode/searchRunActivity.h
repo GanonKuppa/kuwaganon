@@ -121,9 +121,6 @@ namespace umouse {
 
                 if(in_read_wall_area && pre_in_read_wall_area == false && pre_read_wall_coor != m.coor) {
                     printfAsync("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝\n");
-//                    if(ws.right() && ws.left()){
-                        //m.posEsti.setAng(m.trajCommander.ang);
-//                    }
                     pre_read_wall_coor = m.coor;
                     uint8_t x_next = m.coor.x;
                     uint8_t y_next = m.coor.y;
@@ -134,10 +131,10 @@ namespace umouse {
 
                     //printfAsync("msg_flag:%f,%f,壁|| 左 %d 前 (%d %d) 右 %d\n", m.posEsti.getX(), m.posEsti.getY(), ws.left(), ws.ahead_l(), ws.ahead_r(), ws.right());
                     
-                    if (m.maze.existAWall(x_next, y_next, m.direction)){
+                    if (ws.isAhead()){
                         printfAsync("pre:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
-                        m.posEsti.aheadWallCorrection(ws, x_next, y_next);
-                        m.posEsti.sideWallCorrection(ws, x_next, y_next);
+                        //m.posEsti.aheadWallCorrection(ws, x_next, y_next);
+                        //m.posEsti.sideWallCorrection(ws, x_next, y_next);
                         printfAsync("fol:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
                         SE_I7();
                     }
@@ -155,6 +152,7 @@ namespace umouse {
                         destiMove();
                     }
                     else {
+
 
                         if(rot_times == 0) {
                             straight(x_next, y_next);                            
@@ -190,9 +188,9 @@ namespace umouse {
             }
 
             void slalom90(int8_t rot_times, uint8_t x_next, uint8_t y_next) {
-                auto traj0 = StraightTrajectory::create(CurveFactory::getPreDistWithOffset(turn_type_e::TURN_90, v), v, v, v, a, a);
+                auto traj0 = StraightTrajectory::create(CurveFactory::getPreDistWithOffset(turn_type_e::TURN_90, v), v);
                 auto traj1 = CurveTrajectory::createAsNoStraght(v, turn_type_e::TURN_90, (turn_dir_e)SIGN(rot_times));
-                auto traj2 = StraightTrajectory::create(CurveFactory::getFolDist(turn_type_e::TURN_90), v, v, v, a, a);
+                auto traj2 = StraightTrajectory::create(CurveFactory::getFolDist(turn_type_e::TURN_90), v);
                 WallSensor &ws = WallSensor::getInstance();
                 UMouse& m = UMouse::getInstance();
                 m.trajCommander.push(std::move(traj0));
@@ -226,14 +224,24 @@ namespace umouse {
                     }
                 }
                 if(block_count == 1){
-                    auto traj0 = StraightTrajectory::createAsWallCenter(0.09f * block_count, v, v, v, a, a);
-                    m.trajCommander.push(std::move(traj0));
+                    /*
+                    if(ws.isLeft() && m.ang_no_calib_sec > 30.0f){
+                        correctAngle(2);
+                    }
+                    else if(ws.isRight() && m.ang_no_calib_sec > 30.0f){
+                        correctAngle(-2);
+                    }
+                    */
+                    //else{
+                        auto traj0 = StraightTrajectory::createAsWallCenter(0.09f * block_count, v);
+                        m.trajCommander.push(std::move(traj0));
+                    //}
                 }
                 else{
                     auto traj0 = StraightTrajectory::createAsWallCenter(0.09f * block_count - 0.045, v, v_max, v, a, a);
                     m.trajCommander.push(std::move(traj0));
                     while(!m.trajCommander.empty()) {waitmsec(1);}
-                    auto traj1 = StraightTrajectory::createAsWallCenter(0.045f, v, v, v, a, a);
+                    auto traj1 = StraightTrajectory::createAsWallCenter(0.045f, v);
                     m.trajCommander.push(std::move(traj1));
                 }
 
@@ -249,44 +257,122 @@ namespace umouse {
                      return;
                 }
 
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.05f, a, a);
-                //auto traj1 = StraightTrajectory::create(0.005f, 0.05f, 0.05f, 0.05f, 0.0f, 0.0f);
-                auto traj2 = StopTrajectory::create(0.2f);
-                auto traj3 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                auto traj4 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.025f, a, a);
+                auto traj1 = StopTrajectory::create(0.2f);
                 m.trajCommander.push(std::move(traj0));
-                //m.trajCommander.push(std::move(traj1));
+                m.trajCommander.push(std::move(traj1));
+                
+                auto traj2 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
+                auto traj3 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
                 m.trajCommander.push(std::move(traj2));
                 m.trajCommander.push(std::move(traj3));
-                m.trajCommander.push(std::move(traj4));
-
             }
-
-
 
             void spin180(int8_t rot_times) {
                 UMouse& m = UMouse::getInstance();
                 WallSensor& ws = WallSensor::getInstance();
                 ParameterManager& pm = ParameterManager::getInstance();
                 rot_times *= SIGN(m.posEsti.calcWallCenterOffset());
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.02f, v, v, 0.05f, a, a);
-                //auto traj1 = StraightTrajectory::create(0.005f, 0.05f, 0.05f, 0.05f, 0.0, 0.0);
-                auto traj2 = StopTrajectory::create(0.4f);
-                auto traj3 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
-                auto traj4 = StraightTrajectory::createAsWallCenter(0.02f, 0.0f, v, v, a, a);
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.02f, v, v, 0.025f, a, a);
+                auto traj1 = StopTrajectory::create(0.4f);
+                auto traj2 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
+                auto traj3 = StraightTrajectory::createAsWallCenter(0.02f, 0.0f, v, v, a, a);
                 m.trajCommander.push(std::move(traj0));
-                //m.trajCommander.push(std::move(traj1));
+                m.trajCommander.push(std::move(traj1));
                 m.trajCommander.push(std::move(traj2));
                 m.trajCommander.push(std::move(traj3));
-                m.trajCommander.push(std::move(traj4));
             }
+
+            void correctAngle(uint8_t rot_times) {
+                UMouse& m = UMouse::getInstance();
+                WallSensor& ws = WallSensor::getInstance();
+                ParameterManager& pm = ParameterManager::getInstance();
+
+                float sen_wall_diff_ang;
+                if(rot_times == 2) sen_wall_diff_ang = 1.5f;
+                else if(rot_times == -2) sen_wall_diff_ang = 1.5f;
+
+                {
+                    auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.025f, a, a);
+                    auto traj1 = StopTrajectory::create(0.2f);
+                    auto traj2 = SpinTurnTrajectory::create(rot_times*45.0f, 500.0f, 500.0f);                
+                    auto traj3 = StopTrajectory::create(0.1f);
+
+                    m.trajCommander.push(std::move(traj0));
+                    m.trajCommander.push(std::move(traj1));
+                    m.trajCommander.push(std::move(traj2));
+                    m.trajCommander.push(std::move(traj3));
+
+                    while(!m.trajCommander.empty()){
+                        waitmsec(1);
+                    }
+                }
+
+                SEA();
+                auto traj0 = SpinTurnTrajectory::create(20.0f, 500.0f, 500.0f);                
+                auto traj1 = StopTrajectory::create(0.1f);
+                auto traj2 = SpinTurnTrajectory::create(-40.0f, 500.0f, 500.0f);
+                auto traj3 = StopTrajectory::create(0.2f);
+                m.trajCommander.push(std::move(traj0));
+                m.trajCommander.push(std::move(traj1));
+                m.trajCommander.push(std::move(traj2));
+                m.trajCommander.push(std::move(traj3));
+
+                float min_dist = 0.1f;
+                float ang_min_dist = 100.0f;
+
+                while(!m.trajCommander.empty()){
+                    float dist;
+                    if(rot_times == 2) dist = ws.ahead_dist_l();
+                    else if(rot_times == -2) dist = ws.ahead_dist_r();
+                    
+                    if(ws.ahead_dist_l() < min_dist){
+                        ang_min_dist = m.posEsti.getAng();   
+                        min_dist = dist;
+                    }
+                    waitusec(500);
+                }
+                
+                float end_ang = m.posEsti.getAng();
+                float diff_ang = ang_min_dist - end_ang;
+                float turn_ang = sen_wall_diff_ang + diff_ang + (- rot_times*45.0f);
+                if(turn_ang > 180.0f){
+                    turn_ang -= 360.0f;
+                }
+                else if(turn_ang < -180.0f){
+                    turn_ang += 360.0f;
+                }
+
+                auto traj4 = SpinTurnTrajectory::create(turn_ang, 500.0f, 500.0f);
+                auto traj5 = StopTrajectory::create(1.0f);
+                m.trajCommander.push(std::move(traj4));
+                m.trajCommander.push(std::move(traj5));
+                
+                while(!m.trajCommander.empty()){
+                    waitmsec(1);
+                }
+
+                m.posEsti.setAng(m.getDirectionAngle());
+                printfAsync("ahead wall ang reset!\n");
+                printfAsync("%f %f %f!\n",end_ang, ang_min_dist, min_dist);
+
+                {
+                    auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v, v, a, a);
+                    m.trajCommander.push(std::move(traj0));
+                }
+                m.ang_no_calib_sec = 0.0f;
+
+            }
+
+
+
 
             virtual void destiMove() {
                 printfAsync("OOOOO Goal!\n");
                 UMouse& m = UMouse::getInstance();
                 WallSensor& ws = WallSensor::getInstance();
                 m.maze.writeMazeData2Flash();
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.05f, a, a);
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.025f, a, a);
                 auto traj1 = StopTrajectory::create(0.5f);
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));
@@ -339,7 +425,7 @@ namespace umouse {
                 UMouse& m = UMouse::getInstance();
                 WallSensor& ws = WallSensor::getInstance();
                 m.maze.writeMazeData2Flash();
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.05f, a, a);
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v, v, 0.025f, a, a);
                 auto traj1 = StopTrajectory::create(0.5f);
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));

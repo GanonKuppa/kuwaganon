@@ -158,7 +158,7 @@ namespace umouse {
         }
 
         void residualCompensation(float dist) {            
-            float v_0 = constrainL(v, 0.05f);
+            float v_0 = constrainL(v, 0.025f);
             float a_0 = 0.0f;
             std::unique_ptr<BaseTrajectory> traj = nullptr;
 

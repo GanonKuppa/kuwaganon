@@ -75,11 +75,14 @@ namespace umouse {
 
                 float v_ = 0.3;
                 float a_ = 3.0;
-                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f * 16.0f, 0.0f, v_, 0.05f, a_, a_);
-                auto traj1 = StopTrajectory::create(0.5);
+                auto traj0 = StraightTrajectory::createAsWallCenter(0.045f * 16.0f-0.005, 0.0f, v_, 0.025f, a_, a_);
+                auto traj1 = StraightTrajectory::createAsWallCenter(0.005f, 0.025f);
+                auto traj2 = StopTrajectory::create(0.5);
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));
-                
+                m.trajCommander.push(std::move(traj2));
+
+
                 fcled.turn(0,0,1);
                 logger.start();
                 while(!m.trajCommander.empty()) {
@@ -105,11 +108,12 @@ namespace umouse {
                 auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v_slalom, v_slalom, a, a);
                 m.trajCommander.push(std::move(traj0));
                 slalom90(turn_dir_e::CW);
-                auto traj1 = StraightTrajectory::createAsWallCenter(0.045f, v_slalom, v_slalom, 0.05f, a, a);
+                auto traj1 = StraightTrajectory::createAsWallCenter(0.040f, v_slalom, v_slalom, 0.025f, a, a);
                 m.trajCommander.push(std::move(traj1));
-
-                auto traj2 = StopTrajectory::create(1.0);
+                auto traj2 = StraightTrajectory::createAsWallCenter(0.005f, 0.025f);
                 m.trajCommander.push(std::move(traj2));
+                auto traj3 = StopTrajectory::create(0.5);
+                m.trajCommander.push(std::move(traj3));
 
 
 
@@ -201,7 +205,7 @@ namespace umouse {
                 float a_ = pm.test_run_a;
                 auto traj0 = StraightTrajectory::createAsWallCenter(0.09f * 3.0f, 0.0f, v_, 0.3, a_, a_);
                 auto traj1 = StraightTrajectory::createAsWallCenter(0.045f, 0.3f, 0.3f, 0.3f, a_, a_);
-                auto traj2 = StraightTrajectory::createAsWallCenter(0.045f, 0.3f, 0.3f, 0.05f, a_, a_);
+                auto traj2 = StraightTrajectory::createAsWallCenter(0.045f, 0.3f, 0.3f, 0.025f, a_, a_);
                 auto traj3 = StopTrajectory::create(0.5);
                 m.trajCommander.push(std::move(traj0));
                 m.trajCommander.push(std::move(traj1));
@@ -245,16 +249,63 @@ namespace umouse {
                 auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, 0.0, v_slalom, v_slalom, a, a);
                 m.trajCommander.push(std::move(traj0));
 
-                for(int i=0; i<100; i++) {
-                    straight_n_blocks(4.0f);
-                    slalom90(turn_dir_e::CW);
-                }
+                u_turn();
+                slalom90(turn_dir_e::CW);
+                slalom90(turn_dir_e::CW);
+                u_turn();
+                slalom90(turn_dir_e::CW);
+                slalom90(turn_dir_e::CW);
+                u_turn();
+                slalom90(turn_dir_e::CW);
+                slalom90(turn_dir_e::CW);
+                u_turn();
+                slalom90(turn_dir_e::CW);
+                slalom90(turn_dir_e::CW);
 
-                auto traj1 = StraightTrajectory::createAsWallCenter(0.045f, v_slalom, v_slalom, 0.1f, a, a);
+                u_turn();
+                slalom90(turn_dir_e::CCW);
+                slalom90(turn_dir_e::CCW);
+                u_turn();
+                slalom90(turn_dir_e::CCW);
+                slalom90(turn_dir_e::CCW);
+                u_turn();
+                slalom90(turn_dir_e::CCW);
+                slalom90(turn_dir_e::CCW);
+                u_turn();
+                slalom90(turn_dir_e::CCW);
+                slalom90(turn_dir_e::CCW);
+
+                u_turn();
+                slalom90(turn_dir_e::CW);
+                slalom90(turn_dir_e::CW);
+                u_turn();
+                slalom90(turn_dir_e::CW);
+                slalom90(turn_dir_e::CW);
+                u_turn();
+                slalom90(turn_dir_e::CW);
+                slalom90(turn_dir_e::CW);
+                u_turn();
+                slalom90(turn_dir_e::CW);
+                slalom90(turn_dir_e::CW);
+
+                u_turn();
+                slalom90(turn_dir_e::CCW);
+                slalom90(turn_dir_e::CCW);
+                u_turn();
+                slalom90(turn_dir_e::CCW);
+                slalom90(turn_dir_e::CCW);
+                u_turn();
+                slalom90(turn_dir_e::CCW);
+                slalom90(turn_dir_e::CCW);
+                u_turn();
+                slalom90(turn_dir_e::CCW);
+                slalom90(turn_dir_e::CCW);
+
+                auto traj1 = StraightTrajectory::createAsWallCenter(0.045f, v_slalom, v_slalom, 0.025f, a, a);
                 m.trajCommander.push(std::move(traj1));
 
-                auto traj2 = StopTrajectory::create(1.0);
-                m.trajCommander.push(std::move(traj2));
+                auto traj_stop = StopTrajectory::create(1.0);
+                m.trajCommander.push(std::move(traj_stop));
 
             }
 
@@ -264,15 +315,41 @@ namespace umouse {
         void slalom90(turn_dir_e dir) {
             ParameterManager& pm = ParameterManager::getInstance();
             float v_slalom = pm.v_search_run;
-            float a = pm.a_search_run;
             UMouse& m = UMouse::getInstance();
-            auto traj1 = StraightTrajectory::create(CurveFactory::getPreDistWithOffset(turn_type_e::TURN_90, v_slalom), v_slalom, v_slalom, v_slalom, a, a);
+            auto traj1 = StraightTrajectory::create(CurveFactory::getPreDistWithOffset(turn_type_e::TURN_90, v_slalom), v_slalom);
             auto traj2 = CurveTrajectory::createAsNoStraght(v_slalom, turn_type_e::TURN_90, dir);
-            auto traj3 = StraightTrajectory::create(CurveFactory::getFolDist(turn_type_e::TURN_90), v_slalom, v_slalom, v_slalom, a, a);
+            auto traj3 = StraightTrajectory::create(CurveFactory::getFolDist(turn_type_e::TURN_90), v_slalom);
             m.trajCommander.push(std::move(traj1));
             m.trajCommander.push(std::move(traj2));
             m.trajCommander.push(std::move(traj3));
         }
+
+        void u_turn() {
+            ParameterManager& pm = ParameterManager::getInstance();
+            float v_slalom = pm.v_search_run;
+            float a = pm.a_search_run;
+            UMouse& m = UMouse::getInstance();
+            auto traj0 = StraightTrajectory::createAsWallCenter(0.045f, v_slalom, v_slalom, 0.025f, a, a);
+            auto traj1 = StopTrajectory::create(0.3);
+            auto traj2 = SpinTurnTrajectory::create(180.0f, pm.spin_ang_v, pm.spin_ang_a);
+            auto traj3 = StopTrajectory::create(0.3);
+            auto traj4 = StraightTrajectory::createAsWallCenter(0.045f, 0.0f, v_slalom, v_slalom, a, a);
+            
+            m.trajCommander.push(std::move(traj0));
+            m.trajCommander.push(std::move(traj1));
+            m.trajCommander.push(std::move(traj2));
+            m.trajCommander.push(std::move(traj3));
+            m.trajCommander.push(std::move(traj4));
+        }
+
+        void straight_1_block(){
+            ParameterManager& pm = ParameterManager::getInstance();
+            float v_slalom = pm.v_search_run;                        
+            UMouse& m = UMouse::getInstance();
+            auto traj0 = StraightTrajectory::createAsWallCenter(0.09f, v_slalom);
+            m.trajCommander.push(std::move(traj0));
+        }
+
 
         void straight_n_blocks(float n_blocks) {
             ParameterManager& pm = ParameterManager::getInstance();

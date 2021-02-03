@@ -328,7 +328,7 @@ namespace umouse {
             }
             if (v < v_end && a < 0.0f) {
                 v = v_end;
-                if(wall_contact == true && v_end == 0.0f) v = 0.05f;
+                if(wall_contact == true && v_end == 0.0f) v = 0.025f;
                 cumulative_dist = target_dist;
                 //printfAsync("EEEEEEE\n");
             }

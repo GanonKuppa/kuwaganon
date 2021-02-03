@@ -229,18 +229,6 @@ namespace umouse {
             float right_err = ABS(right() - center_r());
             float left_err = ABS(left() - center_l());
             
-            if(isLeft() && isRight()){
-                if(right_err < 30 && left_err < 30) in_wall_center_time += DELTA_T;
-            }
-/*            else if(isLeft()){
-                if(left_err < 10) in_wall_center_time += DELTA_T;
-            }
-            else if(isRight()){
-                if(right_err < 10) in_wall_center_time += DELTA_T;
-            }*/
-            else {
-                in_wall_center_time = 0.0f;
-            }
             
 
             if(isAhead() == true) ahead_on_time += DELTA_T;
@@ -344,15 +332,24 @@ namespace umouse {
         }
 
         bool isOnWallCenter() {
-            if(in_wall_center_time > 0.15) {
-                return true;
-            } else return false;
-
+            bool on_r_center = ABS(dist_r() - 0.045f) < 0.005;
+            bool on_l_center = ABS(dist_l() - 0.045f) < 0.005;
+            
+            if(isLeft() && isRight()){
+                if(on_r_center && on_l_center)return true;
+                else return false;                                
+            } 
+            else if (isLeft() && !isRight()){
+                if(on_l_center)return true;
+                else return false;
+            }
+            else if (!isLeft() && isRight()){
+                if(on_r_center)return true;
+                else return false;
+            }
+            else return false;            
         }
 
-        float getOnWallCenterTime() {
-            return in_wall_center_time;
-        }
 
         void setWallCenterVal() {
             ParameterManager& pm = ParameterManager::getInstance();
@@ -449,8 +446,7 @@ namespace umouse {
       private:
         const uint8_t BUFF_SIZE = 30;
         const uint16_t LED_ON_USEC = 70;
-        bool enable;
-        float in_wall_center_time;
+        bool enable;        
         float contact_wall_time;
         float ahead_on_time;
         const float DELTA_T = 0.0005;
@@ -459,8 +455,7 @@ namespace umouse {
 
         WallSensor() {
 
-            enable = true;
-            in_wall_center_time = 0.0f;
+            enable = true;            
             contact_wall_time = 0.0f;
             ahead_on_time = 0.0f;
             ahead_l_on = 0;

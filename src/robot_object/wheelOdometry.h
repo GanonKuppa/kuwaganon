@@ -24,7 +24,7 @@ namespace umouse {
         uint32_t L_ENC_now;
 
         const float BIG_R = 500000.0;
-        const uint32_t AVERAGE_NUM = 100;
+        const uint32_t AVERAGE_NUM = 30;
         const float DELAY_TIME = (AVERAGE_NUM / 2.0) * DELTA_T;
         const float DELTA_T = 0.001;
         const float TIRE_GEAR_NUM = 41.0;

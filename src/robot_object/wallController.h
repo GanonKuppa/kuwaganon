@@ -14,7 +14,7 @@ namespace umouse {
       public:
 
         virtual void update(WallSensor& ws, bool isRWall, bool isLWall, bool wallCenter) {
-            if( ws.calcAheadWallDist() < 0.08 ||                
+            if( ws.calcAheadWallDist() < 0.08 ||
                 (isRWall == false &&
                  isLWall == false ) ) {
                 reset();
@@ -28,7 +28,7 @@ namespace umouse {
             else if(isRWall && ws.isRight()) dist = ws.dist_r();
 
             float target_line = 0.045f;
-
+            wallCenter = true;
             if     (wallCenter                   ) target_line = 0.045f;
             else if(    dist < 0.039f            ) target_line = 0.039f;
             else if(ABS(dist - 0.041f) <= 0.002f ) target_line = 0.041f;
@@ -39,11 +39,12 @@ namespace umouse {
             
 
             e_r0 =   10000 * ws.center_dist_r(target_line);
+            if(e_r0 > -20 && e_r0 < 20) e_r0 = 0;
             e_l0 = - 10000 * ws.center_dist_l(0.09f - target_line);
-            
+            if(e_l0 > -20 && e_l0 < 20) e_l0 = 0;
 
-            bool is_r_high_volatility = false;//(ABS(e_r0 - e_r1) > 50);
-            bool is_l_high_volatility = false;//(ABS(e_l0 - e_l1) > 50);            
+            bool is_r_high_volatility = false;//(ABS(e_r0 - e_r1) > 100);
+            bool is_l_high_volatility = false;//(ABS(e_l0 - e_l1) > 100);            
 
             bool is_right = ws.isRight() && isRWall && !is_r_high_volatility;
             bool is_left =  ws.isLeft() && isLWall && !is_l_high_volatility;

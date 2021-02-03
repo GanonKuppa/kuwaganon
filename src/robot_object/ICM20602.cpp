@@ -47,7 +47,7 @@ namespace umouse {
         waitmsec(10);
 
         //lpf gyro
-        writeReg(0x1A, 0x00); // DLPF_CFG = 0 and FCHOICE_B=0 のとき 3-db BW = 250Hz
+        writeReg(0x1A, 0x00); // DLPF_CFG = 0 and FCHOICE_B=0 のとき 3-db BW = 250Hz　0.97msecの遅延
         waitmsec(10);
 
         //range gyro
@@ -59,7 +59,7 @@ namespace umouse {
         waitmsec(10);
 
         //lpf acc
-        writeReg(0x1D, 0x08); //0b0000 0001 ACCEL_FCHOICE_Bを1にしないと加速度の内部レートが4kHzにならない
+        writeReg(0x1D, 0x08); //0b0000 0001 ACCEL_FCHOICE_Bを1にしないと加速度の内部レートが4kHzにならない 218.1Hz   
         waitmsec(10);
 
         useSSLA0RSPI0();
