@@ -440,7 +440,7 @@ namespace umouse {
 
 
         void onWallCenterCorrection() {
-            if(on_wall_center_dist > 0.05f) {
+            if(on_wall_center_dist > 0.06f) {
                 if(ang >= 315.0 || ang < 45.0) {
                     y = (uint8_t)(y / 0.09) * 0.09 + 0.09/2.0;
                     ang = 0.0;

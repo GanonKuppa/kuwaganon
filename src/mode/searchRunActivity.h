@@ -120,7 +120,7 @@ namespace umouse {
 
 
                 if(in_read_wall_area && pre_in_read_wall_area == false && pre_read_wall_coor != m.coor) {
-                    printfAsync("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝\n");
+                    printfAsync("＝＝＝\n");
                     pre_read_wall_coor = m.coor;
                     uint8_t x_next = m.coor.x;
                     uint8_t y_next = m.coor.y;
@@ -132,10 +132,11 @@ namespace umouse {
                     //printfAsync("msg_flag:%f,%f,壁|| 左 %d 前 (%d %d) 右 %d\n", m.posEsti.getX(), m.posEsti.getY(), ws.left(), ws.ahead_l(), ws.ahead_r(), ws.right());
                     
                     if (ws.isAhead()){
-                        printfAsync("pre:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
+                        printfAsync("ahead\n");
+                        //printfAsync("pre:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
                         //m.posEsti.aheadWallCorrection(ws, x_next, y_next);
                         //m.posEsti.sideWallCorrection(ws, x_next, y_next);
-                        printfAsync("fol:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
+                        //printfAsync("fol:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
                         SE_I7();
                     }
 

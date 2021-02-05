@@ -70,7 +70,7 @@ namespace umouse {
 
             {
                 Intent* intent = new Intent();
-                intent->uint8_t_param["SUB_MODE_NUM"] = 8;
+                intent->uint8_t_param["SUB_MODE_NUM"] = 6;
                 intent->uint16_t_param["LED_ON_MSEC"] = 125;
                 intent->uint16_t_param["LED_OFF_MSEC"] = 125;
                 intent->int8_t_param["NOTE_PITCH_OFSET"] = 2;
@@ -109,26 +109,14 @@ namespace umouse {
 
             if (param_mode == 0) return;
             //                                  v   turn_v a
-            else if(param_mode == 1) turn_p.set(0.2, 0.2, 2.0);
-            else if(param_mode == 2) turn_p.set(0.3, 0.3, 3.0);
-            else {
-                if(param_mode == 3) setParamFromFlash(0, turn_p);
-                else if(param_mode == 4) setParamFromFlash(1, turn_p);
-                else if(param_mode == 5) setParamFromFlash(2, turn_p);
-                else if(param_mode == 6) setParamFromFlash(3, turn_p);
-                else if(param_mode == 7) setParamFromFlash(4, turn_p);
-            }
-
-
-
-            //else if(param_mode == 3) turn_p.set(1.0, 0.40, 0.40, 0.4 , 0.4 , 0.4 , 0.4 , 0.4 , 5.0, 3.0);
-            //else if(param_mode == 4) turn_p.set(1.0, 0.45, 0.45, 0.45, 0.38, 0.45, 0.45, 0.45, 5.0, 3.0);
-            //else if(param_mode == 5) turn_p.set(1.0, 0.50, 0.50, 0.47, 0.38, 0.47, 0.47, 0.47, 5.0, 3.0);
-            //else if(param_mode == 6) turn_p.set(1.0, 0.55, 0.55, 0.55, 0.45, 0.55, 0.55, 0.55, 5.0, 3.0);
-            //else if(param_mode == 7) turn_p.set(1.0, 0.60, 0.60, 0.60, 0.48, 0.60, 0.60, 0.60, 5.0, 3.0);
+            else if(param_mode == 1) setParamFromFlash(0, turn_p);
+            else if(param_mode == 2) setParamFromFlash(1, turn_p);
+            else if(param_mode == 3) setParamFromFlash(2, turn_p);
+            else if(param_mode == 4) setParamFromFlash(3, turn_p);
+            else if(param_mode == 5) setParamFromFlash(4, turn_p);
+            else turn_p.set(0.2, 0.2, 2.0);
 
             std::vector<Path> path_vec;
-
 
             if(run_mode == 0 ) {
                 return;
@@ -157,8 +145,8 @@ namespace umouse {
 
 
             // ゴール区画に微妙に入り切れないことを防ぐための処理
-            auto traj0 = StraightTrajectory::create(0.09f, 0.1f);
-            m.trajCommander.push(std::move(traj0));
+            //auto traj0 = StraightTrajectory::create(0.09f, 0.1f);
+            //m.trajCommander.push(std::move(traj0));
 
             pre_read_wall_coor.set(255, 255);
             pre_in_read_wall_area = false;

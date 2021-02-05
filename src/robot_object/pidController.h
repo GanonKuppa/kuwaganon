@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include "myUtil.h"
+#include <float.h>
 
 namespace umouse {
     class PidfController {
@@ -105,6 +106,11 @@ namespace umouse {
             e_i1 = 0.0f;
             e_d1 = 0.0f;
             u_k1 = 0.0f;
+        }
+
+        bool engaged(){
+            if (ABS(u_k0) < FLT_EPSILON) return false;
+            else return true;
         }
 
       protected:

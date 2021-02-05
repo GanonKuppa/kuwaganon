@@ -139,9 +139,8 @@ namespace umouse {
 
                 if(direct_duty_set_enable == false) {
                     if(!trajCommander.empty()) {
-                        auto traj = trajCommander.getTraj();
-                        bool wall_center = (runMode == ERunMode::SHORTEST_RUN);
-                        ctrlMixer.update(traj, posEsti, isRWallControllable(), isLWallControllable(), wall_center);
+                        auto traj = trajCommander.getTraj();                        
+                        ctrlMixer.update(traj, posEsti, isRWallControllable(), isLWallControllable(), watchedPillar());
                         auto duty = ctrlMixer.getDuty();
                         pt.setDuty(duty(0), duty(1));
                     } else {
@@ -275,7 +274,30 @@ namespace umouse {
                 else if (direction == direction_e::S) y_--;
             }
 
-            return maze.existRWall(x_, y_, direction);
+            if(!maze.watchedRWall(x_, y_, direction)) return true;
+            else return maze.existRWall(x_, y_, direction);
+        }
+
+        bool watchedPillar(){
+            // マウスと同じ角度の座標系における区画の入口からの距離
+            float fmod_x = fmodf(posEsti.getX(), 0.09f);
+            float fmod_y = fmodf(posEsti.getY(), 0.09f);
+            float dist = 0.0f;
+            if(getDirection() == direction_e::E) {
+                dist = fmod_x;
+            }
+            if(getDirection() == direction_e::N) {
+                dist = fmod_y;
+            }
+            if(getDirection() == direction_e::W) {
+                dist = 0.09f - fmod_x;
+            }
+            if(getDirection() == direction_e::S) {
+                dist = 0.09f - fmod_y;
+            }
+            
+            if(dist > 0.045f && dist < 0.06f) return true;
+            else return false;
         }
 
         bool isLWallControllable() {
@@ -304,8 +326,10 @@ namespace umouse {
                 else if (direction == direction_e::W) x_--;
                 else if (direction == direction_e::S) y_--;
             }
+            
 
-            return maze.existLWall(x_, y_, direction);
+            if(!maze.watchedLWall(x_, y_, direction)) return true;
+            else return maze.existLWall(x_, y_, direction);
         }
     
     ERunMode getMode(){

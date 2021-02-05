@@ -180,14 +180,33 @@ namespace umouse {
             else return false;
         }
 
+        bool watchedRWall(uint16_t x, uint16_t y, direction_e dir) {
+            Wall wall = readWall(x, y);
+            if(dir == direction_e::E) return wall.SF;
+            else if(dir == direction_e::N) return wall.EF;
+            else if(dir == direction_e::W) return wall.NF;
+            else if(dir == direction_e::S) return wall.WF;
+            else return false;
+        }
+
         bool existLWall(uint16_t x, uint16_t y, direction_e dir) {
             Wall wall = readWall(x, y);
             if(dir == direction_e::E) return wall.N && wall.NF;
             else if(dir == direction_e::N) return wall.W && wall.WF;
             else if(dir == direction_e::W) return wall.S && wall.SF;
-            else if(dir == direction_e::S) return wall.E && wall.SF;
+            else if(dir == direction_e::S) return wall.E && wall.EF;
             else return false;
         }
+
+        bool watchedLWall(uint16_t x, uint16_t y, direction_e dir) {
+            Wall wall = readWall(x, y);
+            if(dir == direction_e::E) return wall.NF;
+            else if(dir == direction_e::N) return wall.WF;
+            else if(dir == direction_e::W) return wall.SF;
+            else if(dir == direction_e::S) return wall.EF;
+            else return false;
+        }
+
 
         void updateStartSectionWall() {
             writeReached(0,0,true);
@@ -395,18 +414,17 @@ namespace umouse {
             else if(potential_min == potential_S) min_dir = direction_e::S;
 
 #ifdef MAZE_DEBUG
-            printfAsync("■■■ x:%d, y%d, dir:%d, mindir: %d p(x,y): %d|| Ep:%d, Np:%d, Wp:%d, Sp:%d\n",
-                        x, y, dir, min_dir,p_map[x][y], potential_E, potential_N, potential_W, potential_S);
-            printfAsync("(%d, %d)|",x, y);
+            printfAsync("・ %d|",p_map[x][y]);
             readWall(x,y).print();
-            printfAsync("(%d+1, %d)|",x, y);
+            printfAsync("→ %d|",p_map[x+1][y]);
             readWall(x + 1,y).print();
-            printfAsync("(%d-1, %d)|",x, y);
+            printfAsync("← %d|",p_map[x-1][y]);
             readWall(x -1,y).print();
-            printfAsync("(%d, %d+1)|",x, y);
+            printfAsync("↑ %d|",p_map[x][y+1]);
             readWall(x, y + 1).print();
-            printfAsync("(%d, %d-1)|",x, y);
+            printfAsync("↓ %d|",p_map[x][y-1]);
             readWall(x,y - 1).print();
+            printfAsync("p s%d g%d|",p_map[0][0], p_map[7][7]);
 #endif
             return min_dir;
         };
@@ -470,7 +488,10 @@ namespace umouse {
         direction_e getSearchDirection2(uint16_t x, uint16_t y, direction_e dir) {
             uint8_t min_dir = (uint8_t)getMinDirection(x, y, dir);
             uint8_t unknown_dir = (uint8_t)getUnknownDirection(x, y, dir);
-            
+#ifdef MAZE_DEBUG            
+            printfAsync("YY X=%d, Y=%d, dir=%d\n",x, y, dir);
+            printfAsync("YY MDir=%d, UDir=%d\n",min_dir, unknown_dir);
+#endif
             if(unknown_dir == 255) return (direction_e)min_dir;
             else if(unknown_dir != min_dir) return (direction_e)unknown_dir;
             else return (direction_e)min_dir;
@@ -486,7 +507,7 @@ namespace umouse {
                     p_map[i][j] = 0xffff;
                 }
             }
-            p_map[x][y] = 0; //目的地のテンシャルは0
+            p_map[x][y] = 0; //目的地のポテンシャルは0
 
             que.push(std::make_pair(x, y));
             while(que.empty() == false) {

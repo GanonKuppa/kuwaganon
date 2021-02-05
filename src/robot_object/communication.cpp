@@ -660,7 +660,7 @@ namespace umouse {
         set2ByteVal(buf, 144, m.ctrlMixer.ang_v_fric_FF, 10000);
 
         set2ByteVal(buf, 146, m.ctrlMixer.wall_pidf.getControlVal(), 100);
-        set2ByteVal(buf, 148, m.ctrlMixer.pos_pidf.getControlVal(), 100);
+        set2ByteVal(buf, 148, 0.0f, 100);
 
         set2ByteVal(buf, 150, (float)wo.getAng_v(), 10);
         set2ByteVal(buf, 152, (float)m.posEsti.getBeta(), 100);

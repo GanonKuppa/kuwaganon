@@ -18,8 +18,7 @@ namespace umouse {
     class ControlMixer {
       public:
         PidfController v_pidf;
-        PidfController ang_v_pidf;
-        PidfController pos_pidf;
+        PidfController ang_v_pidf;        
         AngPidfController ang_pidf;
         WallPidfController wall_pidf;
 
@@ -58,8 +57,7 @@ namespace umouse {
             ang_v_back_emf_FF = 0.0f;
             ang_a_acc_FF = 0.0f;
             ang_v_fric_FF = 0.0f;
-
-            pos_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
+            
             v_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
             ang_v_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
             ang_pidf.set(0.0f, 0.0f, 0.0f, 0.0f);
@@ -87,8 +85,7 @@ namespace umouse {
             ang_v_back_emf_FF = 0.0f;
             ang_a_acc_FF = 0.0f;
             ang_v_fric_FF = 0.0f;
-
-            pos_pidf.reset();
+            
             v_pidf.reset();
             ang_v_pidf.reset();
             ang_pidf.reset();
@@ -136,7 +133,7 @@ namespace umouse {
 
 
 
-        void update(BaseTrajectory& traj, PositionEstimator& esti, bool isRWall, bool isLWall, bool wallCenter) {
+        void update(BaseTrajectory& traj, PositionEstimator& esti, bool isRWall, bool isLWall, bool isPillar) {
             ParameterManager& pm = ParameterManager::getInstance();
             EMotionType motion_type = traj.motion_type;
             turn_type_e turn_type = traj.turn_type;
@@ -150,7 +147,7 @@ namespace umouse {
 
 
             if(motion_type == EMotionType::STRAIGHT_WALL_CENTER) {
-                wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall, wallCenter);
+                wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall, isPillar);
             } else {
                 wall_pidf.reset();
             }
@@ -159,10 +156,11 @@ namespace umouse {
                  motion_type == EMotionType::STRAIGHT_WALL_CENTER &&
                  pm.wall_PIDF_enable == true
               ) {
-                wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall, wallCenter);
-                target_rot_x += wall_pidf.getControlVal();
-                pos_pidf.reset();
-            } 
+                wall_pidf.update(WallSensor::getInstance(), isRWall, isLWall, isPillar);
+                // 壁制御量は曲率とみなし, 速度をかけることで角速度に変換
+                float v_now = constrainL(esti.getV(), 0.1f);
+                target_rot_v += v_now *  wall_pidf.getControlVal();
+            }
 
             // 直進時の衝突回避
             if(motion_type == EMotionType::STRAIGHT_WALL_CENTER || 
@@ -210,7 +208,12 @@ namespace umouse {
 
 
             ang_pidf.update(target_rot_x, esti.getAng());
-            target_rot_v += ang_pidf.getControlVal();            
+            float ang_pidf_controlval = ang_pidf.getControlVal();
+            if(wall_pidf.engaged()){
+                ang_pidf.reset();
+            } 
+
+            target_rot_v += ang_pidf_controlval;
 
 
             if( (motion_type != motion_type_pre &&
@@ -220,8 +223,7 @@ namespace umouse {
                 ang_v_pidf.reset();
                 ang_pidf.reset();
                 v_pidf.reset();
-                wall_pidf.reset();
-                pos_pidf.reset();
+                wall_pidf.reset();                
             }
 
             WheelOdometry& wodo = WheelOdometry::getInstance();
@@ -328,9 +330,6 @@ namespace umouse {
             } else if(motion_type == EMotionType::CURVE) {
                 ang_pidf.set(pm.rot_x_slalom_P, pm.rot_x_slalom_I, pm.rot_x_slalom_D, pm.rot_x_slalom_F);
             }
-
-            // 位置PIDFゲイン設定
-            pos_pidf.set(pm.pos_P, pm.pos_I, pm.pos_D, pm.pos_F);
             
             // 壁PIDFゲイン設定
             wall_pidf.set(pm.wall_P, pm.wall_I, pm.wall_D, pm.wall_F);
@@ -339,8 +338,7 @@ namespace umouse {
             // ------------------------------------------------------------------------- //
             // PIDFイネーブル設定
             v_pidf.setEnable(pm.trans_v_PIDF_enable);
-            ang_v_pidf.setEnable(pm.rot_v_PIDF_enable);
-            pos_pidf.setEnable(pm.pos_PIDF_enable);
+            ang_v_pidf.setEnable(pm.rot_v_PIDF_enable);            
             wall_pidf.setEnable(pm.wall_PIDF_enable);
             ang_pidf.setEnable(pm.rot_v_PIDF_enable); // 角度制御と角速度制御のイネーブルは兼用
 
@@ -356,22 +354,19 @@ namespace umouse {
             } else {
                 ang_v_pidf.setSaturationEnable(pm.rot_v_PIDF_saturation_enable);
             }
-
-            pos_pidf.setSaturationEnable(true);
+            
             ang_pidf.setSaturationEnable(true);
             wall_pidf.setSaturationEnable(true);
 
             // サチュレーション値設定
 
-
-            pos_pidf.setSaturation(pm.target_rot_x_saturation);
+            
             ang_pidf.setSaturation(360.0f);
-            wall_pidf.setSaturation(pm.target_rot_x_saturation);
+            wall_pidf.setSaturation(360.0f);
             
             // 積分サチュレーションイネーブル設定
             v_pidf.setIntegralSaturationEnable(true);
-            ang_v_pidf.setIntegralSaturationEnable(true);
-            pos_pidf.setIntegralSaturationEnable(true);
+            ang_v_pidf.setIntegralSaturationEnable(true);            
             wall_pidf.setIntegralSaturationEnable(true);
             ang_pidf.setIntegralSaturationEnable(true); // 角度制御と角速度制御のイネーブルは兼用
 
@@ -386,8 +381,7 @@ namespace umouse {
                 ang_v_pidf.setIntegralSaturation(pm.rot_v_PIDF_integral_saturation);
                 ang_pidf.setIntegralSaturation(pm.rot_x_PIDF_integral_saturation);
             }
-
-            pos_pidf.setIntegralSaturation(pm.pos_PIDF_integral_saturation);
+            
             wall_pidf.setIntegralSaturation(pm.wall_PIDF_integral_saturation);
         }
 

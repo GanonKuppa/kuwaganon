@@ -114,8 +114,8 @@ namespace umouse {
                         motion_type == EMotionType::DIAGONAL_CENTER
                    ) &&
                         dist < 0.0) {
-                    printfAsync("■over e=(%f, %f)", x_esti, y_esti);
-                    printfAsync(" t=(%f, %f)\n", x, y);
+                    //printfAsync("■over e=(%f, %f)", x_esti, y_esti);
+                    //printfAsync(" t=(%f, %f)\n", x, y);
 
                     x = trajQueue.front()->getEndX();
                     y = trajQueue.front()->getEndY();
@@ -129,8 +129,8 @@ namespace umouse {
                     y = trajQueue.front()->getEndY();
                     ang = trajQueue.front()->getEndAng();
                                         
-                    printfAsync("●end e=(%f, %f)", x_esti, y_esti);
-                    printfAsync(" t=(%f, %f)\n", x, y);
+                    //printfAsync("●end e=(%f, %f)", x_esti, y_esti);
+                    //printfAsync(" t=(%f, %f)\n", x, y);
 
                     trajQueue.pop_front();
 
@@ -143,7 +143,7 @@ namespace umouse {
                        ) &&                            
                             dist > 0.0001 
                       ) {                        
-                        printfAsync("★less (%f, %f) %f \n", x_esti, y_esti, dist);
+                        //printfAsync("★less (%f, %f) %f \n", x_esti, y_esti, dist);
                         residualCompensation(dist);
                     }
 
@@ -171,7 +171,7 @@ namespace umouse {
             } else if(motion_type == EMotionType::DIAGONAL_CENTER) {
                 traj = StraightTrajectory::createAsDiagonalCenter(ABS(dist), v_0, v_0, v_0, a_0, a_0);
             } else {
-                printfAsync("EEEEEE residual compensation Error!\n");
+                //printfAsync("EEEEEE residual compensation Error!\n");
                 return;
             }
 
