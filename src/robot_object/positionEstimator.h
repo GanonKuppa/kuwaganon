@@ -119,12 +119,7 @@ namespace umouse {
             v = v_ave + acc_y_int * DELTA_T;
 
             if(!(motion_type == EMotionType::CURVE ) ){
-                if(ABS(a_setp) < 3.9f){
-                    v_for_int = v_enc;
-                }
-                else {
-                    v_for_int += a_y * DELTA_T;
-                }
+                v_for_int = v_enc;
             }
             else{
                 v_for_int = v;
@@ -174,22 +169,36 @@ namespace umouse {
 
             // 壁中心判定
             if(motion_type == EMotionType::STRAIGHT_WALL_CENTER && 
-            ws.isOnWallCenter() && 
-            !ws.isAhead() && 
-            v > 0.1f && 
-            fabsf(ang_v) < 50.0f){
+               ws.isOnWallCenter() && 
+               !ws.isAhead() && 
+               v > 0.1f && 
+               fabsf(ang_v) < 50.0f
+            ){
                 on_wall_center_dist += v_enc * DELTA_T;
             }
             else{
                 on_wall_center_dist = 0.0f;
             }
 
+            // 壁切れ位置無補正でどれくらい走ったか判定
+            if( (motion_type == EMotionType::STRAIGHT_WALL_CENTER || 
+                 motion_type == EMotionType::STRAIGHT) &&
+                 v > 0.1f
+            ){
+                corner_l_cool_down_dist += v_enc * DELTA_T;
+                corner_r_cool_down_dist += v_enc * DELTA_T;
+            }
+            else{
+                corner_l_cool_down_dist = 0.0f;
+                corner_r_cool_down_dist = 0.0f;
+            }
+
             onWallCenterCorrection();
-            //cornerLCorrection(ws);
-            //cornerRCorrection(ws);
+            cornerLCorrection(ws);
+            cornerRCorrection(ws);
             //diagCornerRCorrection(ws);
             //diagCornerLCorrection(ws);
-            //nearWallCorrection(motion_type, ws);            
+            //nearWallCorrection(motion_type, ws);
             //contactWallCorrection(motion_type, ws);
         }
 
@@ -290,7 +299,7 @@ namespace umouse {
 
 
 
-        void aheadWallCorrection(WallSensor& ws, uint8_t x_next, uint8_t y_next) {
+        bool aheadWallCorrection(WallSensor& ws, uint8_t x_next, uint8_t y_next) {
             float ang_ = getAng();
             float x_ = getX();
             float y_ = getY();
@@ -301,8 +310,8 @@ namespace umouse {
                                 (ang_ >= 180.0f - ok_ang && ang_ < 180.0f + ok_ang) ||
                                 (ang_ >= 270.0f - ok_ang && ang_ < 270.0f + ok_ang);
 
-            if( !good_posture || !ws.isAhead() ) {
-                return;
+            if( !good_posture || !ws.isAhead() || wall_dist ) {
+                return false;
             }
 
             if(ang_ >= 315.0 || ang_ < 45.0) {
@@ -318,6 +327,8 @@ namespace umouse {
                 float nearest_wall_y = (y_next) * 0.09;
                 y = nearest_wall_y + wall_dist;
             }
+
+            return true;
         }
 
 
@@ -399,8 +410,8 @@ namespace umouse {
         const uint8_t ACC_Y_AVERAGE_NUM = 15;
 
         float contact_wall_cool_down_time;
-        float corner_r_cool_down_time;
-        float corner_l_cool_down_time;
+        float corner_r_cool_down_dist;
+        float corner_l_cool_down_dist;
         float diag_corner_r_cool_down_time;
         float diag_corner_l_cool_down_time;
 
@@ -461,41 +472,39 @@ namespace umouse {
 
         void cornerLCorrection(WallSensor& ws) {
             ParameterManager& pm = ParameterManager::getInstance();
-
-            if( corner_l_cool_down_time == 0.0f &&
-                    ws.isCornerL() == true &&
-                    fabs(ang_v) < 50.0 &&
+            float ok_ang = 3.0f;
+            if( corner_l_cool_down_dist > 0.07f &&
+                    ws.isCornerL()&&
+                    fabs(ang_v) < 50.0f &&
                     v > 0.1 &&
-                    fabs(calcWallCenterOffset()) < 0.005
+                    fabs(calcWallCenterOffset()) < 0.005f
               ) {
                 bool done = true;
-                if(ang >= 350.0 || ang < 10.0) {
+                if(ang >= 360.0 - ok_ang || ang < ok_ang) {
                     x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (float)pm.wall_corner_read_offset_l;
-                } else if(ang >= 80.0 && ang < 100.0) {
+                } else if(ang >= 90.0 - ok_ang && ang < 90.0 + ok_ang) {
                     y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (float)pm.wall_corner_read_offset_l;
-                } else if(ang >= 170.0 && ang < 190.0) {
+                } else if(ang >= 180.0 - ok_ang && ang < 180.0 + ok_ang) {
                     x = (uint8_t)(x / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_l;
-                } else if(ang >= 260.0 && ang < 280.0) {
+                } else if(ang >= 270.0 - ok_ang && ang < 270.0 + ok_ang) {
                     y = (uint8_t)(y / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_l;
                 } else {
                     done = false;
                 }
 
-                if(done == true) {
+                if(done) {
                     printfAsync("msg_flag:%f,%f,isCornerL\n", x, y);
                     SE_CORNER_L();
-                    corner_l_cool_down_time = 0.1;
+                    corner_l_cool_down_dist = 0.0f;
                 }
-
             }
-            corner_l_cool_down_time -= (float)DELTA_T;
-            if(corner_l_cool_down_time < 0.0f)corner_l_cool_down_time = 0.0f;
-
         }
 
         void cornerRCorrection(WallSensor& ws) {
             ParameterManager& pm = ParameterManager::getInstance();
-            if(corner_r_cool_down_time == 0.0f &&
+            float ok_ang = 3.0f;
+
+            if(corner_r_cool_down_dist > 0.07f &&
                     ws.isCornerR() == true &&
                     fabs(ang_v) < 50.0 &&
                     v > 0.1 &&
@@ -504,27 +513,25 @@ namespace umouse {
 
                 bool done = true;
 
-                if(ang >= 350.0 || ang < 10.0) {
+                if(ang >= 360.0f - ok_ang || ang < ok_ang) {
                     x = (uint8_t)(x / 0.09f) * 0.09f + 0.09f - (float)pm.wall_corner_read_offset_r;
-                } else if(ang >= 80.0 && ang < 100.0) {
+                } else if(ang >= 90.0f - ok_ang && ang < 90.0f + ok_ang) {
                     y = (uint8_t)(y / 0.09f) * 0.09f + 0.09f - (float)pm.wall_corner_read_offset_r;
-                } else if(ang >= 170.0 && ang < 190.0) {
+                } else if(ang >= 180.0 - ok_ang && ang < 180.0 + ok_ang) {
                     x = (uint8_t)(x / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_r;
-                } else if(ang >= 260.0 && ang < 280.0) {
+                } else if(ang >= 270.0 - ok_ang && ang < 270.0 + ok_ang) {
                     y = (uint8_t)(y / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_r;
                 } else {
                     done = false;
                 }
 
-                if(done == true) {
+                if(done) {
                     printfAsync("msg_flag:%f,%f,isCornerR\n", getX(), getY());
                     SE_CORNER_R();
-                    corner_r_cool_down_time = 0.1f;
+                    corner_r_cool_down_dist = 0.0f;
                 }
 
             }
-            corner_r_cool_down_time -= (float)DELTA_T;
-            if(corner_r_cool_down_time < 0.0f) corner_r_cool_down_time = 0.0f;
         }
 
         void contactWallCorrection(EMotionType motion_type, WallSensor& ws) {
@@ -560,32 +567,41 @@ namespace umouse {
 
 
         void nearWallCorrection(EMotionType motion_type, WallSensor& ws) {
-            ParameterManager& pm = ParameterManager::getInstance();
-            if(     v > 0.0f && v < 0.15f &&
-                    (motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
-                     motion_type == EMotionType::STRAIGHT) &&
-                     ws.ahead_l() + ws.ahead_r() > 950
-                    
-              ) {
-                SE_CONTACT_WALL();
-                printfAsync("<<<<<<near wall (x_e, y_e, ang_e)=(%f, %f, %f)\n", x, y, ang);
+            float ang_ = getAng();
+            float x_ = getX();
+            float y_ = getY();
+            uint8_t x_int = (uint8_t)(x_ / 0.09f);
+            uint8_t y_int = (uint8_t)(y_ / 0.09f);
+            float wall_dist = ws.calcAheadWallDist();
+            float ok_ang = 3.0f;
+            bool good_posture = (ang >= 360.0 - ok_ang || ang < ok_ang)  ||
+                                (ang_ >= 90.0f - ok_ang && ang_ < 90.0f + ok_ang) ||
+                                (ang_ >= 180.0f - ok_ang && ang_ < 180.0f + ok_ang) ||
+                                (ang_ >= 270.0f - ok_ang && ang_ < 270.0f + ok_ang);
 
-                if(ang >= 315.0 || ang < 45.0) {
-                    ang = 0.0;
-                    x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - 0.045;
-                } else if(ang >= 45.0 && ang < 135.0) {
-                    ang = 90.0;
-                    y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - 0.045;
-                } else if(ang >= 135.0 && ang < 225.0) {
-                    ang = 180.0f;
-                    x = (uint8_t)(x / 0.09) * 0.09 + 0.045 ;
-                } else if(ang >= 225.0 && ang < 315.0) {
-                    ang = 270.0;
-                    y = (uint8_t)(y / 0.09) * 0.09 + 0.045;
-                }
-                printfAsync(">>>>>near wall (x_e, y_e, ang_e)=(%f, %f, %f)\n", getX(), getY(), getAng());
+            if( !good_posture || 
+                !ws.isAhead() || 
+                 wall_dist > 0.06 ||
+                !(motion_type == EMotionType::STRAIGHT_WALL_CENTER ||
+                  motion_type == EMotionType::STRAIGHT)
+            ){
+                return;
             }
 
+            if(ang_ >= 315.0 || ang_ < 45.0) {
+                float nearest_wall_x = (x_int + 1) * 0.09;
+                x = nearest_wall_x - wall_dist;                
+            } else if(ang_ >= 45.0 && ang_ < 135.0) {
+                float nearest_wall_y = (y_int + 1) * 0.09;
+                y = nearest_wall_y - wall_dist;
+            } else if(ang_ >= 135.0 && ang_ < 225.0) {
+                float nearest_wall_x = (x_int) * 0.09;
+                x = nearest_wall_x + wall_dist;
+            } else if(ang_ >= 225.0 && ang_ < 315.0) {
+                float nearest_wall_y = (y_int) * 0.09;
+                y = nearest_wall_y + wall_dist;
+            }
+            SE_POSITION_CHANGE();
         }
 
 
@@ -641,10 +657,10 @@ namespace umouse {
         void diagCornerLCorrection(WallSensor& ws) {
             ParameterManager& pm = ParameterManager::getInstance();
             if(pm.diag_l_corner_read_offset < 0.0f) return;
-            if(diag_corner_l_cool_down_time == 0.0f &&
-                    ws.isCornerL() == true &&
-                    fabs(ang_v) < 50.0 &&
-                    v > 0.1 ) {
+            if(diag_corner_l_cool_down_time > 0.07f &&
+                    ws.isCornerL() &&
+                    fabs(ang_v) < 50.0f &&
+                    v > 0.1f ) {
 
                 bool done = true;
 

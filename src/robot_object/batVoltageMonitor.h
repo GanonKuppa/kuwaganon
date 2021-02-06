@@ -17,7 +17,7 @@ namespace umouse {
 
       private:
         const uint8_t BUFF_SIZE = 10;
-        const float alert_vol = 3.3;
+        const float alert_vol = 3.5;
         uint16_t count;
         std::deque<int16_t> buff;
 

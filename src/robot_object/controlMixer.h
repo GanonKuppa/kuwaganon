@@ -161,7 +161,7 @@ namespace umouse {
                 float v_now = constrainL(esti.getV(), 0.1f);
                 target_rot_v += v_now *  wall_pidf.getControlVal();
             }
-
+/*
             // 直進時の衝突回避
             if(motion_type == EMotionType::STRAIGHT_WALL_CENTER || 
                motion_type == EMotionType::STRAIGHT) {
@@ -173,15 +173,18 @@ namespace umouse {
                     target_rot_x += pm.wall_diagonal_avoid_add_ang;
                 }
             }
+*/
             // 斜め直進時の衝突回避
             if(motion_type == EMotionType::DIAGONAL_CENTER) {
-                if (WallSensor::getInstance().ahead_l() > pm.wall_diagonal_ahead_l_threshold) {
-                    target_rot_x -= pm.wall_diagonal_avoid_add_ang;
-                } else if (WallSensor::getInstance().ahead_r() > pm.wall_diagonal_ahead_r_threshold) {
-                    target_rot_x += pm.wall_diagonal_avoid_add_ang;
+                float v_now = constrainL(esti.getV(), 0.1f);
+                if (WallSensor::getInstance().ahead_l() < pm.wall_diagonal_ahead_l_threshold) {
+                    target_rot_v -= v_now * pm.wall_diagonal_avoid_add_ang;
+                } else if (WallSensor::getInstance().ahead_r() < pm.wall_diagonal_ahead_r_threshold) {
+                    target_rot_v += v_now * pm.wall_diagonal_avoid_add_ang;
                 }
             }
             // 斜めターン時の衝突回避
+/*            
             if(motion_type == EMotionType::CURVE &&
                     (( esti.getAng() > 30.0f  && esti.getAng() < 60.0f  ) ||
                      ( esti.getAng() > 120.0f && esti.getAng() < 150.0f ) ||
@@ -205,7 +208,7 @@ namespace umouse {
                     target_rot_x += pm.wall_diagonal_avoid_add_ang;
                 }
             }
-
+*/
 
             ang_pidf.update(target_rot_x, esti.getAng());
             float ang_pidf_controlval = ang_pidf.getControlVal();

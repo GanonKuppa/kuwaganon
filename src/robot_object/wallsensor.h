@@ -422,13 +422,15 @@ namespace umouse {
         }
 
         float dist_l() {
+            const float offset = - 0.0;
             float dist = linearInterpolation( left(), L_WALL_DIST_TABLE_IN, L_WALL_DIST_TABLE_OUT, L_WALL_DIST_TABLE_SIZE);
-            return dist;
+            return dist + offset;
         }
         
         float dist_r() {
+            const float offset = -0.001f;
             float dist = linearInterpolation( right(), R_WALL_DIST_TABLE_IN, R_WALL_DIST_TABLE_OUT, R_WALL_DIST_TABLE_SIZE);
-            return dist;            
+            return dist + offset;
         }
 
         float center_dist_l(float center_line = 0.045f) {

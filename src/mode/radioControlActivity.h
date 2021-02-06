@@ -11,6 +11,7 @@
 #include "ICM20602.h"
 #include "mouse.h"
 #include "wallsensor.h"
+#include "batVoltageMonitor.h"
 //#include "adis16470.h"
 //#include "activityFactory.h"
 
@@ -231,6 +232,16 @@ namespace umouse {
                 SEF();
                 waitmsec(100);
             }
+
+            if(gamepad.LB > 3000) {
+                WallSensor& ws = WallSensor::getInstance();
+                BatVoltageMonitor& vm = BatVoltageMonitor::getInstance();
+                while(1){
+                    waitmsec(1000);
+                    printfSync("%f, %f, %f\n",vm.bat_vol, ws.dist_l(), ws.dist_r());
+                }                
+            }
+
 
 
 
