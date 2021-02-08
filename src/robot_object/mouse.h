@@ -89,7 +89,7 @@ namespace umouse {
         Maze maze;
         ERunMode runMode;
         bool error_run_flag;
-        bool direct_duty_set_enable;
+        bool direct_duty_set_enable;        
 
         ControlMixer ctrlMixer;
         TrajectoryCommander trajCommander;
@@ -158,14 +158,14 @@ namespace umouse {
 
                 if( !trajCommander.empty() &&
                     (icm.isUpsideDown()      ||
-                     esti_target_diff > 0.045||
+                     esti_target_diff > 0.09f||
                     (ctrlMixer.isOutOfControl() && (ABS(pt.getDuty_R()) > 0.01f || ABS(pt.getDuty_L()) > 0.01f ))
                     )
                 ) {                    
-                    printOutOfControl();
-                    trajCommander.clear();
+                    printOutOfControl();                    
+                    //trajCommander.freeze();
+                    trajCommander.clear();                    
                     pt.setDuty(0.0f, 0.0f);
-
                     SEH();
                 }
             }
@@ -349,7 +349,7 @@ namespace umouse {
             runMode = ERunMode::STANBY;
             maze.readMazeDataFromFlash();
             running_sec = 0.0f;
-            ang_no_calib_sec = 0.0f;
+            ang_no_calib_sec = 0.0f;            
         }
 
         ~UMouse() {

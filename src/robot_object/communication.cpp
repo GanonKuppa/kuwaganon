@@ -56,7 +56,7 @@ namespace umouse {
     static const uint16_t PARAM_MNG_PART_NUM = 80;
     static const uint16_t CMD_SIZE  = 16;
     static const uint16_t part_num  = 5;
-    static const uint16_t PRINTF_BUFF_MAX_SIZE = 5000;
+    static const uint16_t PRINTF_BUFF_MAX_SIZE = 500;
 
     static std::queue<uint8_t> printfBuff;
     static uint8_t periodicMsg[PERIODIC_MSG_LEN];
@@ -93,7 +93,7 @@ namespace umouse {
         len = vsprintf(buffer, fmt, ap);
 
         for (int c = 0; c < len; c++) {
-            if(printfBuff.size() < PRINTF_BUFF_MAX_SIZE) printfBuff.push(buffer[c]);
+            if(printfBuff.size() < PRINTF_BUFF_MAX_SIZE - 1) printfBuff.push(buffer[c]);
         }
 
         va_end(ap);

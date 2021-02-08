@@ -23,29 +23,8 @@ namespace umouse {
 
         ELoopStatus loop() {
             UMouse& m = UMouse::getInstance();
-            WallSensor& ws = WallSensor::getInstance();
-            bool in_read_wall_area = m.inReadWallArea(0.035);
 
-            if(in_read_wall_area && pre_in_read_wall_area == false && pre_read_wall_coor != m.coor) {
-                pre_read_wall_coor = m.coor;
-                uint8_t x_next = m.coor.x;
-                uint8_t y_next = m.coor.y;
-                if (m.direction == direction_e::E) x_next++;
-                else if (m.direction == direction_e::N) y_next++;
-                else if (m.direction == direction_e::W) x_next--;
-                else if (m.direction == direction_e::S) y_next--;
-
-
-                if (m.maze.existAWall(x_next, y_next, m.direction) && m.trajCommander.isStraight()){
-                    printfAsync("pre:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
-                    //m.posEsti.aheadWallCorrection(ws, x_next, y_next);
-                    printfAsync("fol:%f, %f\n", m.posEsti.getX(), m.posEsti.getY());
-                    SE_I7();
-                }
-                
-            }
-            pre_in_read_wall_area = in_read_wall_area;
-
+            waitmsec(1);
 
             
             if(m.trajCommander.empty()== true) return ELoopStatus::FINISH;

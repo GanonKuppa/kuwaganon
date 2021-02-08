@@ -140,7 +140,7 @@ namespace umouse {
             if(v > 0.1) beta_dot =  -a_x / v - ang_v_rad;
             else beta_dot = 0.0;
 
-            if(fabs(ang_v) < 50.0 || !(motion_type == EMotionType::CURVE )) {
+            if(motion_type != EMotionType::CURVE) {
                 beta = 0.0;
             } else {
                 beta += beta_dot * DELTA_T;
@@ -481,13 +481,13 @@ namespace umouse {
               ) {
                 bool done = true;
                 if(ang >= 360.0 - ok_ang || ang < ok_ang) {
-                    x = (uint8_t)(x / 0.09) * 0.09 + 0.09 - (float)pm.wall_corner_read_offset_l;
+                    x = (uint8_t)((x-0.045) / 0.09) * 0.09 + 0.09 - (float)pm.wall_corner_read_offset_l;
                 } else if(ang >= 90.0 - ok_ang && ang < 90.0 + ok_ang) {
-                    y = (uint8_t)(y / 0.09) * 0.09 + 0.09 - (float)pm.wall_corner_read_offset_l;
+                    y = (uint8_t)((y-0.045) / 0.09) * 0.09 + 0.09 - (float)pm.wall_corner_read_offset_l;
                 } else if(ang >= 180.0 - ok_ang && ang < 180.0 + ok_ang) {
-                    x = (uint8_t)(x / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_l;
+                    x = (uint8_t)((x+0.045) / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_l;
                 } else if(ang >= 270.0 - ok_ang && ang < 270.0 + ok_ang) {
-                    y = (uint8_t)(y / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_l;
+                    y = (uint8_t)((y+0.045) / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_l;
                 } else {
                     done = false;
                 }
@@ -514,13 +514,13 @@ namespace umouse {
                 bool done = true;
 
                 if(ang >= 360.0f - ok_ang || ang < ok_ang) {
-                    x = (uint8_t)(x / 0.09f) * 0.09f + 0.09f - (float)pm.wall_corner_read_offset_r;
+                    x = (uint8_t)((x-0.045f) / 0.09f) * 0.09f + 0.09f - (float)pm.wall_corner_read_offset_r;
                 } else if(ang >= 90.0f - ok_ang && ang < 90.0f + ok_ang) {
-                    y = (uint8_t)(y / 0.09f) * 0.09f + 0.09f - (float)pm.wall_corner_read_offset_r;
+                    y = (uint8_t)((y-0.045f) / 0.09f) * 0.09f + 0.09f - (float)pm.wall_corner_read_offset_r;
                 } else if(ang >= 180.0 - ok_ang && ang < 180.0 + ok_ang) {
-                    x = (uint8_t)(x / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_r;
+                    x = (uint8_t)((x+0.045f) / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_r;
                 } else if(ang >= 270.0 - ok_ang && ang < 270.0 + ok_ang) {
-                    y = (uint8_t)(y / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_r;
+                    y = (uint8_t)((y+0.045f) / 0.09) * 0.09 + (float)pm.wall_corner_read_offset_r;
                 } else {
                     done = false;
                 }

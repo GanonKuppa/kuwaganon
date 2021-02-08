@@ -27,8 +27,8 @@ namespace umouse {
             e_l0 = - 10000 * ws.center_dist_l(0.09f - target_line);
 
 
-            bool is_right = ws.isRight() && isRWall;
-            bool is_left =  ws.isLeft() && isLWall;
+            bool is_right = ws.isRight_for_ctrl() && isRWall;
+            bool is_left =  ws.isLeft_for_ctrl() && isLWall;
 
             // 柱を見ている際は柱に近づき過ぎている場合のみ壁制御をかける
             if(isPillar){

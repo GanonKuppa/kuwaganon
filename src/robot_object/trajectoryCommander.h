@@ -39,6 +39,7 @@ namespace umouse {
             x_dd = 0.0f;
             y_dd = 0.0f;
             lock_guard = false;
+            freezed = false;
 
         }
 
@@ -86,7 +87,7 @@ namespace umouse {
         }
 
         void update(float x_esti, float y_esti, float ang_esti) {
-            if(lock_guard) return;
+            if(lock_guard || freezed) return;            
 
             if(trajQueue.empty() == false) {
 
@@ -213,6 +214,10 @@ namespace umouse {
             lock_guard = false;
         }
 
+        void freeze(){
+            freezed = true;
+        }
+
         bool empty() {
             lock_guard = true;
             bool is_empty = trajQueue.empty();
@@ -253,6 +258,7 @@ namespace umouse {
         uint16_t traj_hash;
         std::deque< std::unique_ptr<BaseTrajectory> > trajQueue;        
         bool lock_guard;
+        bool freezed;
 
     };
 

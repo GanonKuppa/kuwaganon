@@ -272,30 +272,13 @@ namespace umouse {
         bool isAheadCloseWall() {return 0;}
 
         bool isRight_for_ctrl() {
-            ParameterManager& pm = ParameterManager::getInstance();
-            int16_t d_RS = right_q.at(0) - right_q.at(2);
-            int16_t threshold = pm.wall_ctrl_threshold_right;
-            int16_t threshold_delta = pm.wall_ctrl_threshold_delta_right;
-            int16_t threshold_add_val = pm.wall_ctrl_add_val_right;
-
-            int16_t threshold_ctrl = threshold;
-            if (ABS(d_RS) > threshold_delta) threshold_ctrl += threshold_add_val;
-            if (right_q.at(0) > threshold_ctrl ) return true;
+            if(dist_r() < 0.06f) return true;
             else return false;
-
         }
+
         bool isLeft_for_ctrl() {
-            ParameterManager& pm = ParameterManager::getInstance();
-            int16_t d_LS = left_q.at(0) - left_q.at(2);
-            int16_t threshold = pm.wall_ctrl_threshold_left;
-            int16_t threshold_delta = pm.wall_ctrl_threshold_delta_left;
-            int16_t threshold_add_val = pm.wall_ctrl_add_val_left;
-
-            int16_t threshold_ctrl = threshold;
-            if (ABS(d_LS) > threshold_delta) threshold_ctrl += threshold_add_val;
-            if (left_q.at(0) > threshold_ctrl ) return true;
+            if(dist_l() < 0.06f) return true;
             else return false;
-
         }
 
         int16_t right() {return right_q.at(0);}
