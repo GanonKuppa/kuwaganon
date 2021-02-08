@@ -275,7 +275,7 @@ namespace umouse {
                 ParameterManager& pm = ParameterManager::getInstance();
                 rot_times *= SIGN(m.posEsti.calcWallCenterOffset());
                 auto traj0 = StraightTrajectory::createAsWallCenter(0.02f, v, v, 0.025f, a, a);
-                auto traj1 = StopTrajectory::create(0.4f);
+                auto traj1 = StopTrajectory::create(0.1f);
                 auto traj2 = SpinTurnTrajectory::create(rot_times * 45.0f, pm.spin_ang_v, pm.spin_ang_a);
                 auto traj3 = StraightTrajectory::createAsWallCenter(0.02f, 0.0f, v, v, a, a);
                 m.trajCommander.push(std::move(traj0));

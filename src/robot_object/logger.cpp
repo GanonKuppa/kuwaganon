@@ -22,8 +22,8 @@ void Logger::printHeadder(){
         "ang_v,"
         "acc_cor_x,"
         "acc_cor_y,"
-        "acc_x,"
-        "acc_y,"
+        "ws_l_raw,"
+        "ws_r_raw,"
         "x,"
         "y,"
         "beta,"
@@ -96,10 +96,11 @@ void Logger::print(){
     startCMT1();
 }
 
-void Logger::start(){
-    _data_num =0;
+void Logger::start(uint8_t skip_mod){
+    _data_num = 0;
     _logging = true;
     _start_time_ms = getElapsedMsec();
+    _skip_mod = skip_mod;
 }
 
 
@@ -109,6 +110,12 @@ void Logger::end(){
 }
 
 void Logger::update(){
+    static uint32_t count = 0;
+    count ++;
+    if( !(_skip_mod == 1 || _skip_mod == 0)){
+        if( (count % _skip_mod) != 0) return;
+    }
+
     if(_data_num >= _max_data_num){
         _logging = false;
         _data_num = _max_data_num;
@@ -123,7 +130,7 @@ void Logger::update(){
 
         PowerTransmission& pt = PowerTransmission::getInstance();
 
-        _log_data[_data_num][0] = getElapsedMsec() - _start_time_ms;
+        _log_data[_data_num][0] = (float)(getElapsedMsec() - _start_time_ms)/1000.0f;
         _log_data[_data_num][1] = wo.getV();
         _log_data[_data_num][2] = wo.getAveV();
         _log_data[_data_num][3] = m.posEsti.getV();
@@ -133,15 +140,15 @@ void Logger::update(){
         _log_data[_data_num][6] = m.posEsti.getAngV();
         _log_data[_data_num][7] = icm.acc_f_cor[0];
         _log_data[_data_num][8] = icm.acc_f_cor[1];
-        _log_data[_data_num][9] = icm.acc_f[0];
-        _log_data[_data_num][10] = icm.acc_f[1];
-        _log_data[_data_num][11] = m.posEsti.getX();
-        _log_data[_data_num][12] = m.posEsti.getY();
+        _log_data[_data_num][9] = (float)ws.left();
+        _log_data[_data_num][10] = (float)ws.right();
+        _log_data[_data_num][11] = m.posEsti.getX() / 0.09f;
+        _log_data[_data_num][12] = m.posEsti.getY() / 0.09f;
         _log_data[_data_num][13] = m.posEsti.getBeta();
 
         _log_data[_data_num][14] = m.trajCommander.v;
-        _log_data[_data_num][15] = m.trajCommander.x;
-        _log_data[_data_num][16] = m.trajCommander.y;
+        _log_data[_data_num][15] = m.trajCommander.x / 0.09f;
+        _log_data[_data_num][16] = m.trajCommander.y / 0.09f;
         _log_data[_data_num][17] = m.trajCommander.a;
         _log_data[_data_num][18] = m.trajCommander.ang_v;
         _log_data[_data_num][19] = m.ctrlMixer.target_rot_v;

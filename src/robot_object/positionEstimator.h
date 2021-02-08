@@ -10,6 +10,7 @@
 #include "wallSensor.h"
 #include "fcled.h"
 #include <deque>
+#include <float.h>
 
 namespace umouse {
 
@@ -36,6 +37,7 @@ namespace umouse {
 
             contact_wall_cool_down_time = 0.0f;            
             on_wall_center_dist = 0.0f;
+            after_curve_time = 0.0f;
         }
 
         PositionEstimator(float x_, float y_, float ang_) {
@@ -49,6 +51,7 @@ namespace umouse {
 
             contact_wall_cool_down_time = 0.0f;            
             on_wall_center_dist = 0.0f;
+            after_curve_time = 0.0f;
         }
 
         void reset(float x_, float y_, float ang_) {
@@ -72,6 +75,7 @@ namespace umouse {
             y_d_2 = 0.0;
             
             on_wall_center_dist = 0.0f;
+            after_curve_time = 0.0f;
         }
 
 
@@ -117,7 +121,7 @@ namespace umouse {
             }
             
             v = v_ave + acc_y_int * DELTA_T;
-
+            
             if(!(motion_type == EMotionType::CURVE ) ){
                 v_for_int = v_enc;
             }
@@ -137,10 +141,14 @@ namespace umouse {
             y += calcEulerDelta(y_d);
                 
             // スリップ角算出
+            after_curve_time -= DELTA_T;   
+            if(after_curve_time < 0.0f) after_curve_time = 0.0f;
+            if(motion_type == EMotionType::CURVE) after_curve_time = afrer_curve_beta_dot_time;
+
             if(v > 0.1) beta_dot =  -a_x / v - ang_v_rad;
             else beta_dot = 0.0;
 
-            if(motion_type != EMotionType::CURVE) {
+            if(motion_type != EMotionType::CURVE && (after_curve_time < FLT_EPSILON) ) {
                 beta = 0.0;
             } else {
                 beta += beta_dot * DELTA_T;
@@ -414,6 +422,8 @@ namespace umouse {
         float corner_l_cool_down_dist;
         float diag_corner_r_cool_down_time;
         float diag_corner_l_cool_down_time;
+        const float afrer_curve_beta_dot_time = 0.050f;
+        float after_curve_time;
 
         const float DELTA_T = 0.001;
         const float SQRT_2 = 1.4142356f;

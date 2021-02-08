@@ -13,6 +13,7 @@
 #include "adis16470.h"
 #include <vector>
 #include "wallsensor.h"
+#include "logger.h"
 
 namespace umouse {
 
@@ -45,6 +46,7 @@ namespace umouse {
                 run_mode = intent->uint8_t_param["SUB_MODE"];
                 delete intent;
                 if(run_mode == 0) return;
+
             }
 
             {
@@ -130,8 +132,15 @@ namespace umouse {
             pre_read_wall_coor.set(255, 255);
             pre_in_read_wall_area = false;
 
+            Logger& logger = umouse::Logger::getInstance();
+            logger.start(4);
+
+
         }
-        void onFinish() { }
+        void onFinish() {
+            Logger& logger = umouse::Logger::getInstance();
+            logger.end();
+        }
 
       private:
         void setParamFromFlash(uint8_t num, TurnParameter& turn_p) {

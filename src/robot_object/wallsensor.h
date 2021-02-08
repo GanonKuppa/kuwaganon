@@ -434,7 +434,7 @@ namespace umouse {
         bool enable;        
         float contact_wall_time;
         float ahead_on_time;
-        const float DELTA_T = 0.0005;
+        const float DELTA_T = 0.001f;
 
 
 
